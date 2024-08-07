@@ -1,0 +1,118 @@
+
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
+
+
+  .header-section-login {
+    max-height: 100px;
+    background-color: #66D1FF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;  
+  }
+
+  .header-logo{
+    width:'10px';
+    height: '10px';
+  }
+
+
+  .header-section-login h2 {
+    margin: 0;
+    color: #064282;
+    font-family: "Roboto Serif", serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    font-variation-settings:
+      "wdth" 200,
+      "GRAD" 0;
+    z-index: 1;
+  }
+  
+  .header-section-login .subtitle {
+    /* margin-top: 0.5rem; */
+    color: black;
+    /* font-stretch: ultra-expanded; */
+    font-family: "Roboto Serif", serif;
+    font-weight: 300;
+    /* text-align: center; */
+    font-size: 1rem;
+    /* padding: 0 2rem; */
+    z-index: 1;
+    
+  }
+
+  .form-inputs{
+    box-shadow: rgba(50, 50, 93, 0.15) 0px 10px 10px 0px, rgba(0, 0, 0, 0.1) 0px 0px 10px 0px; background-color:#ffffff;
+  }
+
+  .scrollable-section {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  
+  /* .image-section {
+    margin-top: 3%;
+    padding-bottom: 3%;
+  } */
+
+   
+  .logo1 {
+    /* margin-top: 10%; */
+    height: 350px;
+    width: 350px;
+  }
+
+  .input-section {
+    width: 80%;
+    padding: 1rem 0;
+  }
+  
+  .input-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .input-section ion-input {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .button-section {
+    width: 80%;
+    padding-top: 1rem;
+  }
+  
+  .button-section ion-button {
+    font-size: 1rem;
+    color: black;
+  }
+
+  @media (max-width: 600px) {
+    .header-section-login h2 {
+      font-size: 1.5rem;
+    }
+  
+    .header-section-login .subtitle {
+      font-size: 0.9rem;
+      padding: 0 1rem;
+    }
+  
+    .logo {
+      height: 15%;
+      width: 15%;
+    }
+  }
+  
+
+
+   

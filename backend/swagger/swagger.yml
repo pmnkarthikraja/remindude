@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: Users API
+  version: 1.0.0
+  description: API to retrieve list of users
+paths:
+  /:
+    get:
+      summary: Retrieve list of users
+      responses:
+        '200':
+          description: List of Registered Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /signup/email:
+    post:
+      summary: Sign up with email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserWithEmail'
+      responses:
+        '201':
+          description: User signed up successfully
+        '400':
+          description: Bad request - Invalid input data
+        '409':
+          description: User Already Registered!
+        '500':
+          description: Internal Server Error
+  /signup/google:
+    post:
+      summary: Sign up with google
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserWithGoogle'
+      responses:
+        '200':
+          description: Successfully access token verified with user
+        '400':
+          description: Bad request - Invalid Input Data
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: The unique identifier for a user
+        userName:
+          type: string
+          description: The username of the user
+        email:
+          type: string
+          description: The email address of the user
+        password:
+          type: string
+          description: The password of the user
+        googleId:
+          type: string
+          description: Google Id of the user, Incase of signup with google
+    UserWithEmail:
+      type: object
+      properties:
+        userName:
+          type: string
+          description: The username of the user
+        email:
+          type: string
+          description: The email address of the user
+        password:
+          type: string
+          description: The password of the user
+    UserWithGoogle:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: Valid Access Token From Google

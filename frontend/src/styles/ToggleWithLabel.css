@@ -1,0 +1,16 @@
+.toggle-container {
+    display: flex;
+    flex-direction: row;
+    margin-left: -18px;
+}
+
+.toggle-container .selected {
+    background-color: #089c82; 
+    color: #089c82;
+    font-weight: 500;
+}
+
+.tick-mark {
+    margin-left: 10px;
+    color: black;
+}

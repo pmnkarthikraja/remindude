@@ -1,0 +1,19 @@
+.calendar-header {
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .calendar-day {
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .note-day {
+    background-color: #e0f7fa;
+  }
+  
+  .note-tiny {
+    font-size: 12px;
+    color: green;
+  }
+  

@@ -1,0 +1,64 @@
+@startuml task-flow
+
+actor User
+participant "System" as System
+participant "TaskController" as TaskController
+participant "TaskService" as TaskService
+participant "TaskRepo" as TaskRepo
+database "TaskDB" as TaskDB
+participant "EmailScheduler" as EmailScheduler
+
+User -> System: POST /create-task
+System -> TaskController: createTask()
+TaskController -> TaskService: CreateTask(task)
+TaskService -> TaskRepo: CreateTask(task)
+TaskRepo -> TaskDB: insertTask(task)
+TaskDB --> TaskRepo: Success/Failure
+TaskRepo --> TaskService: TaskModel
+TaskService -> EmailScheduler: cancelScheduledNotifications(task.id)
+alt Email Notification Enabled
+    TaskService -> EmailScheduler: scheduleNotifications(task)
+end
+TaskService --> TaskController: TaskModel, SuccessMsg
+TaskController --> System: Response
+System --> User: Response
+
+User -> System: PUT /update-task
+System -> TaskController: updateTask()
+TaskController -> TaskService: UpdateTask(task)
+TaskService -> TaskRepo: UpdateTask(task)
+TaskRepo -> TaskDB: updateTask(task)
+TaskDB --> TaskRepo: Success/Failure
+TaskRepo --> TaskService: TaskModel
+TaskService -> EmailScheduler: cancelScheduledNotifications(task.id)
+alt Email Notification Enabled
+    TaskService -> EmailScheduler: scheduleNotifications(task)
+end
+TaskService --> TaskController: TaskModel, SuccessMsg
+TaskController --> System: Response
+System --> User: Response
+
+User -> System: DELETE /delete-task/:email/:id
+System -> TaskController: deleteTask(email, id)
+TaskController -> TaskService: DeleteTask(email, id)
+TaskService -> TaskRepo: DeleteTask(email, id)
+TaskRepo -> TaskDB: deleteTask(email, id)
+TaskDB --> TaskRepo: Success/Failure
+TaskRepo --> TaskService: Success/Failure
+TaskService -> EmailScheduler: cancelScheduledNotifications(id)
+TaskService --> TaskController: Success/Failure
+TaskController --> System: Response
+System --> User: Response
+
+User -> System: GET /tasks/:email
+System -> TaskController: getAllTasks(email)
+TaskController -> TaskService: GetAllTasks(email)
+TaskService -> TaskRepo: GetAllTasks(email)
+TaskRepo -> TaskDB: getTasks(email)
+TaskDB --> TaskRepo: TasksList
+TaskRepo --> TaskService: TasksList
+TaskService --> TaskController: TasksList, Msg
+TaskController --> System: Response
+System --> User: Response
+
+@enduml

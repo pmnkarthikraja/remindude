@@ -1,0 +1,120 @@
+@startuml api-map
+
+actor User
+participant "System" as System
+participant "UserController" as UserController
+participant "UserService" as UserService
+database "UserDB" as UserDB
+participant "TaskController" as TaskController
+participant "TaskService" as TaskService
+database "TaskDB" as TaskDB
+
+User -> System: POST /signup-email
+System -> UserController: signUpEmail()
+UserController -> UserService: createUser(data)
+UserService -> UserDB: insertUser(data)
+UserDB --> UserService: Success/Failure
+UserService --> UserController: Success/Failure
+UserController --> System: Response
+System --> User: Response
+
+User -> System: POST /signup-google
+System -> UserController: signUpGoogle()
+UserController -> UserService: createGoogleUser(data)
+UserService -> UserDB: insertGoogleUser(data)
+UserDB --> UserService: Success/Failure
+UserService --> UserController: Success/Failure
+UserController --> System: Response
+System --> User: Response
+
+User -> System: POST /signin-email
+System -> UserController: signInEmail()
+UserController -> UserService: authenticateEmailUser(data)
+UserService -> UserDB: getUserByEmail(data)
+UserDB --> UserService: UserDetails
+UserService --> UserController: Success/Failure
+UserController --> System: Response
+System --> User: Response
+
+User -> System: POST /signin-google
+System -> UserController: signInGoogle()
+UserController -> UserService: authenticateGoogleUser(data)
+UserService -> UserDB: getGoogleUser(data)
+UserDB --> UserService: UserDetails
+UserService --> UserController: Success/Failure
+UserController --> System: Response
+System --> User: Response
+
+User -> System: POST /auth-user
+System -> UserController: authUser()
+UserController -> UserService: validateUserToken(token)
+UserService -> UserDB: getUserByToken(token)
+UserDB --> UserService: UserDetails
+UserService --> UserController: Valid/Invalid
+UserController --> System: Response
+System --> User: Response
+
+User -> System: POST /send-otp
+System -> UserController: sendOTP()
+UserController -> UserService: generateOTP(data)
+UserService -> UserDB: saveOTP(data)
+UserDB --> UserService: Success/Failure
+UserService --> UserController: OTPResponse
+UserController --> System: Response
+System --> User: Response
+
+User -> System: PUT /update-user
+System -> UserController: updateUser()
+UserController -> UserService: updateUserProfile(data)
+UserService -> UserDB: updateUser(data)
+UserDB --> UserService: Success/Failure
+UserService --> UserController: Success/Failure
+UserController --> System: Response
+System --> User: Response
+
+User -> System: PUT /reset-password
+System -> UserController: resetPassword()
+UserController -> UserService: resetUserPassword(data)
+UserService -> UserDB: updatePassword(data)
+UserDB --> UserService: Success/Failure
+UserService --> UserController: Success/Failure
+UserController --> System: Response
+System --> User: Response
+
+User -> System: POST /create-task
+System -> TaskController: createTask()
+TaskController -> TaskService: createNewTask(data)
+TaskService -> TaskDB: insertTask(data)
+TaskDB --> TaskService: Success/Failure
+TaskService --> TaskController: Success/Failure
+TaskController --> System: Response
+System --> User: Response
+
+User -> System: PUT /update-task
+System -> TaskController: updateTask()
+TaskController -> TaskService: modifyTask(data)
+TaskService -> TaskDB: updateTask(data)
+TaskDB --> TaskService: Success/Failure
+TaskService --> TaskController: Success/Failure
+TaskController --> System: Response
+System --> User: Response
+
+User -> System: GET /tasks/:email
+System -> TaskController: getAllTasks(email)
+TaskController -> TaskService: fetchTasks(email)
+TaskService -> TaskDB: getTasks(email)
+TaskDB --> TaskService: TasksList
+TaskService --> TaskController: TasksList
+TaskController --> System: Response
+System --> User: Response
+
+User -> System: DELETE /delete-task/:email/:id
+System -> TaskController: deleteTask(email, id)
+TaskController -> TaskService: removeTask(email, id)
+TaskService -> TaskDB: deleteTask(email, id)
+TaskDB --> TaskService: Success/Failure
+TaskService --> TaskController: Success/Failure
+TaskController --> System: Response
+System --> User: Response
+
+@enduml

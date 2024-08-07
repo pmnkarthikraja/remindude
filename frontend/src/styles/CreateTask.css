@@ -1,0 +1,55 @@
+ion-modal#responsive-modal-windows {
+  --width: 380px;
+  --min-width: 250px;
+  --height: 80vh;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+}
+
+.select {
+  --background: 'red'
+}
+
+.date-time {
+  background-color: #ffffff;
+  justify-content: center;
+  padding-right: 30px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.loading {
+  z-index: 10;
+}
+
+.fab-button {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  margin-right: 30px;
+}
+
+.fab-button .fab-label {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.2s, opacity 0.2s, transform 0.2s;
+  transform: translateX(10px);
+  background-color: #089C82;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-right: 10px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.fab-button:hover .fab-label {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+.add-fab {
+  --background: #089C82;
+  --color: #ffffff; 
+}

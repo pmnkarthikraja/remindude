@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@575&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Teko:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Noto+Color+Emoji&family=Teko:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aclonica&family=Arizonia&family=Dancing+Script:wght@400..700&family=Noto+Color+Emoji&family=Teko:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aclonica&family=Arizonia&family=Dancing+Script:wght@400..700&family=Noto+Color+Emoji&family=Teko:wght@300..700&family=Trade+Winds&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Roboto+Serif:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
+
+
+.title{
+  color: #064282;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 200,
+    "GRAD" 0;
+  }
+
+
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .header-content ion-avatar {
+    margin-right: 10px;
+  }
+  
+  .header-content h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: white;
+  }
+  
+  .header-content p {
+    margin: 0;
+    color: white;
+  }
+  
+  .task-list {
+    margin-top: 10px;
+    width:'500px'
+  }
+  
+  .task-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+  }
+  
+  .task-info h3 {
+    margin: 0;
+    font-size: 1.2em;
+  }
+  
+  .task-info p {
+    margin: 0;
+    color: #ffffff;
+  }
+  
+  .task-progress {
+    margin-left: 0px;
+    font-size: 1.1em;
+  }
+
+ 
+  .mobile-header{
+    --background:none;
+    background-color: white;
+    /* background: url('/assets/header-background-3.png') */
+  }
+
+  ion-segment {
+    --background: #f4f4f4;
+    --indicator-color: #16181a;
+  }
+
+  ion-segment-button {
+    --background: #f4f4f4;
+    --color-checked: #87ceeb;
+  }
+  
+  ion-segment-button ion-label {
+    color: #87ceeb;
+  }
+  
+  ion-fab-button {
+    --background: #1877f2;
+    --color: white;
+  }
+
+  ion-button{
+    text-transform: capitalize;
+}
+  
+  .sidebar {
+    background-color: #1c0941;
+  }
+
+  .sidebar ion-item {
+    --background: #1c0941; 
+    --color: white; 
+    padding-bottom:12px;
+
+  }
+
+  .filter-menu ion-item{
+    --background: #1c0941;
+    --color:white 
+  }
+
+  .filter-content {
+    --background:#1e0c42;
+    background-color: #1a0a38;
+  }
+
+  .sidebar-content {
+    --background:#1e0c42;
+    background-color: #1a0a38;
+  }
+
+  .sidebar-clicked-item ion-item{
+    --background: #4b289676; 
+    --color: white; 
+  }
+
+  .page-container {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .sidebar {
+    flex: 0 0 auto; 
+    width: 200px; 
+  }
+  
+  .main-content {
+    flex: 1; 
+  }
+  
+  .header {
+    background-color: #ffffff; 
+  }
+
+  .App {
+    text-align: center;
+  }
+  
+  .App-header {
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: black;
+  }

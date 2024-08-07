@@ -1,0 +1,57 @@
+.swiper-container{
+  height: 100%;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    background-color: #E1FBFF;
+    color: white;
+  }
+  
+  h2 {
+    margin-top: 3rem;
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    margin: 1rem 2rem;
+    font-size: 1rem;
+  }
+  
+  .illustration {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height:100%;
+    max-width:650px;
+    max-height: 700px;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0 1rem 2rem;
+  }
+  
+  .buttons IonButton {
+    margin: 0 1rem;
+    background-color: yellow;
+  }
+
+  .skip-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+  }
+
+
+  
+

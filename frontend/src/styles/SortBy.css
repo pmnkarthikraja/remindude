@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+
+.sortby-button{
+    text-transform: none;
+font-family: "Noto Sans", sans-serif;
+font-size: inherit;
+letter-spacing: inherit;
+font-style: inherit;
+font-weight: inherit;
+text-transform: inherit;
+text-align: inherit;
+color: inherit;
+}
+
+ion-button{
+    text-transform: capitalize;
+}
+
+ion-menu-toggle{
+    border: none;
+}

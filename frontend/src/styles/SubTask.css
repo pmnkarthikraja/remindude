@@ -1,0 +1,19 @@
+.swipe-left-img-animate{
+    width: 18px;
+    height: auto;
+    animation: infinite-swipe 1s backwards infinite
+}
+
+.title-left-img{
+    width: 18px;
+    height: auto;
+}
+
+@keyframes infinite-swipe {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-30px);
+    }
+  }
