@@ -26,8 +26,8 @@ class TaskService implements TaskServiceImplementation {
         const gotTask = await taskRepo.CreateTask(task)
 
         //send email once the user successfully created the task - testing the status change by email
-        const inProgressLink = `http://localhost:4000/api/update-task/${task.email}/${task.id}/InProgress`;
-        const doneLink = `http://localhost:4000/api/update-task/${task.email}/${task.id}/Done`;
+        const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
+        const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
 
         const emailContent = `
         <!DOCTYPE html>
