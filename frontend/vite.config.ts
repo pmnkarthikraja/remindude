@@ -6,8 +6,13 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [
     react(),
-    legacy()
+    legacy({
+      targets: ['defaults', 'not IE 11'] // Adjust this based on your browser support requirements
+    })
   ],
+  build: {
+    outDir: 'dist', // Ensure the output directory is set to 'dist'
+  },
   test: {
     globals: true,
     environment: 'jsdom',
