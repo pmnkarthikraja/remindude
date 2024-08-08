@@ -1,5 +1,5 @@
 import { UserModel } from "../models/UserModel";
-import UserService from "../services/UserService";
+import UserService from "../services/userService";
 import {Request,Response,NextFunction} from 'express'
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound } from "../utils/handleErrors";
 import { GoogleUser } from "../view/googleUser";
