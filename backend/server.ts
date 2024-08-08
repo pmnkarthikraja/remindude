@@ -3,9 +3,9 @@ import cors from 'cors';
 import express from 'express';
 require('dotenv').config();
 import bodyParser from 'body-parser';
-import YAML from 'yamljs';
-import swaggerUi from 'swagger-ui-express';
-const swaggerDocument = YAML.load('./swagger/swagger.yml')
+// import YAML from 'yamljs';
+// import swaggerUi from 'swagger-ui-express';
+// const swaggerDocument = YAML.load('./swagger/swagger.yml')
 
 import taskRoutes from './routes/taskRoutes';
 import userRoutes from './routes/userRoutes';
@@ -21,7 +21,7 @@ app.use(cookieParser())
 app.use(express.json())
 app.use('/', userRoutes);
 app.use('/',taskRoutes)
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 
 let serverStarted=false
