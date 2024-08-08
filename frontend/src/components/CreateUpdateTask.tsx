@@ -1,4 +1,5 @@
 import {
+    DatetimeChangeEventDetail,
     IonFab, IonFabButton,
     IonIcon,
     IonLoading,
@@ -9,8 +10,8 @@ import React, { Fragment, FunctionComponent, useCallback, useMemo, useRef, useSt
 import { useForm } from 'react-hook-form';
 import * as uuid from 'uuid';
 import { useCreateTaskMutation, useUpdateTaskMutation } from "../hooks/taskHooks";
-import { Platform, useGetPlatform } from "../utils/useGetPlatform";
 import '../styles/CreateTask.css';
+import { Platform, useGetPlatform } from "../utils/useGetPlatform";
 import FormModal from "./FormModal";
 import { getNotificationSchedule } from "./calculateRemindTime";
 import { EventData, TaskRequestData } from "./task";
@@ -142,11 +143,28 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
         reset();
     }, [UpdateTaskMutation, reset]);
 
-    const onSkipDays = useCallback((days: number) => {
+    const onSkipDays =(days: number) => {
         const today = new Date();
         today.setDate(today.getDate() + days);
         setValue('datetime', today.toJSON());
-    }, [setValue]);
+    };
+
+    const handleDateChange = (e: CustomEvent<DatetimeChangeEventDetail>) => {
+        const newDate = new Date(e.detail.value as string);
+        if (newDate >= new Date()) { // check if new date is within min and max dates
+            const utcDate = new Date(
+                newDate.getUTCFullYear(),
+                newDate.getUTCMonth(),
+                newDate.getUTCDate(),
+            );
+            const formatedDate = new Date();
+                formatedDate.setDate(utcDate.getDate())
+                formatedDate.setMonth(utcDate.getMonth())
+                formatedDate.setFullYear(utcDate.getFullYear())
+            
+            setValue('datetime',formatedDate.toJSON());
+        }
+    };
 
     const updateTaskTime = useCallback((newTaskTime: Date) => {
         setTaskTime(newTaskTime);
@@ -192,6 +210,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                                 fieldErrors={errors}
                                 clearErrors={clearErrors}
                                 control={control}
+                                handleDateChange={handleDateChange}
                             />
                         </Fragment>
                     )}
@@ -218,6 +237,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                         fieldErrors={errors}
                         clearErrors={clearErrors}
                         control={control}
+                        handleDateChange={handleDateChange}
                     />
                 </Fragment>
             )}

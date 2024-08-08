@@ -74,7 +74,7 @@ interface AxiosErrorType {
           return res.data 
         },
         onError:(e:AxiosError<AxiosErrorType>)=>e,
-        refetchInterval,
+        refetchInterval:false,
       })
   }
  

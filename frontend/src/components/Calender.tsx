@@ -92,8 +92,8 @@ const Calender1: FunctionComponent<Calender1Props> = ({
     return (<>
       <IonGrid>
         <IonRow>
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <IonCol key={day} className="calendar-header">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day,index) => (
+            <IonCol key={index} className="calendar-header">
               {day}
             </IonCol>
           ))}
@@ -165,7 +165,6 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                       </div>
                     }
                     <div style={{ maxHeight: '280px', overflow: 'auto', padding: '12px' }}>
-                      {/* <IonList > */}
                       <IonAccordionGroup >
                         {!!tasksWithDates[selectedDate.split('T')[0]] && tasksWithDates[selectedDate.split('T')[0]].map((task, idx) => { //loop start
                           const taskDateTime = task.split('|')[1]
@@ -182,9 +181,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                                   <div className="ion-no-padding" slot="content">
                                     <ol>
                                       <strong style={{ color: 'red', fontSize: '13px', textAlign: 'center' }}>-- Checklists --</strong>
-                                      {task.split('|')[2].split(',').map((r) => <>
-                                        <li>{r}</li>
-                                      </>)}
+                                      {task.split('|')[2].split(',').map((r,listIndex) => <li key={listIndex}>{r}</li>)}
                                     </ol>
                                   </div>
                                 </IonAccordion>
@@ -198,9 +195,8 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                                   <div className="ion-no-padding" slot="content">
                                     <ol>
                                       <strong style={{ color: 'green', fontSize: '13px', textAlign: 'center' }}>-- Checklists --</strong>
-                                      {task.split('|')[2].split(',').map((r) => <>
-                                        <li>{r}</li>
-                                      </>)}
+                                      {task.split('|')[2].split(',').map((r,listIndex) =>
+                                        <li key={listIndex}>{r}</li>)}
                                     </ol>
                                   </div>
                                 </IonAccordion>
@@ -212,7 +208,6 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                         {tasksWithDates[selectedDate.split('T')[0]] == undefined && <>No Meetings</>}
 
                       </IonAccordionGroup>
-                      {/* </IonList> */}
                     </div>
 
                   </IonCardContent>

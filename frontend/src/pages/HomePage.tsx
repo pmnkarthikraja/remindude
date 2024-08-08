@@ -1,6 +1,6 @@
-import { IonAvatar, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonLoading, IonMenu, IonMenuButton, IonMenuToggle, IonPage, IonRow, IonToolbar } from "@ionic/react"
+import { IonAvatar, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonLoading, IonMenu, IonMenuButton, IonMenuToggle, IonPage, IonRow, IonToolbar, RefresherEventDetail } from "@ionic/react"
 import { arrowForward, close, filterOutline } from "ionicons/icons"
-import React, { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { Fragment, FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import InteractiveAnalogClock from "../components/AnalogClock"
 import Calender1 from "../components/Calender"
 import CreateEditTaskFabButton from "../components/CreateUpdateTask"
@@ -18,20 +18,16 @@ import { chooseAvatar } from "../utils/util"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
 
-
-
 export interface HomePageProps {
   user: User
   signOut: () => void,
 }
-
 
 export const getRemainingTime = (dateTime: string): number => {
   const now = new Date().getTime();
   const targetTime = new Date(dateTime).getTime();
   return targetTime - now;
 };
-
 
 const HomePage: FunctionComponent<HomePageProps> = ({
   user,
@@ -64,14 +60,21 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [hideSidebar, setHidesibebar] = useState<boolean>(false);
-  const {data:taskData, isLoading:isGetTasksLoading}=useGetTasks(user.email,2000)
+  const { data: taskData, isLoading: isGetTasksLoading, refetch } = useGetTasks(user.email, 2000)
 
-  const handleFiltersChange = (newFilters: { [key: string]: string[] }) =>{
+  const handleFiltersChange = (newFilters: { [key: string]: string[] }) => {
     setFilters(newFilters);
   }
 
+  function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
+    setTimeout(() => {
+      refetch() //refetching task data
+      event.detail.complete();
+    }, 1500);
+  }
+
   const tasks = taskData?.tasks || []
-  
+
   useEffect(() => {
     const filteredTasks = filterTasks(tasks, pageNav, startDate, endDate);
     setFilteredTasks(filteredTasks);
@@ -237,7 +240,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   }, []);
 
   const userAvatar = chooseAvatar(user);
-  return <>
+  return <Fragment>
     <IonMenu contentId="main-content" disabled={hideSidebar} onIonDidClose={() => setHidesibebar(e => !e)}>
       <IonContent scrollX={false} className="sidebar-content">
         <Sidebar buildPageNav={buildPageNav} pageNav={pageNav} signOut={signOut} user={user} />
@@ -278,7 +281,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
               />
             )}
 
-            {!pageNav.isSetting && <>
+            {!pageNav.isSetting && <Fragment>
               <IonCol >
                 <IonGrid>
                   <IonRow style={{ width: 'fit-content' }}>
@@ -348,7 +351,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                   <ProfilePage signOut={signOut} user={user} />
                 </div>}
 
-                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} />
+                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} />
               </IonCol>
 
               <IonCol>
@@ -357,10 +360,10 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                 </div>
               </IonCol>
 
-            </>}
+            </Fragment>}
 
 
-            {pageNav.isSetting && <>
+            {pageNav.isSetting && <Fragment>
 
               <IonRow >
                 <IonCol sizeXs='28' sizeSm='30' sizeMd='35' sizeLg='35' sizeXl='30' >
@@ -392,8 +395,6 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                           </IonRow>
                         </div>
 
-
-
                         <div >
                           <IonRow>
                             <IonCol>
@@ -412,9 +413,6 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                           </IonRow>
                         </div>
 
-
-
-
                         <div >
                           <IonRow>
                             <IonCol>
@@ -432,7 +430,6 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                             </IonCol>
                           </IonRow>
                         </div>
-
 
                         <div >
                           <IonRow>
@@ -457,7 +454,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                   </IonCard>
                 </IonCol>
               </IonRow>
-            </>}
+            </Fragment>}
 
           </IonRow>
         </IonGrid>
@@ -474,7 +471,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
       </IonContent>
 
     </IonPage>
-  </>
+  </Fragment>
 
 }
 

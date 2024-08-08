@@ -1,13 +1,13 @@
-import { IonModal, IonHeader, IonToolbar, IonRow, IonImg, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, IonTextarea, IonDatetimeButton, IonBadge, IonDatetime, IonButton, IonRadioGroup, IonRadio, IonNote, IonCol, IonAccordion, IonAccordionGroup, IonItemSliding, IonIcon, IonToast, IonText, IonCheckbox } from "@ionic/react"
-import { Fragment, FunctionComponent, useCallback, useEffect, useRef } from "react"
-import { UseFormRegister, UseFormWatch, UseFormSetValue, FieldErrors, UseFormClearErrors, Control } from "react-hook-form"
+import { DatetimeChangeEventDetail, IonBadge, IonButton, IonCheckbox, IonCol, IonContent, IonDatetime, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
+import { close } from "ionicons/icons"
+import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from "react"
+import { Control, FieldErrors, UseFormClearErrors, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form"
 import CategoryDropdown from "./CategoryDropdown"
-import { formatISTDateToString } from "./CreateUpdateTask"
+import SubTaskForm from './SubTask'
 import StaticTimePickerLandscape from "./TimePicker"
 import ToggleWithLabel from "./Toggle"
 import { EventData, TaskRequestData } from "./task"
-import React from "react"
-import SubTaskForm from './SubTask'
+
 
 interface FormModalProps {
     id: string
@@ -24,7 +24,8 @@ interface FormModalProps {
     toggleEditTask?: (op: { isEdit: boolean, task: TaskRequestData | undefined }) => void,
     fieldErrors: FieldErrors<EventData>
     clearErrors: UseFormClearErrors<EventData>
-    control: Control<EventData, any>
+    control: Control<EventData, any>,
+    handleDateChange: (e: CustomEvent<DatetimeChangeEventDetail>) => void
 }
 
 const FormModal: FunctionComponent<FormModalProps> = ({
@@ -42,13 +43,24 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     id,
     fieldErrors,
     clearErrors,
-    control
+    control,
+    handleDateChange
 }) => {
-    const { eventType, category, datetime, emailNotification, priority, notifyFrequency, status,subTasks,checklists } = watch()
+    const { eventType, category, datetime, emailNotification, priority, notifyFrequency, status } = watch()
+    const modal = useRef<HTMLIonModalElement>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
         updateTaskTime(new Date(datetime))
     }, [])
-    const modal = useRef<HTMLIonModalElement>(null);
+
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
     const addCardTitle = 'Add Task/Meeting'
     const editCardTitle = `Edit ${eventType == 'Meeting' ? "Meeting" : 'Task'}`
@@ -117,7 +129,6 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             </IonSelect>
                         </IonItem>
 
-
                         <IonItem>
                             <IonLabel position="fixed">Type:</IonLabel>
                             <ToggleWithLabel initialLabel={eventType} labels={["Task", "Meeting"]}
@@ -125,7 +136,6 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         </IonItem>
 
                         <CategoryDropdown initialValue={category} onSave={e => setValue('category', e)} />
-
 
                         <IonItem>
                             <IonLabel position="fixed">Description</IonLabel>
@@ -143,10 +153,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 }}>{eventType} Done?</IonCheckbox>
                         </IonItem>}
 
-
-                        {eventType == 'Task' && <SubTaskForm fieldName="subTasks"  isTask={true} control={control}/>}
-                        {eventType == 'Meeting' && <SubTaskForm fieldName="checklists"   isTask={false} control={control}/> }
-
+                        {eventType == 'Task' && <SubTaskForm fieldName="subTasks" isTask={true} control={control} />}
+                        {eventType == 'Meeting' && <SubTaskForm fieldName="checklists" isTask={false} control={control} />}
 
                         <IonItem>
                             <div>
@@ -155,23 +163,26 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             </div>
                         </IonItem>
 
-
                         <IonItem>
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/calender.png' />
-                            <IonDatetimeButton datetime="datetime" />
-                            <IonModal keepContentsMounted={true}>
+                            <IonBadge color='light' onClick={openModal} style={{ cursor: 'pointer' }}>{new Date(datetime).toLocaleDateString()}</IonBadge>
+
+                            {isModalOpen && <IonModal aria-hidden={false} mode="ios" className="custom-modal" isOpen={isModalOpen} onDidDismiss={closeModal} >
                                 <IonItem>
                                     <IonBadge color='light'>Saudi Calender</IonBadge>
                                     <IonBadge color='light'>Indian Calender</IonBadge>
+                                    <IonButton size="small" slot="end" color={"light"} onClick={closeModal}>
+                                        <IonIcon slot="icon-only" icon={close}></IonIcon>
+                                    </IonButton>
                                 </IonItem>
+
                                 <IonDatetime
                                     value={datetime}
                                     ref={datetimeRef}
-                                    onIonChange={e => setValue('datetime', new Date(e.target.value as string).toJSON())}
-                                    min={formatISTDateToString(new Date())}
+                                    onIonChange={handleDateChange}
+                                    min={new Date().toISOString().split("T")[0]}
                                     className="date-time"
                                     presentation='date'
-                                    id="datetime"
                                     name="datetime"
                                     formatOptions={{
                                         date: {
@@ -179,12 +190,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                             month: 'long',
                                             day: '2-digit',
                                         },
-                                        time: {
-                                            hour: '2-digit',
-                                            minute: '2-digit',
-                                            hour12: false,
-                                        }
                                     }}
+                                    showDefaultTimeLabel
                                     max="2900-12-30T23:59:59"
                                 />
                                 <IonItem>
@@ -193,11 +200,14 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                     <IonButton fill="solid" color='success' onClick={() => onSkipDays(90)}>+90 days</IonButton>
                                     <IonButton fill="solid" color='warning' onClick={() => setValue('datetime', new Date().toJSON())}>Reset</IonButton>
                                 </IonItem>
-                                <IonItem lines='full'>
+                                <IonItem lines='inset'>
                                     <IonInput
-                                        type='number' placeholder="Or Enter Manually" labelPlacement='stacked' onIonChange={(e) => onSkipDays(parseInt(e.detail.value || '') || 3)} ></IonInput>
+                                        type='number' placeholder="Or Enter Manually" onIonChange={(e) => onSkipDays(parseInt(e.detail.value || '') || 3)} ></IonInput>
                                 </IonItem>
+                                <div style={{ height: '10px' }}></div>
                             </IonModal>
+                            }
+
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/clock.png' />
                             <IonBadge color='light'>{taskTime?.toLocaleTimeString('en-IN',
                                 { hour: 'numeric', minute: 'numeric', hour12: true }) || ''}
@@ -242,7 +252,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             </IonItem>
                         )}
 
-                        
+
                         <IonRow>
                             <IonCol>
                                 <IonButton size="small" onClick={() => {

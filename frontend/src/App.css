@@ -5,3 +5,9 @@ html, body {
     height: 100%;
     padding: 0;
   }
+
+.custom-modal {
+    max-width: 400px; 
+    margin: auto; 
+}
+
