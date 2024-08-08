@@ -1,5 +1,5 @@
 {
-  "name": "reminderMaster",
+  "name": "remindermaster",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -22,6 +22,7 @@
     "@capacitor/status-bar": "6.0.0",
     "@capawesome/capacitor-file-picker": "^6.0.0",
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
+    "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.11.5",
     "@ionic/react": "^8.0.0",
     "@ionic/react-router": "^8.0.0",

@@ -15,7 +15,9 @@ export interface UserAPI{
 
 
 
-const BASE_URL = "http://localhost:4000/api"
+// const BASE_URL = "http://localhost:4000/api"
+const BASE_URL="https://remindude.vercel.app"
+
 
 class UserAPIService implements UserAPI{
     async signup (user:User): Promise<AxiosResponse>{
