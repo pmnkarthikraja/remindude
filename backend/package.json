@@ -2,9 +2,9 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "app.ts",
+  "main": "/app.ts",
   "scripts": {
-    "start": "node app.ts",
+    "start": "nodemon app.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
   },
