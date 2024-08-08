@@ -13,10 +13,22 @@ import userRoutes from './routes/userRoutes';
 export const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+// app.use(cors({
+//   origin: "*",
+//   credentials: true,
+// }))
+
 app.use(cors({
-  origin: "*",
-  credentials: true,
-}))
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Set the Access-Control-Allow-Origin header to the incoming origin
+    callback(null, origin);
+  },
+  credentials: true // Allow credentials
+}));
+
 app.use(cookieParser())
 app.use(express.json())
 app.use('/', userRoutes);
