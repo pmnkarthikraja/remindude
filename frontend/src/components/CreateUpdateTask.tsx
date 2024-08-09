@@ -152,15 +152,10 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
     const handleDateChange = (e: CustomEvent<DatetimeChangeEventDetail>) => {
         const newDate = new Date(e.detail.value as string);
         if (newDate >= new Date()) { // check if new date is within min and max dates
-            const utcDate = new Date(
-                newDate.getUTCFullYear(),
-                newDate.getUTCMonth(),
-                newDate.getUTCDate(),
-            );
             const formatedDate = new Date();
-                formatedDate.setDate(utcDate.getDate())
-                formatedDate.setMonth(utcDate.getMonth())
-                formatedDate.setFullYear(utcDate.getFullYear())
+                formatedDate.setDate(newDate.getDate())
+                formatedDate.setMonth(newDate.getMonth())
+                formatedDate.setFullYear(newDate.getFullYear())
             
             setValue('datetime',formatedDate.toJSON());
         }

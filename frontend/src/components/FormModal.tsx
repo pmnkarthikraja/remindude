@@ -1,5 +1,5 @@
-import { DatetimeChangeEventDetail, IonBadge, IonButton, IonCheckbox, IonCol, IonContent, IonDatetime, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
-import { close } from "ionicons/icons"
+import { DatetimeChangeEventDetail, IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
+import { close, closeOutline, closeSharp } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from "react"
 import { Control, FieldErrors, UseFormClearErrors, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form"
 import CategoryDropdown from "./CategoryDropdown"
@@ -83,18 +83,36 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                     }
                 }}>
                 <IonHeader >
-                    <IonToolbar>
-                        <IonRow>
-                            {!isEdit && <Fragment><IonImg style={{ width: '40px', height: '40px' }} src="/assets/task.png"></IonImg>
-                                <IonImg style={{ width: '40px', height: '40px' }} src="/assets/meeting-new.png"></IonImg>
-                                <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px' }}>{addCardTitle}</IonTitle>
-                            </Fragment>}
-                            {isEdit && <Fragment><IonImg style={{ width: '40px', height: '40px' }} src={`/assets/${eventType == 'Meeting' ? 'meeting-new' : 'task'}.png`}></IonImg>
-                                <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px' }}>{editCardTitle}</IonTitle>
-                            </Fragment>}
-                            <IonBadge style={{ width: '150px', textAlign: 'start' }} color={'light'}>Status: <span style={{ color: status == 'Done' ? 'green' : 'orange' }}>{status}</span>{status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
-                        </IonRow>
-                    </IonToolbar>
+                <IonToolbar>
+    <IonRow style={{ alignItems: 'center' }}>
+        {!isEdit && (
+            <Fragment>
+                <IonImg style={{ width: '40px', height: '40px' }} src="/assets/task.png" />
+                <IonImg style={{ width: '40px', height: '40px' }} src="/assets/meeting-new.png" />
+                <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px', flexGrow: 1 }}>
+                    {addCardTitle}
+                </IonTitle>
+            </Fragment>
+        )}
+        {isEdit && (
+            <Fragment>
+                <IonImg style={{ width: '40px', height: '40px' }} src={`/assets/${eventType === 'Meeting' ? 'meeting-new' : 'task'}.png`} />
+                <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px', flexGrow: 1 }}>
+                    {editCardTitle}
+                </IonTitle>
+            </Fragment>
+        )}
+          <IonButtons slot="end">
+            <IonButton  onClick={()=>{}}>
+                <IonIcon icon={closeOutline} />
+            </IonButton>
+        </IonButtons>
+        <IonBadge style={{ width: '150px', textAlign: 'start' }} color={'light'}>
+            Status: <span style={{ color: status === 'Done' ? 'green' : 'orange' }}>{status}</span>
+            {status === 'Done' && <span className="tick-mark">✔</span>}
+        </IonBadge>
+    </IonRow>
+</IonToolbar>
                 </IonHeader>
                 <IonContent
                 >
@@ -108,7 +126,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             },
                         ]} position="top" isOpen={true} message={'Please Enter a valid data!'} duration={3000}></IonToast>}
 
-                    <form id="task-formj" onSubmit={onSubmit}>
+                    <form id="task-form" onSubmit={onSubmit} >
                         <IonItem>
                             <IonLabel position="fixed">Title</IonLabel>
                             <IonInput {...register("title", {
@@ -251,27 +269,26 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 </IonNote>
                             </IonItem>
                         )}
-
-
-                        <IonRow>
-                            <IonCol>
-                                <IonButton size="small" onClick={() => {
-                                    modal.current?.dismiss()
-                                    clearErrors()
-                                }
-                                } color={'warning'} id="task-submit" type="button" expand="block" className="ion-margin-top">
-                                    Cancel
-                                </IonButton>
-                            </IonCol>
-                            <IonCol>
-                                <IonButton size="small" id="task-submit" type="submit" expand="block" className="ion-margin-top">
-                                    Submit
-                                </IonButton>
-                            </IonCol>
-                        </IonRow>
                     </form>
-
                 </IonContent>
+
+                <IonFooter >
+                    <IonRow>
+                        <IonCol>
+                            <IonButton size="small" onClick={() => {
+                                modal.current?.dismiss()
+                                clearErrors()}
+                            } color={'warning'} id="task-submit" type="button" expand="full">
+                                Cancel
+                            </IonButton>
+                        </IonCol>
+                        <IonCol>
+                            <IonButton  size="small" id="task-submit" type="submit" expand="full" form="task-form">
+                                Submit
+                            </IonButton>
+                        </IonCol>
+                    </IonRow>
+                </IonFooter>
             </IonModal>
         </Fragment>
     );

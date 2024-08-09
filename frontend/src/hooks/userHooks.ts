@@ -235,4 +235,32 @@ export const useEmailSigninMutation = () => {
   );
 };
 
+interface EditProfilePayload{
+  email:string,
+  password:string,
+  userName:string,
+  profilePicture:Blob|undefined
+}
+
+export const useEditProfileMutation = () => {
+  const queryClient = useQueryClient();
+  const history = useHistory()
+
+  return useMutation(
+    (user: EditProfilePayload) => userApi.editProfile(user.email,user.password,user.userName,user.profilePicture),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('userDetails');
+        setTimeout(() => {
+          window.location.href='/home'
+        }, 1000)
+        console.log("on edit profile mutation success: ", data);
+      },
+      onError: (e: AxiosError<AxiosErrorType>) => {
+        console.log("error on edit profile", e);
+      }
+    }
+  );
+};
+
 

@@ -1,0 +1,39 @@
+
+.full-page-content {
+    --ion-background-color: transparent;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .full-page-grid {
+    height: 100%;
+  }
+  
+  .full-page-row {
+    height: 100%;
+  }
+  
+  .full-page-card {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+  }
+  
+  .mobile-header {
+    --background: transparent;
+  }
+  
+  .full-page-content ion-content {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .full-page-content ion-modal ion-content {
+    padding: 20px;
+  }
+  
+  .full-page-content ion-modal ion-card {
+    margin: auto;
+  }
+  

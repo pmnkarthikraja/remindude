@@ -43,6 +43,7 @@ import Calender from './components/Calender';
 import TestPage from './pages/TestPage';
 import {SplashScreen} from '@capacitor/splash-screen'
 import { QueryClient, QueryClientProvider } from 'react-query';
+import ProfilePage from './pages/ProfilePage';
 
 setupIonicReact();
 
@@ -69,8 +70,8 @@ const App: React.FC = () => {
         <Route path="/confirmation" component={ConfirmationPage} exact={true} />
         <Route path="/testpage" component={TestPage} exact={true} />
         <Route path="/calender" component={Calender} exact={true} />
+        <Route path="/profile" component={Home} exact={true}/>
         <Route exact path="/" render={() => <Redirect to="/home" />} />
-
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp></CookiesProvider></QueryClientProvider>

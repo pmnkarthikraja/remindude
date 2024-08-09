@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { register } from '../serviceWorkerRegistration';
 
 
 const container = document.getElementById('root');
@@ -12,5 +11,4 @@ root.render(
   </React.StrictMode>
 );
 
-register()
 

@@ -89,7 +89,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
       }
     }
 
-    return (<>
+    return (
       <IonGrid>
         <IonRow>
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day,index) => (
@@ -100,7 +100,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
         </IonRow>
         <IonRow>{dates}</IonRow>
       </IonGrid>
-    </>
+ 
     );
   };
 
@@ -116,12 +116,11 @@ const Calender1: FunctionComponent<Calender1Props> = ({
   isTomorrow.setDate(today.getDate() + 1);
 
   return (
-    <>
       <IonCol size='auto' >
         <IonCard >
           <IonCardContent>
             <IonRow>
-              <IonCol sizeXs='12' sizeSm='6' sizeMd='12' sizeLg='6'>
+              <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='6' sizeXl='6'>
                 <IonDatetime
                   size='cover'
                   value={selectedDate}
@@ -129,7 +128,8 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                   onIonChange={handleDateChange}
                 ></IonDatetime>
               </IonCol>
-              <IonCol sizeXs='12' sizeSm='6' sizeMd='12' sizeLg='6'  >
+
+              <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='6' sizeXl='6' >
                 {selectedDate &&
                   <IonCardContent>
                     {(new Date(selectedDate).toDateString() == isToday.toDateString()) && <Fragment>
@@ -218,13 +218,6 @@ const Calender1: FunctionComponent<Calender1Props> = ({
 
         </IonCard>
       </IonCol>
-      {/* <IonCol size='auto'>
-        <IonCard>
-          <IonCardContent>{renderCalendar()}</IonCardContent>
-        </IonCard>
-      </IonCol> */}
-
-    </>
   );
 };
 

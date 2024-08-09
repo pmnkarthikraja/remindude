@@ -282,7 +282,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
             )}
 
             {!pageNav.isSetting && <Fragment>
-              <IonCol >
+              <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
                 <IonGrid>
                   <IonRow style={{ width: 'fit-content' }}>
                     <IonCol >
@@ -354,7 +354,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                 <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} />
               </IonCol>
 
-              <IonCol>
+              <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
                 <div ref={calenderContentRef}>
                   <Calender1 tasks={filteredTasks} />
                 </div>

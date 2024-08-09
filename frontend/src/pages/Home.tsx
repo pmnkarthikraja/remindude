@@ -64,7 +64,8 @@ const Home: FunctionComponent = () => {
   return (<Fragment>
     {status=='success' &&
       <Fragment>
-        {platform != 'Windows' && <IonReactRouter>
+        {platform != 'Windows' && 
+        <IonReactRouter>
           <IonTabs>
             <IonRouterOutlet>
               <Redirect exact path="/" to="/home" />
@@ -72,15 +73,18 @@ const Home: FunctionComponent = () => {
               <Route path="/profile" render={() => <ProfilePage signOut={signOut} user={user} />} exact={true} />
             </IonRouterOutlet>
             <IonTabBar slot="bottom" >
+
               <IonTabButton tab="home" href="/home">
                 <IonImg style={{ width: '30px', height: '30px' }} src='/assets/home.png' />
                 <IonLabel >Home</IonLabel>
               </IonTabButton>
 
-              <IonTabButton tab="search" href="/profile">
+
+              <IonTabButton tab="profile" href="/profile">
                 <IonImg style={{ width: '30px', height: '30px' }} src='/assets/profile.png' />
-                <IonLabel>Profile</IonLabel>
+                <IonLabel>Settings</IonLabel>
               </IonTabButton>
+
             </IonTabBar>
           </IonTabs>
         </IonReactRouter>}
