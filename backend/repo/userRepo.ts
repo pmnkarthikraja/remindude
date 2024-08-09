@@ -6,7 +6,7 @@ interface UserRepo {
     findOneByEmail: (email: string) => Promise<UserModel | null>;
     findOneById:(id:string)=>Promise<UserModel | null>;
     SignUp: (user: UserModel) => Promise<UserModel>;
-    UpdateUser:(email:string,userName:string,password:string,profilePicture:string)=>Promise<UserModel|null>;
+    UpdateUser:(email:string,userName:string,profilePicture:string,isProfilePicSet:string)=>Promise<UserModel|null>;
     ResetPassword:(email:string,password:string)=>Promise<UserModel|null>
 }
 
@@ -36,11 +36,16 @@ class UserRepoClass implements UserRepo {
         }   
     }
 
-    async UpdateUser(email:string,userName:string,password:string,profilePicture:string):Promise<UserModel|null>{
+    async UpdateUser(email:string,userName:string,profilePicture:string,isProfilePicSet:string):Promise<UserModel|null>{
         try{
+            if (isProfilePicSet=='notset'){
+                const gotUser= await UserSchema.findOneAndUpdate({email},{
+                    userName,
+                })
+                return gotUser  
+            }
             const gotUser= await UserSchema.findOneAndUpdate({email},{
                 userName,
-                password,
                 profilePicture
             })
             return gotUser
@@ -49,6 +54,17 @@ class UserRepoClass implements UserRepo {
         }
     }
     async ResetPassword(email:string,password:string):Promise<UserModel|null>{
+        try{
+            const gotUser= await UserSchema.findOneAndUpdate({email},{
+               $set:{password}
+            },{new:true})
+            return gotUser
+        }catch(e){
+            throw new DBErrInternal('DB Error')
+        }
+    }
+
+    async ValidatePassword(email:string,password:string):Promise<UserModel|null>{
         try{
             const gotUser= await UserSchema.findOneAndUpdate({email},{
                $set:{password}

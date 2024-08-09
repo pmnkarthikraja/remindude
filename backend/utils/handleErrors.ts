@@ -24,7 +24,7 @@ export class DBErrUserNotFound extends Error {
 export class DBErrCredentialsMismatch extends Error {
   constructor() {
     super();
-    this.name = "Password is not correct"
+    this.name = "Incorrect Password"
   }
 }
 

@@ -10,7 +10,6 @@ let inMemoryOTP:Map<string,string>=new Map()
 class UserController {
     public async signUpEmail(req: Request, res: Response): Promise<void> {
       const { userName, email, password } = req.body;
-      console.log("signup",userName,email,password)
       try {
         const user: UserModel = { userName, email, password } as UserModel;
         const { user: newUser, token } = await UserService.SignUp(user);
@@ -68,7 +67,7 @@ class UserController {
 
     public async signInEmail(req:Request,res:Response,next:NextFunction):Promise<void>{
       const {email,password} = req.body
-      console.log({email,password})
+      console.log("user login",{email,password})
       try{
         const {user,token} = await UserService.SignIn(email,password)
         res.cookie('token', token, {
@@ -90,7 +89,7 @@ class UserController {
         } else if (err instanceof DBErrInternal) {
           res.status(500).json({ message: err.name, success: false });
         } else if (err instanceof DBErrCredentialsMismatch) {
-          res.status(500).json({ message: err.name, success: false });
+          res.status(401).json({ message: err.name, success: false });
         }
         else {
           res.status(500).json({ message:  `An unexpected error occurred: ${err}`, success: false });
@@ -120,7 +119,7 @@ class UserController {
         } else if (err instanceof DBErrInternal) {
           res.status(500).json({ message: err.name, success: false });
         } else if (err instanceof DBErrCredentialsMismatch) {
-          res.status(500).json({ message: err.name, success: false });
+          res.status(401).json({ message: err.name, success: false });
         }
         else {
           res.status(500).json({ message:  `An unexpected error occurred: ${err}`, success: false });
@@ -182,9 +181,9 @@ class UserController {
 
     public async updateUser(req:Request,res:Response):Promise<void>{
       try{
-        const {userName,email,password}=req.body
+        const {userName,email,isProfilePicSet}=req.body
         const file = req.file 
-        const {user} =await UserService.UpdateUser(email,userName,password,file)
+        const {user} =await UserService.UpdateUser(email,userName,file,isProfilePicSet)
         res.status(201).json({message:"successfully user profile updated",success:true,user})
       }catch(err:any){
         if (err instanceof DBErrUserNotFound){
@@ -201,7 +200,6 @@ class UserController {
     public async resetPassword(req:Request,res:Response):Promise<void>{
       try{
         const {email,password}=req.body
-        const file = req.file
         const {user} =await UserService.ResetPassword(email,password)
         res.status(201).json({message:"successfully password resetted",success:true,user})
       }catch(err:any){
@@ -209,6 +207,26 @@ class UserController {
           res.status(404).json({ message: err.name, success: false });
         }else if (err instanceof DBErrInternal) {
           res.status(500).json({ message: err.name, success: false });
+        } else {
+          res.status(500).json({ message: `An unexpected error occurred: ${err}`, success: false });
+        }
+      }
+    }
+
+
+    public async validatePassword(req:Request,res:Response):Promise<void>{
+      try{
+        const {email,password}=req.body
+        console.log("email:password",email,password)
+        const {user} =await UserService.ValidatePassword(email,password)
+        res.status(201).json({message:"successfully password validated",success:true,user})
+      }catch(err:any){
+        if (err instanceof DBErrUserNotFound){
+          res.status(404).json({ message: err.name, success: false });
+        }else if (err instanceof DBErrInternal) {
+          res.status(500).json({ message: err.name, success: false });
+        }else if (err instanceof DBErrCredentialsMismatch){
+          res.status(401).json({ message: err.name, success:false })
         } else {
           res.status(500).json({ message: `An unexpected error occurred: ${err}`, success: false });
         }

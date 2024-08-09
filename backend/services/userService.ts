@@ -19,8 +19,9 @@ interface UserServiceImplementation{
     GoogleSignIn:(googleId:string,email:string)=>Promise<{user:UserModel;token:string}>
     AuthUser:(token:string)=>Promise<{user:UserModel}>
     SendOTP:(email:string, accountVerification:boolean )=>Promise<{msg:string,otp:string}>
-    UpdateUser:(email:string,userName:string,password:string,profilePicture:Express.Multer.File | undefined)=>Promise<{user:UserModel}>
+    UpdateUser:(email:string,userName:string,profilePicture:Express.Multer.File | undefined,isProfilePicSet:string)=>Promise<{user:UserModel}>
     ResetPassword:(email:string,password:string)=>Promise<{user:UserModel}>
+    ValidatePassword:(email:string,password:string)=>Promise<{user:UserModel}>
   }
 
 class UserService implements UserServiceImplementation {
@@ -62,11 +63,11 @@ class UserService implements UserServiceImplementation {
  async SignIn(email: string, password: string): Promise<{ user: UserModel; token: string; }>{
   //find the user by email
   const existingUser =await userRepo.findOneByEmail(email)
-  if (!existingUser){
+  if (existingUser==null){
     throw new DBErrUserNotFound()
   }
 
-  const isPasswordMatch = await bcrypt.compare(password,existingUser.password || '')
+  const isPasswordMatch = await bcrypt.compare(password,existingUser.password)
 
   if (!isPasswordMatch){
     throw new DBErrCredentialsMismatch()
@@ -133,11 +134,10 @@ async SendOTP(email:string,accountVerification:boolean):Promise<{msg:string,otp:
   }
 }
 
-async UpdateUser(email:string,userName:string,password:string,profilePicture:Express.Multer.File | undefined):Promise<{user:UserModel}>{
+async UpdateUser(email:string,userName:string,profilePicture:Express.Multer.File | undefined,isProfilePicSet:string):Promise<{user:UserModel}>{
   const fileContent = Buffer.from(profilePicture?.buffer||'').toString('base64');
-  const hashedPassword = await bcrypt.hash(password, 12);
 
-  const user =await userRepo.UpdateUser(email,userName,hashedPassword,fileContent)
+  const user =await userRepo.UpdateUser(email,userName,fileContent,isProfilePicSet)
   
   if (!user){
     throw new DBErrUserNotFound()
@@ -155,6 +155,22 @@ async ResetPassword(email:string,password:string):Promise<{user:UserModel}>{
   }
 
   return {user}
+}
+
+async ValidatePassword(email:string,password:string):Promise<{user:UserModel}>{
+  //find the user by email
+  const existingUser =await userRepo.findOneByEmail(email)
+  if (existingUser==null){
+    throw new DBErrUserNotFound()
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password,existingUser.password)
+
+  if (!isPasswordMatch){
+    throw new DBErrCredentialsMismatch()
+  }
+
+  return {user:existingUser}
 }
 }
 

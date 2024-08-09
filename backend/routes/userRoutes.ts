@@ -15,6 +15,7 @@ router.post('/send-otp', UserController.sendOTP);
 router.post('/verify-otp', UserController.verifyOTP);
 router.put('/update-user',upload.single('profilePicture'), UserController.updateUser);
 router.put('/reset-password', UserController.resetPassword);
+router.post('/validate-password',UserController.validatePassword)
 
 export default router;
 
