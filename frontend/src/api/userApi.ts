@@ -10,14 +10,12 @@ export interface UserAPI{
     sendOTP:(email:string,accountVerification:boolean)=>Promise<AxiosResponse>
     verifyOTP:(email:string,otp:string)=>Promise<AxiosResponse>
     resetPassword:(email:string,password:string)=>Promise<AxiosResponse>
-    editProfile:(email:string,password:string,userName:string,profilePicture:Blob|undefined)=>Promise<AxiosResponse>
+    editProfile:(email:string,password:string,userName:string,profilePicture:Blob|string)=>Promise<AxiosResponse>
+    validatePassword :(email:string,password:string)=>Promise<AxiosResponse>
 }
 
-
-
-// const BASE_URL = "http://localhost:4000/api"
+// const BASE_URL = "http://localhost:4000"
 const BASE_URL="https://remindude.vercel.app"
-
 
 class UserAPIService implements UserAPI{
     async signup (user:User): Promise<AxiosResponse>{
@@ -60,14 +58,21 @@ class UserAPIService implements UserAPI{
      async resetPassword (email:string,password:string):Promise<AxiosResponse> {
          return await axios.put(`${BASE_URL}/reset-password`,{email,password})
      }
+     
+     async validatePassword (email:string,password:string):Promise<AxiosResponse> {
+        return await axios.post(`${BASE_URL}/validate-password`,{email,password})
+    }
  
-     async editProfile (email:string,password:string,userName:string,profilePicture:Blob|undefined):Promise<AxiosResponse>{
+     async editProfile (email:string,password:string,userName:string,profilePicture:Blob|string):Promise<AxiosResponse>{
          const formData = new FormData();
          formData.append('email', email);
          formData.append('password', password);
          formData.append('userName', userName);
-         if (!!profilePicture){
+         if (!!profilePicture && typeof profilePicture!=='string'){
              formData.append('profilePicture', profilePicture, 'profile.jpg');
+         }
+         if (!!profilePicture && typeof profilePicture=='string'){
+            formData.append("isProfilePicSet",profilePicture)
          }
          return await axios.put(`${BASE_URL}/update-user`,formData,{
              headers: {

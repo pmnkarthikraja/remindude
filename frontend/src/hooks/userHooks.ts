@@ -107,6 +107,46 @@ export const useVerifyOTPMutation = () => {
   )
 }
 
+interface ValidatePasswordPayload{
+  email:string,
+  password:string,
+}
+
+export const useValidatePassword = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (payload: ValidatePasswordPayload) => userApi.validatePassword(payload.email, payload.password),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('userclient');
+      },
+      onError: (e: AxiosError<AxiosErrorType>) => {
+        console.log("error on validating password: ", e)
+      }
+    }
+  )
+}
+
+export const useResetPassword = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (payload: ValidatePasswordPayload) => userApi.resetPassword(payload.email, payload.password),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('userclient');
+      },
+      onError: (e: AxiosError<AxiosErrorType>) => {
+        console.log("error on reseting password: ", e)
+      }
+    }
+  )
+}
+
+
+
+
 const initializeGoogleAuth = async () => {
   try {
     await GoogleAuth.initialize({
@@ -239,7 +279,7 @@ interface EditProfilePayload{
   email:string,
   password:string,
   userName:string,
-  profilePicture:Blob|undefined
+  profilePicture:Blob|string
 }
 
 export const useEditProfileMutation = () => {

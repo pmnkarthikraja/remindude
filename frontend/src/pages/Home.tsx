@@ -45,6 +45,7 @@ const Home: FunctionComponent = () => {
         setUser({
           email: userData.email,
           userName: userData.userName,
+          password:userData.password,
           profilePicture: img,  
           googlePicture
         })

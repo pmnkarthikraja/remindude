@@ -8,8 +8,8 @@ interface TaskAPI{
     deleteTask:(email:string,id:string)=>Promise<AxiosResponse>
 }
 
-// const BASE_URL="http://localhost:4000/api"
-const BASE_URL="https://remindude.vercel.app"
+const BASE_URL="http://localhost:4000"
+// const BASE_URL="https://remindude.vercel.app"
 
 class TaskAPIService implements TaskAPI{
     async createTask (task: TaskRequestData) : Promise<AxiosResponse<any, any>>{
