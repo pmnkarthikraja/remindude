@@ -3,13 +3,14 @@ import { IonAlert, IonBadge, IonButtons, IonCard, IonCardContent, IonCardHeader,
 import { CSSProperties } from '@mui/styled-engine';
 import { AnimatePresence, Reorder } from 'framer-motion';
 import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
-import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
+import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from 'react';
 import { useDeleteTaskMutation } from '../hooks/taskHooks';
 import { getRemainingTime } from '../pages/HomePage';
 import { Platform, useGetPlatform } from '../utils/useGetPlatform';
 import CreateEditTaskFabButton from './CreateUpdateTask';
 import '../styles/Sorting.css';
 import { EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
+import { localTimeZone } from '../utils/util';
 
 export interface SortableCardsProps {
   email: string,
@@ -33,8 +34,6 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
   const [editTask, setEditTask] = useState<{ isEdit: boolean, task: EventData | undefined } | undefined>(undefined)
   const [confirmDelete, setConfirmDelete] = useState<{ task: TaskRequestData | undefined, isOpen: boolean } | undefined>(undefined)
   const { isError: isDeleteTaskMutationError, error: deleteTaskMutationError, mutateAsync: deleteTaskMutation } = useDeleteTaskMutation()
-
-
 
   const handlePlatformChange = (newPlatform: Platform) => {
     setPlatform(newPlatform);
@@ -238,8 +237,8 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
         notifyFrequency: taskReqData.dayFrequency as '0' | '1' | '2' | '3',
         status: taskReqData.status,
         checklists: taskReqData.checklists,
-        subTasks: taskReqData.subTasks
-
+        subTasks: taskReqData.subTasks,
+        timezone:taskReqData.timezone
       }
       setEditTask({
         isEdit: op.isEdit,
@@ -262,8 +261,10 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
 
   const cardContentStyle: CSSProperties = {
-    height: '100vh',
-    maxHeight: '100vh',
+    height: '120vh',
+    width:'100%',
+    paddingBottom:'100px',
+    maxHeight: '200vh',
     overflowY: 'auto',
     backgroundColor: 'inherit',
   }
@@ -355,7 +356,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
           </IonRefresherContent>
         </IonRefresher>
 
-        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
+        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px', scrollBehavior:'smooth' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
           <AnimatePresence >
             {filteredTasks.map((task, idx) => {
               const icon = task.priority === 'Urgent' ? 'highPriority' : task.priority === 'Moderate' ? 'mediumPriority1' : 'lowPriority';
@@ -394,7 +395,8 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                             <IonCardTitle style={{ fontSize: '15px', marginRight: '10px' }}>{new Date(task.dateTime).toLocaleDateString()}</IonCardTitle>
 
                             <IonImg style={{ ...iconStyle, marginRight: '5px' }} src='/assets/clock.png' />
-                            <IonCardTitle style={{ fontSize: '15px', marginRight: '10px', width: '70px', whiteSpace: 'nowrap' }}>{new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</IonCardTitle>
+                            <IonCardTitle style={{ fontSize: '15px', marginRight: '10px', width: '70px', whiteSpace: 'nowrap' }}>{
+                            new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true,timeZone:localTimeZone,timeZoneName:'short' })}</IonCardTitle>
                           </IonItem>
                         </IonCol>
                       </IonRow>

@@ -19,8 +19,9 @@ export interface ChangePasswordModalProps {
     user: User
     isOpen: boolean
     onClose: () => void
+    forgotPassword: boolean
 }
-const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOpen, onClose, user }) => {
+const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOpen, onClose, user, forgotPassword }) => {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -31,7 +32,7 @@ const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOp
 
     const verifyOldPassword = async () => {
         try {
-            if (oldPassword==''){
+            if (oldPassword == '') {
                 setErrorMessage('Please Enter a valid password!')
                 return
             }
@@ -46,7 +47,7 @@ const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOp
     };
 
     const updatePassword = async () => {
-        if (newPassword=='' || confirmPassword==''){
+        if (newPassword == '' || confirmPassword == '') {
             setErrorMessage('Passwords should not be empty')
             return
         }
@@ -68,40 +69,41 @@ const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOp
             setErrorMessage('Failed to update the password.');
             console.log("error on resetting the password", e)
         }
-
-
     };
 
     return (
         <IonModal isOpen={isOpen} onDidDismiss={onClose}>
             <IonHeader>
                 <IonToolbar>
-                    <IonTitle>Change Password</IonTitle>
+                    <IonTitle>{forgotPassword ? 'Reset Password' : 'Change Password'}</IonTitle>
                     <IonAvatar slot='end' style={{ width: '80px', height: '80px', padding: '10px' }}>
-                        <img src={user.profilePicture || user.googlePicture} alt="avatar" style={{ width: '70px' }} />
+                        {!forgotPassword && <img src={user.profilePicture || user.googlePicture} alt="avatar" style={{ width: '70px' }} />}
+                        {forgotPassword &&
+                            <img src={`data:image/*;base64,${user.profilePicture}`} alt="avatar" style={{ width: '70px' }} />
+                        }
                     </IonAvatar>
                 </IonToolbar>
 
             </IonHeader>
             <IonContent className="ion-padding">
                 {isPasswordResetSuccess && <p style={{ color: 'green', textAlign: 'center', textTransform: 'capitalize' }}>{resetPasswordData.data.message}</p>}
-                {(isValidatePasswordLoading || isResetPasswordLoading )&& <IonLoading isOpen={true} message={isValidatePasswordLoading && 'Verifying...' || isResetPasswordLoading && 'Updating Password..' || ''}/>}
+                {(isValidatePasswordLoading || isResetPasswordLoading) && <IonLoading isOpen={true} message={isValidatePasswordLoading && 'Verifying...' || isResetPasswordLoading && 'Updating Password..' || ''} />}
                 {isValidatePasswordError && <p style={{ color: 'red', textAlign: 'center' }}>{validatePasswordError.response?.data.message || validatePasswordError.message}</p>}
                 {isResetPasswordError && <p style={{ color: 'red', textAlign: 'center' }}>{resetPasswordError.response?.data.message || resetPasswordError.message}</p>}
                 {errorMessage != '' && <p style={{ color: 'red', textAlign: 'center' }}>{errorMessage}</p>}
-                <IonItem>
+               {!forgotPassword && <IonItem>
                     <IonLabel position="stacked">Old Password</IonLabel>
                     <IonInput
                         placeholder='Enter Old Password'
                         type="password"
                         value={oldPassword}
-                        onIonInput={e => { setErrorMessage(''); setOldPassword(e.detail.value!);resetResetPassword(); validatePasswordReset()  }}
+                        onIonInput={e => { setErrorMessage(''); setOldPassword(e.detail.value!); resetResetPassword(); validatePasswordReset() }}
                         disabled={isVerified}
                     />
-                    {!isVerified && <IonButton color={'tertiary'} expand="full" size='small'  onClick={verifyOldPassword}>Verify</IonButton>}
-                </IonItem>
+                    {!isVerified && <IonButton color={'tertiary'} expand="full" size='small' onClick={verifyOldPassword}>Verify</IonButton>}
+                </IonItem>}
 
-                {isVerified && (
+                {(isVerified || forgotPassword) && (
                     <Fragment>
                         <IonNote style={{ marginLeft: '15px' }}>Password length should be greater than 3</IonNote>
                         <IonItem>
@@ -109,7 +111,7 @@ const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOp
                             <IonInput
                                 type="password"
                                 value={newPassword}
-                                onIonInput={(e) => { setNewPassword(e.detail.value as string); setErrorMessage('');  }}
+                                onIonInput={(e) => { setNewPassword(e.detail.value as string); setErrorMessage(''); }}
                             />
                         </IonItem>
                         <IonItem>

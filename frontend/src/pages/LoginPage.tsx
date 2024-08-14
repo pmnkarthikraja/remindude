@@ -9,39 +9,43 @@ import ResetPasswordPage from '../components/ResetPasswordPage';
 import { User } from '../components/user';
 import { useEmailSigninMutation, useGoogleSigninMutation } from '../hooks/userHooks';
 import '../styles/LoginPage.css';
+import ChangePasswordModal from '../components/ChangePasswordModal'
+
 
 const LoginPage: FunctionComponent = () => {
-  const { register, handleSubmit,watch,clearErrors,setValue, formState: { errors } } = useForm<User>();
-  const { isLoading: isEmailSigninLoading, isError: isEmailSigninError, error: emailSigninError,isSuccess:isEmailSigninSuccess, mutateAsync: emailSigninMutation } = useEmailSigninMutation()
-  const { isLoading: isGoogleSigninLoading, isError: isGoogleSigninError, error: googleSigninError,isSuccess:isGoogleSigninSuccess, mutateAsync: googleSigninMutation } = useGoogleSigninMutation()
+  const { register, handleSubmit, watch, clearErrors, setValue, formState: { errors } } = useForm<User>();
+  const { data: emailSignInData, isLoading: isEmailSigninLoading, isError: isEmailSigninError, error: emailSigninError, isSuccess: isEmailSigninSuccess, mutateAsync: emailSigninMutation } = useEmailSigninMutation()
+  const { isLoading: isGoogleSigninLoading, isError: isGoogleSigninError, error: googleSigninError, isSuccess: isGoogleSigninSuccess, mutateAsync: googleSigninMutation } = useGoogleSigninMutation()
 
   const [forgetPassword, setForgetPassword] = useState(false)
-  const [otpVerified, setOtpVerified] = useState<{ otpVerified: boolean, email: string }>({
+  const [otpVerified, setOtpVerified] = useState<{ otpVerified: boolean, email: string,user:User|undefined }>({
     email: '',
-    otpVerified: false
+    otpVerified: false,
+    user:undefined
   })
 
 
-  const signInQuery = async () =>{
+  const signInQuery = async () => {
     const data = watch()
     await emailSigninMutation(data)
   }
 
-  const handleGoogleSignIn = async ()=>{
-    try{
+  const handleGoogleSignIn = async () => {
+    try {
       await googleSigninMutation()
-    }catch(e:any){
-      console.log("error on google",e)
+    } catch (e: any) {
+      console.log("error on google", e)
     }
   }
 
   const googlesigninerrmsg = googleSigninError?.message == 'popup_closed_by_user' && 'An error occurred during the Google sign-up process. Please try again.' || googleSigninError?.response?.data.message
 
+
   return (<>
     <IonPage>
       <IonContent >
 
-      {(isEmailSigninError  || isGoogleSigninError && googleSigninError.message !== 'popup_closed_by_user') && <>
+        {(isEmailSigninError || isGoogleSigninError && googleSigninError.message !== 'popup_closed_by_user') && <>
           <IonAlert
             className='alert'
             isOpen={true}
@@ -53,11 +57,11 @@ const LoginPage: FunctionComponent = () => {
               role: 'cancel',
               handler: () => window.location.reload()
             },
-           ]}
+            ]}
           ></IonAlert>
         </>}
 
-      {isGoogleSigninError && googleSigninError.message == 'popup_closed_by_user' && <>
+        {isGoogleSigninError && googleSigninError.message == 'popup_closed_by_user' && <>
           <IonAlert
             className='alert'
             isOpen={true}
@@ -75,18 +79,18 @@ const LoginPage: FunctionComponent = () => {
 
 
         <IonLoading
-          isOpen={isEmailSigninLoading || isGoogleSigninLoading }
+          isOpen={isEmailSigninLoading || isGoogleSigninLoading}
           message={'Loading...'}
           duration={0}
         />
 
 
 
-          <IonLoading
-            isOpen={isEmailSigninSuccess || isGoogleSigninSuccess}
-            message={"Login successfull, Redirecting to homepage.."}
-            duration={2400}
-          />
+        <IonLoading
+          isOpen={isEmailSigninSuccess || isGoogleSigninSuccess}
+          message={"Login successfull, Redirecting to homepage.."}
+          duration={2400}
+        />
         <div >
           <div className="header-section-login">
             <IonGrid >
@@ -96,24 +100,24 @@ const LoginPage: FunctionComponent = () => {
                 </IonCol>
                 <IonCol >
                   <IonText>
-                    <h2 style={{textAlign:'center',marginRight:'60px'}} >Login</h2>
+                    <h2 style={{ textAlign: 'center', marginRight: '60px' }} >Login</h2>
                   </IonText>
-                  <p style={{textAlign:'center',marginRight:'60px'}} className="subtitle">Welcome, please login to your account using Email or Google</p>
+                  <p style={{ textAlign: 'center', marginRight: '60px' }} className="subtitle">Welcome, please login to your account using Email or Google</p>
                 </IonCol>
               </IonRow>
             </IonGrid>
           </div>
 
           <div className='scrollable-section'>
-              <IonImg src="/assets/login4.png" alt="Logo" className="logo1" />
-        
+            <IonImg src="/assets/login4.png" alt="Logo" className="logo1" />
+
             <div className='form-inputs'>
               <form onSubmit={handleSubmit(signInQuery)}>
                 <IonList style={{ width: '80%', marginLeft: '20px' }}>
                   <IonItem>
                     <IonInput style={{ width: "280px" }} type='email'
                       {...register('email', { required: true })}
-                      onIonInput={()=>clearErrors('email')}
+                      onIonInput={() => clearErrors('email')}
                       labelPlacement="floating">
                       <div slot="label">
                         Email <IonText color="danger">*</IonText>
@@ -124,7 +128,7 @@ const LoginPage: FunctionComponent = () => {
                   <IonItem>
                     <IonInput style={{ width: "150px" }} type='password'
                       {...register("password", { required: true })}
-                      onIonInput={(e)=>{clearErrors('password');setValue('password',e.target.value as string)}}
+                      onIonInput={(e) => { clearErrors('password'); setValue('password', e.target.value as string) }}
                       labelPlacement="floating">
                       <div slot="label">
                         Password <IonText color="danger"></IonText>
@@ -134,23 +138,39 @@ const LoginPage: FunctionComponent = () => {
                   </IonItem>
                 </IonList>
 
-                {forgetPassword && !otpVerified.otpVerified  && 
+                {forgetPassword && !otpVerified.otpVerified &&
                   <ForgotPasswordAlertWithResend
-                    otpVerified={(otpVerified, email) => {
+                    otpVerified={(otpVerified, email,user) => {
                       setOtpVerified({
                         email,
-                        otpVerified
+                        otpVerified,
+                        user
+
                       })
                     }} closeAlert={() => setForgetPassword(false)} />
                 }
-
+                {/* 
                 {otpVerified.otpVerified && <ResetPasswordPage email={otpVerified.email} onClose={() => setOtpVerified({
                   email: '',
                   otpVerified: false
+                })} />} */}
+
+                {otpVerified.otpVerified && <ChangePasswordModal isOpen={true} forgotPassword={true} user={otpVerified.user || {
+                  email:'',
+                  googlePicture:'',
+                  password:'',
+                  profilePicture:'',
+                  userName:''
+                }} 
+                onClose={() => setOtpVerified({
+                  email: '',
+                  otpVerified: false,
+                  user:undefined
                 })} />}
 
+
                 <div style={{ display: 'flex', width: '300px', marginLeft: '15px', flexDirection: 'column', alignItems: 'center' }}>
-                  <IonButton onClick={() => setForgetPassword(true)} fill='clear'><span style={{textTransform:'none'}}>Forgot your password ?</span></IonButton>
+                  <IonButton onClick={() => setForgetPassword(true)} fill='clear'><span style={{ textTransform: 'none' }}>Forgot your password ?</span></IonButton>
                   <div style={{ height: '10px' }}></div>
 
                   <div >

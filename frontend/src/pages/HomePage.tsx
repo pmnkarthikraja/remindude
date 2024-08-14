@@ -253,7 +253,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
       </IonContent>
     </IonMenu>
 
-    <IonLoading isOpen={isGetTasksLoading} message={'Load Tasks..'}/>
+    <IonLoading isOpen={isGetTasksLoading} message={'Load Tasks..'} duration={3000}/>
 
     <IonPage id="main-content" >
       {platform !== 'Windows' && <IonHeader >
@@ -364,8 +364,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
 
             {pageNav.isSetting && <Fragment>
-
-              <IonRow >
+              {/* <IonRow >
                 <IonCol sizeXs='28' sizeSm='30' sizeMd='35' sizeLg='35' sizeXl='30' >
                   <IonCard >
                     <IonItem>
@@ -453,7 +452,9 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
                   </IonCard>
                 </IonCol>
-              </IonRow>
+              </IonRow> */}
+              {/* <ProfilePage signOut={signOut} user={user} /> */}
+              <p>need to create seperate setting page for window screen</p>
             </Fragment>}
 
           </IonRow>

@@ -10,3 +10,9 @@ html, body {
     max-width: 400px; 
     margin: auto; 
 }
+
+ion-select {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 44px;
+}

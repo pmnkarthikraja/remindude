@@ -1,5 +1,4 @@
 import {
-    DatetimeChangeEventDetail,
     IonFab, IonFabButton,
     IonIcon,
     IonLoading,
@@ -30,7 +29,7 @@ export interface CreateTaskFabButtonProps {
 }
 
 const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ email, isEdit, taskData, toggleEditTask }) => {
-    const { register, handleSubmit, setValue, reset, watch, clearErrors, formState: { errors }, control } = useForm<EventData>({
+    const formData = useForm<EventData>({
         defaultValues: isEdit && taskData ? {
             id: taskData.id,
             email: taskData.email,
@@ -45,10 +44,11 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             notifyFrequency: taskData.notifyFrequency,
             status: taskData.status,
             subTasks: taskData.subTasks,
-            checklists: taskData.checklists
+            checklists: taskData.checklists,
+            timezone: taskData.timezone,
         } : {
             title: '',
-            datetime: new Date().toJSON(),
+            datetime: new Date().toISOString(),
             category: {
                 name: 'HR',
                 label: 'Employee Onboarding'
@@ -70,20 +70,15 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
 
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const datetime = useRef<null | HTMLIonDatetimeElement>(null);
-    const [taskTime, setTaskTime] = useState<Date | null>(new Date())
 
     const onSubmit = useCallback(async (data: EventData) => {
         const taskId = uuid.v4();
-        const notificationIntervals = getNotificationSchedule(taskTime || new Date(), parseInt(data.notifyFrequency || '0'));
-        const formattedDateTime = new Date(data.datetime);
-        if (taskTime !== null) {
-            formattedDateTime.setHours(taskTime.getHours(), taskTime.getMinutes(), taskTime.getSeconds());
-        }
+        const notificationIntervals = getNotificationSchedule(new Date(data.datetime) || new Date(), parseInt(data.notifyFrequency || '0'));
 
         const createTaskPayload: TaskRequestData = {
             id: taskId,
             priority: data.priority,
-            dateTime: formattedDateTime.toJSON(),
+            dateTime: data.datetime,
             description: data.description,
             email: email,
             dayFrequency: data.notifyFrequency || '0',
@@ -95,12 +90,13 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             categoryLabel: data.category.label,
             status: 'InProgress',
             checklists: data.checklists,
-            subTasks: data.subTasks
+            subTasks: data.subTasks,
+            timezone: data.timezone
         }
 
         const updateTaskPayload: TaskRequestData = {
             id: data.id,
-            dateTime: formattedDateTime.toJSON(),
+            dateTime: data.datetime,
             dayFrequency: data.notifyFrequency || '0',
             description: data.description,
             email: data.email,
@@ -113,7 +109,8 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             categoryLabel: data.category.label,
             status: data.status,
             checklists: data.checklists,
-            subTasks: data.subTasks
+            subTasks: data.subTasks,
+            timezone: data.timezone
         }
 
         if (isEdit) {
@@ -124,46 +121,25 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                     task: undefined
                 });
             }
-            clearErrors();
+            formData.clearErrors();
             setIsModalOpen(false);
         } else {
             await onCreateTask(createTaskPayload);
-            clearErrors();
+            formData.clearErrors();
             setIsModalOpen(false);
         }
-    }, [taskTime, email, isEdit, clearErrors, toggleEditTask]);
+    }, [email, isEdit, formData.clearErrors, toggleEditTask]);
 
     const onCreateTask = useCallback(async (data: TaskRequestData) => {
         await createTaskMutation(data);
-        reset();
-    }, [createTaskMutation, reset]);
+        formData.reset();
+    }, [createTaskMutation, formData.reset]);
 
     const onUpdateTask = useCallback(async (data: TaskRequestData) => {
         await UpdateTaskMutation(data);
-        reset();
-    }, [UpdateTaskMutation, reset]);
+        formData.reset();
+    }, [UpdateTaskMutation, formData.reset]);
 
-    const onSkipDays =(days: number) => {
-        const today = new Date();
-        today.setDate(today.getDate() + days);
-        setValue('datetime', today.toJSON());
-    };
-
-    const handleDateChange = (e: CustomEvent<DatetimeChangeEventDetail>) => {
-        const newDate = new Date(e.detail.value as string);
-        if (newDate >= new Date()) { // check if new date is within min and max dates
-            const formatedDate = new Date();
-                formatedDate.setDate(newDate.getDate())
-                formatedDate.setMonth(newDate.getMonth())
-                formatedDate.setFullYear(newDate.getFullYear())
-            
-            setValue('datetime',formatedDate.toJSON());
-        }
-    };
-
-    const updateTaskTime = useCallback((newTaskTime: Date) => {
-        setTaskTime(newTaskTime);
-    }, []);
 
     const togglePopover = useCallback(() => {
         setIsModalOpen(prev => !prev);
@@ -191,21 +167,13 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                             <IonLoading isOpen={isCreateTaskMutationLoading} message={'Creating Task..'} className="loading" />
                             <FormModal
                                 id={platform === 'Windows' ? "responsive-modal-windows" : ''}
-                                register={register}
-                                watch={watch}
-                                setValue={setValue}
+
                                 isEdit={isEdit}
                                 datetimeRef={datetime}
-                                onSkipDays={onSkipDays}
-                                onSubmit={handleSubmit(onSubmit)}
+                                onSubmit={formData.handleSubmit(onSubmit)}
                                 setIsAlertOpen={setIsModalOpen}
-                                taskTime={taskTime}
-                                updateTaskTime={updateTaskTime}
                                 toggleEditTask={toggleEditTask}
-                                fieldErrors={errors}
-                                clearErrors={clearErrors}
-                                control={control}
-                                handleDateChange={handleDateChange}
+                                formData={formData}
                             />
                         </Fragment>
                     )}
@@ -218,21 +186,12 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                     <IonToast color={'danger'} buttons={[{ text: 'Ok', role: 'cancel' }]} isOpen={!!toastMessage} message={toastMessage} position="top" duration={3000} />
                     <FormModal
                         id={platform === 'Windows' ? "responsive-modal-windows" : ''}
-                        setValue={setValue}
-                        register={register}
-                        watch={watch}
                         isEdit={isEdit}
                         datetimeRef={datetime}
-                        onSkipDays={onSkipDays}
-                        onSubmit={handleSubmit(onSubmit)}
+                        onSubmit={formData.handleSubmit(onSubmit)}
                         setIsAlertOpen={setIsModalOpen}
-                        taskTime={taskTime}
-                        updateTaskTime={updateTaskTime}
                         toggleEditTask={toggleEditTask}
-                        fieldErrors={errors}
-                        clearErrors={clearErrors}
-                        control={control}
-                        handleDateChange={handleDateChange}
+                        formData={formData}
                     />
                 </Fragment>
             )}

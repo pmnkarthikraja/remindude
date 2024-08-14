@@ -1,5 +1,5 @@
 import { FilePicker } from '@capawesome/capacitor-file-picker'
-import { IonAvatar, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonLoading, IonModal, IonPage, IonRow, IonTitle, IonToast, IonToggle, IonToolbar } from "@ionic/react"
+import { IonAvatar, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonLoading, IonModal, IonPage, IonRow, IonSelect, IonSelectOption, IonTitle, IonToast, IonToggle, IonToolbar } from "@ionic/react"
 import { chevronForwardOutline, cloudUpload, logOutOutline, notificationsOutline, personOutline, remove, settingsOutline } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useState } from "react"
 import { userApi } from '../api/userApi'
@@ -9,6 +9,7 @@ import '../styles/ProfilePage.css'
 import { useEditProfileMutation } from '../hooks/userHooks'
 import { useForm } from 'react-hook-form'
 import ChangePasswordModal from '../components/ChangePasswordModal'
+import { useWeekContext } from '../components/weekContext'
 
 export interface ProfilePageProps {
   user: User,
@@ -19,19 +20,19 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   signOut,
   user
 }) => {
-  const { data, isLoading, isError, error, mutateAsync: editProfile } = useEditProfileMutation()
+  const {isLoading, isError, error, mutateAsync: editProfile } = useEditProfileMutation()
   const [profileModalIsOpen, setProfileModalIsOpen] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const { startOfWeek, setStartOfWeek } = useWeekContext();
 
+  const handleStartOfWeekChange = (value: string) => {
+    setStartOfWeek(value);
+  };
 
   const [blobData, setBlobData] = useState<Blob | string>('notset')
-  // const [userData, setUserData] = useState<User>(user)
   const { setValue, watch, reset } = useForm<User>({
     defaultValues: { ...user }
   })
-
-  // const [newPassword, setNewPassword] = useState('')
-  // const [confirmNewPassword, setConfirmNewPassword] = useState('')
 
   const userData = watch()
 
@@ -215,6 +216,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
 
       <ChangePasswordModal
         user={user}
+        forgotPassword={false}
         isOpen={showChangePassword}
         onClose={() => setShowChangePassword(false)}
       />
@@ -239,10 +241,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             <IonLabel>Change password</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
-          <IonItem>
-            <IonLabel>Change Local TimeZone</IonLabel>
-            <IonIcon slot="end" icon={chevronForwardOutline} />
-          </IonItem>
 
           {/* Notifications Section */}
           <IonItem lines="none">
@@ -257,6 +255,40 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             <IonLabel>App Push Notifications</IonLabel>
             <IonToggle slot="end" checked />
           </IonItem>
+          <IonItem>
+            <IonLabel>Notification Sounds</IonLabel>
+            <IonToggle slot="end" checked />
+          </IonItem>
+
+          {/* Calender Section */}
+          <IonItem lines="none" >
+            <IonIcon slot="start" icon={notificationsOutline} />
+            <IonLabel>Calender Settings</IonLabel>
+          </IonItem>
+
+          {/* Start of the Week Selector */}
+          <IonItem>
+            <IonLabel>Start of the Week</IonLabel>
+            <IonSelect
+              value={startOfWeek}
+              placeholder="Select Day"
+              onIonChange={e => handleStartOfWeekChange(e.detail.value)}
+              slot="end"
+            >
+              <IonSelectOption value="Sunday">Sunday</IonSelectOption>
+              <IonSelectOption value="Monday">Monday</IonSelectOption>
+            </IonSelect>
+          </IonItem>
+
+          {/* Time Format */}
+          <IonItem lines="none">
+            <IonIcon slot="start" icon={notificationsOutline} />
+            <IonLabel>Time Format</IonLabel>
+          </IonItem>
+          <IonItem>
+            <IonLabel>24Hr</IonLabel>
+            <IonToggle slot="end" checked />
+          </IonItem>
 
           {/* More Section */}
           <IonItem lines="none">
@@ -268,7 +300,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
           <IonItem>
-            <IonLabel>Country</IonLabel>
+            <IonLabel>General Info</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
         </IonList>

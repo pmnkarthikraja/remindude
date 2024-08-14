@@ -1,58 +1,139 @@
 import { DatetimeChangeEventDetail, IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
-import { close, closeOutline, closeSharp } from "ionicons/icons"
+import { close, closeOutline } from "ionicons/icons"
+import moment from "moment-timezone"
 import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from "react"
-import { Control, FieldErrors, UseFormClearErrors, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form"
+import { Control, FieldErrors, UseFormClearErrors, UseFormRegister, UseFormReturn, UseFormSetValue, UseFormWatch } from "react-hook-form"
+import Select from 'react-select'
+import { getTimezoneOffset, localTimeZone, localTimeZoneLabel } from "../utils/util"
 import CategoryDropdown from "./CategoryDropdown"
 import SubTaskForm from './SubTask'
-import StaticTimePickerLandscape from "./TimePicker"
-import ToggleWithLabel from "./Toggle"
 import { EventData, TaskRequestData } from "./task"
-
+import ToggleWithLabel from "./Toggle"
+import { useWeekContext } from "./weekContext"
+import StaticTimePickerLandscape from "./TimePicker"
+import dayjs from "dayjs"
 
 interface FormModalProps {
     id: string
-    register: UseFormRegister<EventData>,
-    watch: UseFormWatch<EventData>,
-    setValue: UseFormSetValue<EventData>,
+    formData:UseFormReturn<EventData, any, undefined>
     isEdit: boolean,
     setIsAlertOpen: (isOpen: boolean) => void
     onSubmit: (e: any) => void,
-    updateTaskTime: (time: Date) => void,
     datetimeRef: React.MutableRefObject<HTMLIonDatetimeElement | null>,
-    onSkipDays: (n: number) => void,
-    taskTime: Date | null,
     toggleEditTask?: (op: { isEdit: boolean, task: TaskRequestData | undefined }) => void,
-    fieldErrors: FieldErrors<EventData>
-    clearErrors: UseFormClearErrors<EventData>
-    control: Control<EventData, any>,
-    handleDateChange: (e: CustomEvent<DatetimeChangeEventDetail>) => void
 }
 
 const FormModal: FunctionComponent<FormModalProps> = ({
-    register,
-    watch,
-    setValue,
     isEdit,
     setIsAlertOpen,
     onSubmit,
-    updateTaskTime,
     datetimeRef,
-    onSkipDays,
-    taskTime,
     toggleEditTask,
     id,
-    fieldErrors,
-    clearErrors,
-    control,
-    handleDateChange
+    formData
 }) => {
-    const { eventType, category, datetime, emailNotification, priority, notifyFrequency, status } = watch()
+    const {clearErrors,control,formState:{errors:fieldErrors}, register, watch, setValue, } = formData 
+    const { eventType, category, emailNotification, priority, notifyFrequency, status, datetime, timezone } = watch()
     const modal = useRef<HTMLIonModalElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { startOfWeek } = useWeekContext();
+    const [selectedTimezone, setSelectedTimezone] = useState<string | null>(timezone || localTimeZone);
+    const [selectedTime, setSelectedTime] = useState<Date | null>(new Date());
+    const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
+    const [initialTime, setInitialTime] = useState<Date | null>(null);
+
 
     useEffect(() => {
-        updateTaskTime(new Date(datetime))
-    }, [])
+        if (selectedTimezone) {
+            setValue('timezone', selectedTimezone)
+            setSelectedTime(new Date())
+            setInitialTime(new Date())
+        }
+    }, [selectedTimezone])
+
+
+    // for handling initial values on edit
+    useEffect(() => {
+        if (isEdit && datetime && selectedTimezone) {
+            const originalDateTimeInIST = dayjs(datetime).tz(localTimeZone, true);
+
+            // Convert this datetime to the user's timezone
+            const localDateTimeInUserTZ = originalDateTimeInIST.tz(selectedTimezone);
+
+            const initialTimeForPicker = new Date(localDateTimeInUserTZ.format());
+            setInitialTime(initialTimeForPicker);
+
+            const date = localDateTimeInUserTZ.format('YYYY-MM-DD');
+            const time = localDateTimeInUserTZ.toDate();
+
+            setSelectedDate(date);
+            setSelectedTime(time);
+        } else if (!isEdit) {
+            setSelectedDate(dayjs().format('YYYY-MM-DD'));
+            setSelectedTime(new Date());
+            setInitialTime(null);
+        }
+    }, [isEdit, datetime]);
+
+    // Save function to calculate final datetime with timezone
+    const handleSave = () => {
+        if (selectedDate && selectedTime && selectedTimezone) {
+            try {
+                const formattedDate = dayjs(selectedDate, 'YYYY-MM-DD', true);
+                if (!formattedDate.isValid()) {
+                    throw new Error('Invalid date value');
+                }
+
+                const formattedTime = dayjs(selectedTime).format('HH:mm:ss');
+                if (!formattedTime) {
+                    throw new Error('Invalid time value');
+                }
+
+                const dateTimeString = `${formattedDate.format('YYYY-MM-DD')} ${formattedTime}`;
+                const dateTimeWithTimezone = dayjs.tz(dateTimeString, selectedTimezone);
+
+                if (!dateTimeWithTimezone.isValid()) {
+                    throw new Error('Invalid combined date or time value');
+                }
+
+                const localDateTime = dateTimeWithTimezone.local().format();
+                setValue('datetime', localDateTime);
+            } catch (error) {
+                console.error('Error saving task:', error.message);
+            }
+        } else {
+            console.error('Missing date, time, or timezone selection');
+        }
+    };
+
+    const timezones = moment.tz.names().map((tz) => ({
+        value: tz,
+        label: `${tz.replace('_', ' ')} ${getTimezoneOffset(tz)}`,
+    }));
+
+    const handleChangeOnTimezone = (option: any) => {
+        setSelectedTimezone(option.value);
+    };
+
+
+    const handleTimeChange = (hour: number, minute: number, seconds: number) => {
+        if (selectedTimezone) {
+            const time = new Date()
+            time.setHours(hour)
+            time.setMinutes(minute)
+            time.setSeconds(seconds)
+            setSelectedTime(time);
+        };
+    }
+
+    const handleDateChange = (event: CustomEvent) => {
+        setSelectedDate(event.detail.value);
+    };
+
+    const onSkipDays = (days:number)=>{
+        const updated= dayjs().add(days,'day')
+        setSelectedDate(updated.format('YYYY-MM-DD'))
+    }
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -64,6 +145,40 @@ const FormModal: FunctionComponent<FormModalProps> = ({
 
     const addCardTitle = 'Add Task/Meeting'
     const editCardTitle = `Edit ${eventType == 'Meeting' ? "Meeting" : 'Task'}`
+
+    const isDateDisabled = (dateIsoString: string) => {
+        const date = new Date(dateIsoString);
+        const day = date.getUTCDay();
+        if (startOfWeek == 'Sunday') {
+            return day === 0 || day === 6;
+        } else if (startOfWeek == 'Monday') {
+            return day === 5 || day === 6;
+        }
+    };
+
+    const customTimezoneSelectorStyles = {
+        control: (provided: any) => ({
+            ...provided,
+            zIndex: 9999,
+            border: '1px solid #ccc',
+            boxShadow: 'none',
+            padding: '2px',
+            margin: '15px',
+            '&:hover': {
+                border: '1px solid #aaa',
+            },
+        }),
+        menu: (provided: any) => ({
+            ...provided,
+            zIndex: 9999,
+        }),
+        option: (provided: any, state: any) => ({
+            ...provided,
+            backgroundColor: state.isFocused ? '#f0f0f0' : provided.backgroundColor,
+            color: state.isFocused ? '#333' : provided.color,
+        }),
+    };
+
     return (
         <Fragment>
             <IonModal
@@ -83,36 +198,37 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                     }
                 }}>
                 <IonHeader >
-                <IonToolbar>
-    <IonRow style={{ alignItems: 'center' }}>
-        {!isEdit && (
-            <Fragment>
-                <IonImg style={{ width: '40px', height: '40px' }} src="/assets/task.png" />
-                <IonImg style={{ width: '40px', height: '40px' }} src="/assets/meeting-new.png" />
-                <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px', flexGrow: 1 }}>
-                    {addCardTitle}
-                </IonTitle>
-            </Fragment>
-        )}
-        {isEdit && (
-            <Fragment>
-                <IonImg style={{ width: '40px', height: '40px' }} src={`/assets/${eventType === 'Meeting' ? 'meeting-new' : 'task'}.png`} />
-                <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px', flexGrow: 1 }}>
-                    {editCardTitle}
-                </IonTitle>
-            </Fragment>
-        )}
-          <IonButtons slot="end">
-            <IonButton  onClick={()=>{}}>
-                <IonIcon icon={closeOutline} />
-            </IonButton>
-        </IonButtons>
-        <IonBadge style={{ width: '150px', textAlign: 'start' }} color={'light'}>
-            Status: <span style={{ color: status === 'Done' ? 'green' : 'orange' }}>{status}</span>
-            {status === 'Done' && <span className="tick-mark">✔</span>}
-        </IonBadge>
-    </IonRow>
-</IonToolbar>
+                    <IonToolbar>
+                        <IonRow style={{ alignItems: 'center' }}>
+                            {!isEdit && (
+                                <Fragment>
+                                    <IonImg style={{ width: '40px', height: '40px' }} src="/assets/task.png" />
+                                    <IonImg style={{ width: '40px', height: '40px' }} src="/assets/meeting-new.png" />
+                                    <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px', flexGrow: 1 }}>
+                                        {addCardTitle}
+                                    </IonTitle>
+                                </Fragment>
+                            )}
+                            {isEdit && (
+                                <Fragment>
+                                    <IonImg style={{ width: '40px', height: '40px' }} src={`/assets/${eventType === 'Meeting' ? 'meeting-new' : 'task'}.png`} />
+                                    <IonTitle style={{ fontWeight: '700', position: 'relative', color: '#064282', textAlign: 'center', marginLeft: '-50px', flexGrow: 1 }}>
+                                        {editCardTitle}
+                                    </IonTitle>
+                                </Fragment>
+                            )}
+                            <IonButtons slot="end">
+                                <IonButton onClick={() => { }}>
+                                    <IonIcon icon={closeOutline} />
+                                </IonButton>
+                            </IonButtons>
+                            <IonBadge style={{ width: '150px', textAlign: 'start' }} color={'light'}>
+                                Status: <span style={{ color: status === 'Done' ? 'green' : 'orange' }}>{status}</span>
+                                {status === 'Done' && <span className="tick-mark">✔</span>}
+                            </IonBadge>
+                        </IonRow>
+
+                    </IonToolbar>
                 </IonHeader>
                 <IonContent
                 >
@@ -126,7 +242,10 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             },
                         ]} position="top" isOpen={true} message={'Please Enter a valid data!'} duration={3000}></IonToast>}
 
-                    <form id="task-form" onSubmit={onSubmit} >
+                    <form id="task-form" onSubmit={(e) => {
+                        handleSave();
+                        onSubmit(e)
+                    }} >
                         <IonItem>
                             <IonLabel position="fixed">Title</IonLabel>
                             <IonInput {...register("title", {
@@ -174,16 +293,33 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         {eventType == 'Task' && <SubTaskForm fieldName="subTasks" isTask={true} control={control} />}
                         {eventType == 'Meeting' && <SubTaskForm fieldName="checklists" isTask={false} control={control} />}
 
+                        <IonLabel style={{ marginLeft: '15px' }} position="fixed" >
+                            Timezone: {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{marginTop:'-5px'}} onClick={()=>{setSelectedTimezone(localTimeZone)}}>Set Local</IonButton>}
+                            </IonLabel>
+                        <Select
+                            styles={customTimezoneSelectorStyles}
+                            value={{ value: selectedTimezone, label: selectedTimezone == localTimeZone ? `(Local) ${localTimeZoneLabel}` : `${selectedTimezone} ${ selectedTimezone && getTimezoneOffset(selectedTimezone)}` }}
+                            onChange={handleChangeOnTimezone}
+                            options={timezones}
+                            placeholder="Select a timezone..."
+                            isClearable={false}
+                        />
+
                         <IonItem>
                             <div>
                                 <IonLabel position="fixed">Set Time and Date:</IonLabel>
-                                <StaticTimePickerLandscape initialTime={taskTime} onTimeChange={updateTaskTime} />
+                                <StaticTimePickerLandscape
+                                    initialTime={initialTime?.toUTCString() || ''}
+                                    selectedTimezone={selectedTimezone || ''}
+                                    onTimeChange={handleTimeChange}
+                                />
                             </div>
                         </IonItem>
 
                         <IonItem>
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/calender.png' />
-                            <IonBadge color='light' onClick={openModal} style={{ cursor: 'pointer' }}>{new Date(datetime).toLocaleDateString()}</IonBadge>
+                            <IonBadge color='light' onClick={openModal} style={{ cursor: 'pointer' }}>{selectedDate}</IonBadge>
+
 
                             {isModalOpen && <IonModal aria-hidden={false} mode="ios" className="custom-modal" isOpen={isModalOpen} onDidDismiss={closeModal} >
                                 <IonItem>
@@ -195,9 +331,11 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 </IonItem>
 
                                 <IonDatetime
-                                    value={datetime}
+                                    value={selectedDate}
                                     ref={datetimeRef}
-                                    onIonChange={handleDateChange}
+                                    onIonChange={(e) => {
+                                        handleDateChange(e)
+                                    }}
                                     min={new Date().toISOString().split("T")[0]}
                                     className="date-time"
                                     presentation='date'
@@ -209,10 +347,11 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                             day: '2-digit',
                                         },
                                     }}
+                                    isDateEnabled={(e) => !isDateDisabled(e)}
                                     showDefaultTimeLabel
-                                    max="2900-12-30T23:59:59"
+                                    max="3000-12-30T23:59:59"
                                 />
-                                <IonItem>
+                                  <IonItem>
                                     <IonButton fill="solid" color='success' onClick={() => onSkipDays(30)}>+30 days</IonButton>
                                     <IonButton fill="solid" color='success' onClick={() => onSkipDays(60)}>+60 days</IonButton>
                                     <IonButton fill="solid" color='success' onClick={() => onSkipDays(90)}>+90 days</IonButton>
@@ -227,26 +366,25 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             }
 
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/clock.png' />
-                            <IonBadge color='light'>{taskTime?.toLocaleTimeString('en-IN',
+
+                            <IonBadge color='light'>{selectedTime?.toLocaleTimeString('en-IN',
                                 { hour: 'numeric', minute: 'numeric', hour12: true }) || ''}
                             </IonBadge>
-                        </IonItem>
 
+                        </IonItem>
 
                         <IonItem>
                             <IonLabel position="fixed"> Email Notification?</IonLabel>
                             <IonRadioGroup
                                 onIonChange={(e) => setValue('emailNotification', e.detail.value === 'yes')}
                                 {...register("emailNotification")}
-                                value={emailNotification ? 'yes' : 'no'}
-                            >
+                                value={emailNotification ? 'yes' : 'no'}>
                                 <IonRow>
                                     <IonRadio style={{ marginRight: '10px' }} value={'yes'}>Yes</IonRadio>
                                     <IonRadio value={'no'}>No</IonRadio>
                                 </IonRow>
                             </IonRadioGroup>
                         </IonItem>
-
 
                         {emailNotification && (
                             <IonItem>
@@ -277,13 +415,15 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         <IonCol>
                             <IonButton size="small" onClick={() => {
                                 modal.current?.dismiss()
-                                clearErrors()}
+                                clearErrors()
+                            }
                             } color={'warning'} id="task-submit" type="button" expand="full">
                                 Cancel
                             </IonButton>
                         </IonCol>
                         <IonCol>
-                            <IonButton  size="small" id="task-submit" type="submit" expand="full" form="task-form">
+                            <IonButton size="small" id="task-submit" type="submit"
+                                expand="full" form="task-form">
                                 Submit
                             </IonButton>
                         </IonCol>

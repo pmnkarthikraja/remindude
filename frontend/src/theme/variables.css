@@ -5,11 +5,10 @@ http://ionicframework.com/docs/theming/ */
 
 
 :root{
-    --ion-background-color: #fcfcfc;    
+    --ion-background-color: #ecf9ff;    
     --ion-font-family: "Noto Sans", sans-serif;
     --no-scroll: hidden;
 }
-
 
 ion-item{
     --background:white

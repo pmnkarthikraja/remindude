@@ -98,6 +98,7 @@ export const useVerifyOTPMutation = () => {
     (payload: VerifyOTPPayload) => userApi.verifyOTP(payload.email, payload.otp),
     {
       onSuccess: (data) => {
+        console.log("on verified data: ",data.data)
         queryClient.invalidateQueries('userclient');
       },
       onError: (e: AxiosError<AxiosErrorType>) => {

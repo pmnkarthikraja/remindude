@@ -28,6 +28,7 @@ export interface TaskRequestData{
     categoryName:string,
     categoryLabel:string,
     status:TaskStatus,
+    timezone?:string
 }
 
 
@@ -76,6 +77,7 @@ export interface EventData{
     notifyFrequency?:"0"|'1'|'2'|'3',
     subTasks?:SubTaskData[]
     checklists?:SubTaskData[]
+    timezone?:string
 }
 
 export interface SubTaskData {

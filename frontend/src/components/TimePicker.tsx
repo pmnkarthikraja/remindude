@@ -1,31 +1,67 @@
-import * as React from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { StaticTimePicker } from '@mui/x-date-pickers/StaticTimePicker';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import * as React from 'react';
 
-export interface StaticTimePickerProps{
-  onTimeChange:(time:Date)=>void,
-  initialTime:Date|null
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+export interface StaticTimePickerProps {
+  onTimeChange: (hour: number, minute: number, seconds: number) => void;
+  initialTime: string | null;
+  selectedTimezone: string;
 }
 
-const StaticTimePickerLandscape:React.FunctionComponent<StaticTimePickerProps>=({
+const StaticTimePickerLandscape: React.FunctionComponent<StaticTimePickerProps> = ({
   onTimeChange,
-  initialTime
-})=> {
-  // const [time,setTime]=React.useState(initialTime)
-  const initial=initialTime ? initialTime : new Date() 
+  initialTime,
+  selectedTimezone,
+}) => {
+  const [time, setTime] = React.useState<Dayjs | null>(null);
+
+
+  const handleTimeChange = (newValue: Dayjs | null) => {
+    setTime(newValue);
+    const hour = newValue?.get('hour') || 0
+    const minute = newValue?.get('minute') || 0
+    const seconds = newValue?.get('second') || 0
+    if (newValue) {
+      onTimeChange(hour, minute, seconds);
+    }
+  };
+
+  React.useEffect(() => {
+    if (initialTime && selectedTimezone) {
+      console.log("initial time on timepicker:",initialTime)
+      const parsedTime1 = dayjs(initialTime).utcOffset(0,false).tz(selectedTimezone)
+
+      setTime(parsedTime1);
+      const hour = parsedTime1?.get('hour') || 0
+      const minute = parsedTime1?.get('minute') || 0
+      const seconds = parsedTime1?.get('second') || 0
+      if (parsedTime1) {
+        onTimeChange(hour, minute, seconds);
+      }
+    } else {
+      setTime(null);
+    }
+  }, [initialTime, selectedTimezone]);
 
   return (
-    <div style={{width:'200px'}}>
-        <LocalizationProvider  dateAdapter={AdapterDayjs}>
-        <StaticTimePicker   displayStaticWrapperAs='desktop'  onChange={(e)=>{
-          // setTime(new Date(e?.toJSON() || ''))
-          onTimeChange(new Date(e?.toJSON()|| ''))
-          }} value={ dayjs(initial.toJSON())} orientation='portrait' />
-        </LocalizationProvider>
+    <div style={{ width: '200px' }}>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <StaticTimePicker
+          displayStaticWrapperAs="desktop"
+          value={time}
+          onChange={handleTimeChange}
+          orientation="portrait"
+        />
+      </LocalizationProvider>
     </div>
   );
-}
+};
 
-export default StaticTimePickerLandscape
+export default StaticTimePickerLandscape;

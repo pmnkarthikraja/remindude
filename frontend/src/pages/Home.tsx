@@ -28,7 +28,7 @@ const Home: FunctionComponent = () => {
     profilePicture: '',
     googlePicture: ''
   })
-  const { isLoading: isAuthLoading,status, mutateAsync: authMutation } = useAuthUser()
+  const { isLoading: isAuthLoading, status, mutateAsync: authMutation } = useAuthUser()
   const [platform, setPlatform] = useState<Platform>('Unknown')
   const onSignOut=useSignOutUser()
   const handlePlatformChange = (newPlatform: Platform) => {

@@ -5,10 +5,11 @@ import { userApi } from '../api/userApi';
 import React from 'react';
 import '../styles/alert.css'
 import { useSendOTPMutation, useVerifyOTPMutation } from '../hooks/userHooks';
+import { User } from './user';
 
 export interface ForgotPasswordAlertWithResendProps {
     closeAlert: () => void,
-    otpVerified: (otpVerified: boolean, email: string) => void
+    otpVerified: (otpVerified: boolean, email: string, user:User | undefined) => void
 }
 
 const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithResendProps> = ({
@@ -16,7 +17,7 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
     otpVerified
 }) => {
     const { isLoading: isSendOtpLoading, isError: isSendOtpError, error: sendOtpError, mutateAsync: sendOtpMutation } = useSendOTPMutation()
-    const { isLoading: isVerifyOtpLoading, isError:isVerifyOtpError,error:verifyOtpError, mutateAsync: verifyOtpMutation } = useVerifyOTPMutation()
+    const {data:verifyOtpData, isLoading: isVerifyOtpLoading, isError:isVerifyOtpError,error:verifyOtpError, mutateAsync: verifyOtpMutation } = useVerifyOTPMutation()
     const [email, setEmail] = useState('');
     const [showOtpAlert, setShowOtpAlert] = useState(false);
     const [otpVerifiedAlert, setOtpVerifiedAlert] = useState<{ state: boolean, title: string, msg: string }>({
@@ -27,7 +28,7 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
 
 
     const sendOtpQuery = async (email: string) => {
-        await sendOtpMutation({ email, accountVerification: true })
+        await sendOtpMutation({ email, accountVerification: false })
         setShowOtpAlert(true)
     }
 
@@ -44,19 +45,20 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
                     state: true
                 });
                 setTimeout(() => {
-                    otpVerified(true, email);
+                    console.log("otp verified data on forgetpasssection:",res.data)
+                    otpVerified(true, email,res?.data.user);
                     closeAlert();
                 }, 3000);
                 return
             } else {
                 setTimeout(() => {
-                    otpVerified(false, email);
+                    otpVerified(false, email,res?.data.user);
                     closeAlert();
                 }, 3000);
             }
         } catch (e) {
             setTimeout(() => {
-                otpVerified(false, email);
+                otpVerified(false, email,undefined);
                 closeAlert();
             }, 3000);
         }
@@ -109,7 +111,9 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
                     isOpen={true}
                     header={'Send OTP Failed!'}
                     message={sendOtpError.response?.status == 500 ? 'Check your internet connection' : sendOtpError.response?.data.message}
-                    buttons={['Ok']} />
+                    buttons={['Ok']} 
+                    onClick={()=>window.location.reload()}
+                    />
             }
 
             {isVerifyOtpError &&
