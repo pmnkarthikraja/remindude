@@ -16,7 +16,8 @@ export interface TaskModel extends Document{
     categoryLabel:string,
     status:'InProgress'|'Done',
     subTasks?:SubTaskData[],
-    checklists?:SubTaskData[]
+    checklists?:SubTaskData[],
+    timezone?:string
 }
 
 
@@ -103,13 +104,17 @@ const TaskSchema = new Schema({
     checklists:{
         type:[subTaskDataSchema],
         require:false
+    },
+    timezone:{
+        type:String,
+        require:false
     }
 },{
     timestamps:true
 })
 
 
-export default mongoose.model<TaskModel>('TaskTest',TaskSchema)
+export default mongoose.model<TaskModel>('TaskTestTimeZone',TaskSchema)
 
 
 export const subTasksDummy:SubTaskData[]=[

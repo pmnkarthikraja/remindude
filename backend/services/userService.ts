@@ -116,6 +116,9 @@ class UserService implements UserServiceImplementation {
 async SendOTP(email:string,accountVerification:boolean):Promise<{msg:string,otp:string}>{
   if (!accountVerification){
     const user= await userRepo.findOneByEmail(email)
+    if (user==null){
+      throw new DBErrUserNotFound()
+    }
     if (user){
       if (!!user.googleId){
         throw new DBErrOTPUserSignedUpByEmail()

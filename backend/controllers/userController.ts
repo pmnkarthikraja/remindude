@@ -1,9 +1,8 @@
+import { NextFunction, Request, Response } from 'express';
 import { UserModel } from "../models/UserModel";
+import userRepo from "../repo/userRepo";
 import UserService from "../services/userService";
-import {Request,Response,NextFunction} from 'express'
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound } from "../utils/handleErrors";
-import { GoogleUser } from "../view/googleUser";
-import axios from 'axios'
 
 let inMemoryOTP:Map<string,string>=new Map()
 
@@ -161,7 +160,9 @@ class UserController {
          res.status(409).json({message: err.name, success:false})
        }else if (err instanceof DBErrInternal) {
          res.status(500).json({ message: err.name, success: false });
-       } else {
+       } else if (err instanceof DBErrUserNotFound) {
+        res.status(404).json({ message: err.name, success: false });
+      } else {
          res.status(500).json({ message:  `An unexpected error occurred: ${err}`, success: false });
        }
       }
@@ -170,7 +171,8 @@ class UserController {
      public async verifyOTP(req:Request,res:Response):Promise<void>{
         const {email,otp}=req.body
         if (inMemoryOTP.get(email)==otp){
-          res.status(200).json({message:"OTP Verification successfull",success:true})
+          const user = await userRepo.findOneByEmail(email)
+          res.status(200).json({message:"OTP Verification successfull",success:true,user})
           inMemoryOTP=new Map()
           return
         }else{
