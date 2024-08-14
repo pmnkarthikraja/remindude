@@ -41,9 +41,10 @@ class UserAPIService implements UserAPI{
          }})
      }
  
-     async authToken ():Promise<AxiosResponse>{
+     async authToken (token:string):Promise<AxiosResponse>{
          return await axios.post(`${BASE_URL}/auth-user`,{},{withCredentials:true,headers:{
-             "Content-Type":"application/json"
+             "Content-Type":"application/json",
+             "Authorization":`Bearer ${token}`
          }})
      }
  

@@ -1,28 +1,50 @@
 import { IonAlert, IonButton, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonList, IonLoading, IonPage, IonRow, IonText } from '@ionic/react';
 import 'flag-icon-css/css/flag-icons.min.css';
 import { logoGoogle } from 'ionicons/icons';
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import 'react-phone-input-2/lib/style.css';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 import ForgotPasswordAlertWithResend from '../components/ForgetPasswordWithResend';
-import ResetPasswordPage from '../components/ResetPasswordPage';
 import { User } from '../components/user';
-import { useEmailSigninMutation, useGoogleSigninMutation } from '../hooks/userHooks';
+import { useAuthUser, useEmailSigninMutation, useGoogleSigninMutation } from '../hooks/userHooks';
 import '../styles/LoginPage.css';
-import ChangePasswordModal from '../components/ChangePasswordModal'
 
 
 const LoginPage: FunctionComponent = () => {
   const { register, handleSubmit, watch, clearErrors, setValue, formState: { errors } } = useForm<User>();
-  const { data: emailSignInData, isLoading: isEmailSigninLoading, isError: isEmailSigninError, error: emailSigninError, isSuccess: isEmailSigninSuccess, mutateAsync: emailSigninMutation } = useEmailSigninMutation()
+  const { data: emailSignInData, isLoading: isEmailSigninLoading, isError: isEmailSigninError, error: emailSigninError, isSuccess: isEmailSigninSuccess, mutateAsync: emailSigninMutation } = useEmailSigninMutation(false)
   const { isLoading: isGoogleSigninLoading, isError: isGoogleSigninError, error: googleSigninError, isSuccess: isGoogleSigninSuccess, mutateAsync: googleSigninMutation } = useGoogleSigninMutation()
+  const { mutateAsync: authUser } = useAuthUser()
 
   const [forgetPassword, setForgetPassword] = useState(false)
-  const [otpVerified, setOtpVerified] = useState<{ otpVerified: boolean, email: string,user:User|undefined }>({
+  const [otpVerified, setOtpVerified] = useState<{ otpVerified: boolean, email: string, user: User | undefined }>({
     email: '',
     otpVerified: false,
-    user:undefined
+    user: undefined
   })
+
+  useEffect(() => {
+    const validateSession = async (token: string) => {
+      try {
+        await authUser(token)
+        window.location.href = '/home'
+      } catch (e) {
+        console.log("session not found: " + e)
+        window.location.href = '/login'
+
+      }
+    }
+    const token = window.localStorage.getItem('token');
+
+    // if (token == null) {
+    //   window.location.href = '/login'
+    // }
+
+    if (token != null) {
+      validateSession(token)
+    }
+  }, [authUser,history,localStorage]);
 
 
   const signInQuery = async () => {
@@ -140,7 +162,7 @@ const LoginPage: FunctionComponent = () => {
 
                 {forgetPassword && !otpVerified.otpVerified &&
                   <ForgotPasswordAlertWithResend
-                    otpVerified={(otpVerified, email,user) => {
+                    otpVerified={(otpVerified, email, user) => {
                       setOtpVerified({
                         email,
                         otpVerified,
@@ -156,17 +178,17 @@ const LoginPage: FunctionComponent = () => {
                 })} />} */}
 
                 {otpVerified.otpVerified && <ChangePasswordModal isOpen={true} forgotPassword={true} user={otpVerified.user || {
-                  email:'',
-                  googlePicture:'',
-                  password:'',
-                  profilePicture:'',
-                  userName:''
-                }} 
-                onClose={() => setOtpVerified({
                   email: '',
-                  otpVerified: false,
-                  user:undefined
-                })} />}
+                  googlePicture: '',
+                  password: '',
+                  profilePicture: '',
+                  userName: ''
+                }}
+                  onClose={() => setOtpVerified({
+                    email: '',
+                    otpVerified: false,
+                    user: undefined
+                  })} />}
 
 
                 <div style={{ display: 'flex', width: '300px', marginLeft: '15px', flexDirection: 'column', alignItems: 'center' }}>

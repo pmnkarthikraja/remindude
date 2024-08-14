@@ -16,11 +16,12 @@ import { User } from '../components/user';
 import '../styles/Home.css';
 import HomePage from './HomePage';
 import ProfilePage from './ProfilePage';
-import { useAuthUser, useSignOutUser } from '../hooks/userHooks';
+import { useAuthUser } from '../hooks/userHooks';
 
 
 const Home: FunctionComponent = () => {
-  const [cookies, , removeCookie] = useCookies(['token'])
+  // const [cookies, , removeCookie] = useCookies(['token'])
+  const [token, setToken] = useState<string | null>(null)
   const [user, setUser] = useState<User>({
     email: '',
     password: '',
@@ -28,39 +29,53 @@ const Home: FunctionComponent = () => {
     profilePicture: '',
     googlePicture: ''
   })
-  const { isLoading: isAuthLoading, status, mutateAsync: authMutation } = useAuthUser()
+  const {data, isLoading: isAuthLoading, status, mutateAsync: authMutation } = useAuthUser()
   const [platform, setPlatform] = useState<Platform>('Unknown')
-  const onSignOut=useSignOutUser()
+  // const onSignOut=useSignOutUser()
   const handlePlatformChange = (newPlatform: Platform) => {
     setPlatform(newPlatform);
   };
   useGetPlatform(handlePlatformChange)
 
   useEffect(() => {
-    const verifyCookie = async () => {
-        const res = await authMutation();
-        const userData: User = res.data.user
-        const img = 'data:image/*;base64,' + userData.profilePicture
-        const googlePicture = userData.profilePicture
-        setUser({
-          email: userData.email,
-          userName: userData.userName,
-          password:userData.password,
-          profilePicture: img,  
-          googlePicture
-        })
-    };
-    verifyCookie();
-  }, [cookies, history, removeCookie]);
+    const validateSession = async (token: string) => {
+        try {
+           const res=  await authMutation(token)
+           const userData: User = res.data.user
+           const img = 'data:image/*;base64,' + userData.profilePicture
+           const googlePicture = userData.profilePicture
+           setUser({
+             email: userData.email,
+             userName: userData.userName,
+             password:userData.password,
+             profilePicture: img,  
+             googlePicture
+           })
+        } catch (e) {
+            console.log("session not found: " + e)
+            window.location.href='/login'
+        }
+    }
+    const token = window.localStorage.getItem('token');
+    setToken(token)
+    if (token == null) {
+      window.location.href='/login'
+    }
+    if (token != null) {
+        validateSession(token)
+    }
+}, [authMutation, history,localStorage]);
 
   const signOut = async () => {
     try {
-      onSignOut()
+      console.log("on sign out before: ",localStorage.getItem('token'))
+        localStorage.removeItem('token')
+        console.log("after removed: ",localStorage.getItem('token'))
+        window.location.href='/login'
     } catch (e) {
-      console.log("Error on google sign out", e)
+        console.log("signout failed: ", e)
     }
-  };
-  
+}
 
   return (<Fragment>
     {status=='success' &&

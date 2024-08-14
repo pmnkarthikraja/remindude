@@ -12,7 +12,7 @@ import '../styles/SignupPage.css';
 
 const SignupPage: FunctionComponent = () => {
   const { register, watch, handleSubmit,setValue,clearErrors, formState: { errors } } = useForm<User>();
-  const { isLoading: isEmailSignupLoading, isError: isEmailSignupError, error: emailSignupError, mutateAsync: emailSignupMutation } = useEmailSignupMutation()
+  const { isLoading: isEmailSignupLoading, isError: isEmailSignupError, error: emailSignupError, mutateAsync: emailSignupMutation } = useEmailSignupMutation(false)
   const { isLoading: isSendOtpLoading, isError: isSendOtpError, error: sendOtpError, mutateAsync: sendOtpMutation } = useSendOTPMutation()
   const { isLoading: isGoogleSignupLoading, isError: isGoogleSignupError, error: googleSignupError, status, mutateAsync: googleSignupMutation } = useGoogleSignupMutation()
   const [alertIsOpen, setAlertIsOpen] = useState(false);

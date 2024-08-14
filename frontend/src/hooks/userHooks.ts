@@ -12,7 +12,7 @@ interface AxiosErrorType {
 }
 
 
-export const useEmailSignupMutation = () => {
+export const useEmailSignupMutation = (validatePassword:boolean) => {
   const queryClient = useQueryClient();
   const history = useHistory()
 
@@ -21,6 +21,9 @@ export const useEmailSignupMutation = () => {
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('userDetails');
+        if (!validatePassword){
+          localStorage.setItem('token',data.data.token)
+        }
         setTimeout(() => {
           history.push('/home');
           
@@ -39,31 +42,23 @@ export const useAuthUser = () => {
   return useMutation<
   AxiosResponse<{ message: string, success: boolean, user: User }, AxiosError<AxiosErrorType>>, 
   AxiosError<AxiosErrorType>, 
-  void,
+  string,
   unknown
   >(
     'authenticateUser', 
-    ()=> userApi.authToken(),
+    (token:string)=> userApi.authToken(token),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('userDetails');
       },
       onError: (e) => {
+        alert("error on auth:"+e)
         console.log("Error during authentication", e);
         window.location.href='/login'
       }
     }
   );
 };
-
-export const useSignOutUser = () => {
-  const [, , removeCookie] = useCookies(['token']);
-  return () => {
-    removeCookie('token');
-    window.location.href='/login'
-  };
-};
-
 
 interface OTPPayload {
   email: string,
@@ -193,11 +188,13 @@ const signInWithGoogle = async (): Promise<GoogleUser | null> => {
 
 
 const googleSignup = async (accessToken: string) => {
-  await userApi.googleSignup(accessToken);
+ const data=  await userApi.googleSignup(accessToken);
+ localStorage.setItem('token',data.data.token)
 };
 
 const googleSignin = async (googleId:string,email:string)=>{
-  await userApi.googleLogin(googleId,email)
+  const data= await userApi.googleLogin(googleId,email)
+  localStorage.setItem('token',data.data.token)
 }
 
 
@@ -255,7 +252,7 @@ export const useGoogleSigninMutation = () => {
 }
 
 
-export const useEmailSigninMutation = () => {
+export const useEmailSigninMutation = (validatePassword:boolean) => {
   const queryClient = useQueryClient();
   const history = useHistory()
 
@@ -264,6 +261,9 @@ export const useEmailSigninMutation = () => {
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('userLogin');
+        if (!validatePassword){
+          localStorage.setItem('token',data.data.token)
+        }
         setTimeout(() => {
           history.push('/home')
         }, 2500)
