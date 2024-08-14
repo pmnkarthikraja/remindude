@@ -14,8 +14,8 @@ export interface UserAPI{
     validatePassword :(email:string,password:string)=>Promise<AxiosResponse>
 }
 
-const BASE_URL = "http://localhost:4000"
-// const BASE_URL="https://remindude.vercel.app"
+// const BASE_URL = "http://localhost:4000"
+const BASE_URL="https://remindude.vercel.app"
 
 class UserAPIService implements UserAPI{
     async signup (user:User): Promise<AxiosResponse>{
