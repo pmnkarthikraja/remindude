@@ -12,17 +12,12 @@ class UserController {
       try {
         const user: UserModel = { userName, email, password } as UserModel;
         const { user: newUser, token } = await UserService.SignUp(user);
-    
-        res.cookie('token', token, {
-          httpOnly:false,
-          secure:true,
-          sameSite:'none'
-        });
-    
+
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Signed up Successfully',
           success: true,
           user: newUser,
+          token
         });
       } catch (err:any) {
         if (err instanceof DBErrUserAlreadyExist) {
@@ -39,17 +34,12 @@ class UserController {
       const {accessToken}=req.body
       try{
         const {user,token} = await UserService.GoogleSignUp(accessToken)
-        
-        res.cookie('token',token,{
-          httpOnly:false,
-          sameSite: 'none',
-          secure:true,
-        })
-
+      
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Signed up Successfully with google',
           success: true,
           user,
+          token
         });
       
         next();
@@ -69,16 +59,11 @@ class UserController {
       console.log("user login",{email,password})
       try{
         const {user,token} = await UserService.SignIn(email,password)
-        res.cookie('token', token, {
-          httpOnly:false,
-          secure:true,
-          sameSite:'none'
-        });
-    
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Logged In up Successfully',
           success: true,
           user: user,
+          token
         });
 
         next();
@@ -100,16 +85,12 @@ class UserController {
       const {googleId,email}=req.body
       try{
         const {user,token} =await UserService.GoogleSignIn(googleId,email)
-        res.cookie('token',token,{
-          httpOnly:false,
-          secure:true,
-          sameSite:'none'
-        })
 
         res.setHeader('Authorization',token).status(201).json({
           message: 'User Successfully Logged In via Google',
           success:true,
-          user
+          user,
+          token
         })
         next()
       }catch(err:any){
@@ -126,26 +107,47 @@ class UserController {
       }
     }
 
+    // public async authUser(req:Request,res:Response,next:NextFunction):Promise<void>{
+    //  try{
+    //   const token = req.cookies.token
+    //   if (!token){
+    //      res.status(401).json({message:"User Not Authorized",status:false})
+    //     return
+    //   }
+    //   const {user}= await UserService.AuthUser(token)
+    //     res.status(200).json({message:"successfully authorized",status:true,user})
+    //   next();
+    //  }catch(err:any){
+    //   if (err instanceof DBErrTokenExpired){
+    //     res.status(403).json({message: err.name, success:false})
+    //   }else if (err instanceof DBErrInternal) {
+    //     res.status(500).json({ message: err.name, success: false });
+    //   } else {
+    //     res.status(500).json({ message:  `An unexpected error occurred: ${err}`, success: false });
+    //   }
+    //  }
+    // }
+
     public async authUser(req:Request,res:Response,next:NextFunction):Promise<void>{
-     try{
-      const token = req.cookies.token
-      if (!token){
-         res.status(401).json({message:"User Not Authorized",status:false})
-        return
-      }
-      const {user}= await UserService.AuthUser(token)
-        res.status(200).json({message:"successfully authorized",status:true,user})
-      next();
-     }catch(err:any){
-      if (err instanceof DBErrTokenExpired){
-        res.status(403).json({message: err.name, success:false})
-      }else if (err instanceof DBErrInternal) {
-        res.status(500).json({ message: err.name, success: false });
-      } else {
-        res.status(500).json({ message:  `An unexpected error occurred: ${err}`, success: false });
+      try{
+       const token = req.headers.authorization?.split(' ')[1];
+       if (!token){
+          res.status(401).json({message:"User Not Authorized",success:false})
+         return
+       }
+       const {user}= await UserService.AuthUser(token)
+         res.status(200).json({message:"successfully authorized",success:true,user})
+       next();
+      }catch(err:any){
+       if (err instanceof DBErrTokenExpired){
+         res.status(403).json({message: err.name, success:false})
+       }else if (err instanceof DBErrInternal) {
+         res.status(500).json({ message: err.name, success: false });
+       } else {
+         res.status(500).json({ message:  `An unexpected error occurred: ${err}`, success: false });
+       }
       }
      }
-    }
 
     public async sendOTP(req:Request,res:Response,next:NextFunction):Promise<void>{
       try{

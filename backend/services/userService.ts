@@ -7,6 +7,7 @@ import createJSONWebToken from '../utils/authToken';
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound } from '../utils/handleErrors';
 import { getUserInfo } from '../utils/helper';
 require("dotenv").config();
+import UserSchema from '../models/UserModel';
 
 export interface JwtPayload extends BaseJwtPayload {
   id?: string;
@@ -63,6 +64,7 @@ class UserService implements UserServiceImplementation {
  async SignIn(email: string, password: string): Promise<{ user: UserModel; token: string; }>{
   //find the user by email
   const existingUser =await userRepo.findOneByEmail(email)
+  console.log("existing user: ",existingUser)
   if (existingUser==null){
     throw new DBErrUserNotFound()
   }
