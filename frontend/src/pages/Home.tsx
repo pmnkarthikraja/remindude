@@ -27,7 +27,7 @@ const Home: FunctionComponent = () => {
     password: '',
     userName: '',
     profilePicture: '',
-    googlePicture: ''
+    googlePicture: undefined
   })
   const {data, isLoading: isAuthLoading, status, mutateAsync: authMutation } = useAuthUser()
   const [platform, setPlatform] = useState<Platform>('Unknown')
@@ -43,13 +43,13 @@ const Home: FunctionComponent = () => {
            const res=  await authMutation(token)
            const userData: User = res.data.user
            const img = 'data:image/*;base64,' + userData.profilePicture
-           const googlePicture = userData.profilePicture
+           console.log("user: ",userData)
            setUser({
              email: userData.email,
              userName: userData.userName,
              password:userData.password,
              profilePicture: img,  
-             googlePicture
+             googlePicture: userData.profilePicture
            })
         } catch (e) {
             console.log("session not found: " + e)

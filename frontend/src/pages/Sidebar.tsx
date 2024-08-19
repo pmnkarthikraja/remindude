@@ -1,5 +1,5 @@
 import { IonCol, IonItem, IonAvatar, IonText, IonLabel, IonImg } from "@ionic/react"
-import { FunctionComponent } from "react"
+import { FunctionComponent, useEffect, useState } from "react"
 import React from 'react'
 import { User } from "../components/user"
 import { chooseAvatar } from "../utils/util"
@@ -30,10 +30,12 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
   buildPageNav,
   pageNav
 }) => {
+  const googlepic = user.googlePicture || ''
   const userAvatar = chooseAvatar(user)
   const currentTime = new Date().getHours()
   const greetMsg = currentTime < 12 && 'Good Morning' || currentTime < 18 && 'Good Afternoon' || 'Good Evening'
 
+  console.log("from home: ",{user})
   return (<IonCol className="sidebar" size="2">
     <IonItem>
       <img style={{ width: 'auto', height: 'auto' }} src={'/assets/logonew1.png'} alt="avatar" />
@@ -41,8 +43,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
     <IonItem>
       <IonCol size="auto">
         <IonAvatar>
-          <img style={{ width: '50px', height: '50px' }}
-            src={userAvatar} alt="avatar" />
+          <img style={{ width: '50px', height: '50px' }} src={userAvatar} alt="avatar" />
         </IonAvatar>
       </IonCol>
       <IonCol>

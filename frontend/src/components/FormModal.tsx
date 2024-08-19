@@ -71,7 +71,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
         } else if (!isEdit) {
             setSelectedDate(dayjs().format('YYYY-MM-DD'));
             setSelectedTime(new Date());
-            setInitialTime(null);
+            setInitialTime(new Date());
         }
     }, [isEdit, datetime]);
 
