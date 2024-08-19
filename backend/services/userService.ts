@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload as BaseJwtPayload } from 'jsonwebtoken';
-import { sendEmail } from '../utils/sendEmail';
 import { UserModel } from '../models/UserModel';
 import userRepo from '../repo/userRepo';
 import createJSONWebToken from '../utils/authToken';
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from '../utils/handleErrors';
 import { getUserInfo } from '../utils/helper';
+import { sendEmail } from '../utils/sendEmail';
 require("dotenv").config();
-import UserSchema from '../models/UserModel';
 
 export interface JwtPayload extends BaseJwtPayload {
   id?: string;
@@ -69,7 +68,7 @@ class UserService implements UserServiceImplementation {
     throw new DBErrUserNotFound()
   }
 
-  if (existingUser.email!==''){
+  if (existingUser.googleId){
     throw new DBErrUserSignedUpWithGoogle()
   }
 
