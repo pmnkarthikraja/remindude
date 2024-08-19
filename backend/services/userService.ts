@@ -4,7 +4,7 @@ import { sendEmail } from '../utils/sendEmail';
 import { UserModel } from '../models/UserModel';
 import userRepo from '../repo/userRepo';
 import createJSONWebToken from '../utils/authToken';
-import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound } from '../utils/handleErrors';
+import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from '../utils/handleErrors';
 import { getUserInfo } from '../utils/helper';
 require("dotenv").config();
 import UserSchema from '../models/UserModel';
@@ -64,9 +64,13 @@ class UserService implements UserServiceImplementation {
  async SignIn(email: string, password: string): Promise<{ user: UserModel; token: string; }>{
   //find the user by email
   const existingUser =await userRepo.findOneByEmail(email)
-  console.log("existing user: ",existingUser)
+
   if (existingUser==null){
     throw new DBErrUserNotFound()
+  }
+
+  if (existingUser.email!==''){
+    throw new DBErrUserSignedUpWithGoogle()
   }
 
   const isPasswordMatch = await bcrypt.compare(password,existingUser.password)

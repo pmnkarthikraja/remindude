@@ -28,6 +28,14 @@ export class DBErrCredentialsMismatch extends Error {
   }
 }
 
+export class DBErrUserSignedUpWithGoogle extends Error {
+  constructor() {
+    super();
+    this.name = "You signed up using Google. Please use 'Sign In with Google' to log in"
+  }
+}
+
+
 export class DBErrTokenExpired extends Error {
   constructor() {
     super();
