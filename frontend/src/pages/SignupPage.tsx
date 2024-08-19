@@ -1,17 +1,28 @@
-
-import { IonAlert, IonButton, IonCol, IonContent, IonGrid, IonIcon, IonImg, IonInput, IonItem, IonList, IonLoading, IonPage, IonRow, IonText } from '@ionic/react';
-import 'flag-icon-css/css/flag-icons.min.css';
-import { logoGoogle } from 'ionicons/icons';
-import React, { FunctionComponent, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import 'react-phone-input-2/lib/style.css';
-import AccountVerification from '../components/AccountVerification';
+import {
+  IonAlert,
+  IonButton,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonImg,
+  IonInput,
+  IonItem,
+  IonLoading,
+  IonPage,
+  IonRow,
+  IonToast,
+  IonToolbar
+} from '@ionic/react';
+import React, { useEffect, useState } from 'react';
+import '../styles/LoginPageModel.css';
 import { User } from '../components/user';
-import { useEmailSignupMutation, useGoogleSignupMutation, useSendOTPMutation } from '../hooks/userHooks';
-import '../styles/SignupPage.css';
+import { useForm } from 'react-hook-form';
+import { useEmailSignupMutation, useSendOTPMutation, useGoogleSignupMutation } from '../hooks/userHooks';
+import AccountVerification from '../components/AccountVerification';
 
-const SignupPage: FunctionComponent = () => {
-  const { register, watch, handleSubmit,setValue,clearErrors, formState: { errors } } = useForm<User>();
+const SignupPage: React.FC = () => {
+  const { register, watch, handleSubmit, setValue, clearErrors, formState: { errors } } = useForm<User>();
   const { isLoading: isEmailSignupLoading, isError: isEmailSignupError, error: emailSignupError, mutateAsync: emailSignupMutation } = useEmailSignupMutation(false)
   const { isLoading: isSendOtpLoading, isError: isSendOtpError, error: sendOtpError, mutateAsync: sendOtpMutation } = useSendOTPMutation()
   const { isLoading: isGoogleSignupLoading, isError: isGoogleSignupError, error: googleSignupError, status, mutateAsync: googleSignupMutation } = useGoogleSignupMutation()
@@ -55,7 +66,15 @@ const SignupPage: FunctionComponent = () => {
 
   return (
     <IonPage>
-      <IonContent>
+      <IonHeader style={{ backgroundColor: '#1C0941' }}>
+        <IonToolbar>
+          <div className="header-content">
+            <div className="header-quote" >Your Next Step is Just a <span style={{ color: 'red' }}>Sign-Up </span>Away!</div>
+          </div>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="login-content">
+
         {alertIsOpen && !otpVerified && (
           <AccountVerification
             forgotPassword={false}
@@ -90,14 +109,14 @@ const SignupPage: FunctionComponent = () => {
             {
               text: 'Go to Login',
               role: 'confirm',
-              handler:()=> {
-                window.location.href='/login'
+              handler: () => {
+                window.location.href = '/login'
               }
             },]}
           ></IonAlert>
         </>}
 
-        {isGoogleSignupError && googleSignupError.message == 'popup_closed_by_user' && 
+        {isGoogleSignupError && googleSignupError.message == 'popup_closed_by_user' &&
           <IonAlert
             className='alert'
             isOpen={true}
@@ -113,102 +132,66 @@ const SignupPage: FunctionComponent = () => {
           ></IonAlert>
         }
 
-        <div>
-          <div className="header-section-signup">
-            <IonGrid>
-              <IonRow>
-                <IonCol size='auto'>
-                  <IonImg src='./assets/logo2.png' style={{ width: '100px', height: '100px' }} />
-                </IonCol>
-                <IonCol>
-                  <IonText>
-                    <h2 style={{ textAlign: 'center', marginRight: '60px' }}>Register</h2>
-                  </IonText>
-                  <p style={{ textAlign: 'center', marginRight: '60px' }} className="subtitle">Welcome, please create your account using email address</p>
-                </IonCol>
-              </IonRow>
-            </IonGrid>
-          </div>
+        {(errors.userName || errors.email || errors.password) && <IonToast color={'danger'}
+          onDidDismiss={() => clearErrors()}
+          buttons={[
+            {
+              text: 'Ok',
+              role: 'cancel',
+              handler: clearErrors
+            },
+          ]} position="top" isOpen={true} message={(errors.email && "Email is required!") || (errors.password && 'Password is required!') || (errors.userName && "Username is required!") || '' } duration={3000}></IonToast>}
 
-          <div className="scrollable-section">
-            <IonImg src="/assets/login3.png" alt="Logo" className="logo1" />
-            <div className='form-inputs'>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <IonList style={{ width: '80%', marginLeft: '20px' }}>
-                  <IonItem>
-                    <IonInput type='text'
-                      {...register('userName', { required: true })}
-                      onIonInput={()=>clearErrors('userName')}
-                      labelPlacement="floating">
-                      <div slot="label">
-                        User Name <IonText color="danger">*</IonText>
-                      </div>
-                    </IonInput>
-                    {errors.userName && <IonText color='danger'>user name is required!</IonText>}
+        <IonGrid>
+          <IonRow className="ion-justify-content-center animate__fadeInDown animate__animated">
+            <IonCol size="12" size-md="8" size-lg="6" sizeSm='8' sizeLg='4'>
+              <div className="login-box">
+                <IonImg src="/assets/signup.png" alt="Company Logo" className="header-logo animate__bounceIn animate__animated" />
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  <IonItem className="input-item" >
+                    <IonInput
+                      color={errors.userName && 'danger'}
+                      {...register('userName', { required: true})}
+                      onIonInput={() => clearErrors('userName')}
+                      label='Username' labelPlacement='floating' type="text"/>
                   </IonItem>
-                  <IonItem>
-                    <IonInput type='email'
+                  <IonItem className="input-item">
+                    <IonInput
+                      color={errors.email && 'danger'}
                       {...register("email", { required: true })}
-                      onIonInput={()=>clearErrors('email')}
-                      labelPlacement="floating">
-                      <div slot="label">
-                        Email <IonText color="danger">*</IonText>
-                      </div>
-                    </IonInput>
-                    {errors.email && <IonText color='danger'>email is required!</IonText>}
+                      onIonInput={() => clearErrors('email')}
+                      label='Email' labelPlacement='floating' type="email" />
                   </IonItem>
-                  <IonItem>
-                    <IonInput type='password'
+                  <IonItem className="input-item">
+                    <IonInput
+                      color={errors.password && 'danger'}
                       {...register("password", { required: true })}
-                      onIonInput={(e)=>{
+                      onIonInput={(e) => {
                         clearErrors('password');
-                        setValue('password',e.target.value as string)
+                        setValue('password', e.target.value as string)
                       }}
-                      labelPlacement="floating">
-                      <div slot="label">
-                        Password <IonText color="danger"></IonText>
-                      </div>
-                    </IonInput>
-                    {errors.password && <IonText color='danger'>password is required!</IonText>}
+                      label='Password' labelPlacement='floating' type="password" />
                   </IonItem>
-                  {/* <IonItem>
-                    <PhoneInput
-                      country={'in'}
-                      value={phone}
-                      specialLabel='Mobile'
-                      onChange={setPhone}
-                    />
-                  </IonItem> */}
-                </IonList>
+                  <IonButton type='submit' expand="block" className="login-button animate__bounceIn animate__animated">
+                    Register
+                  </IonButton>
+                </form>
 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div >
-                    <IonButton type='submit' style={{ width: '200px' }} color='secondary' size='small' >Register</IonButton>
-                  </div>
-                  <div>
-                    or
-                  </div>
-                  <div >
-                    <IonButton style={{ width: '200px' }} color='danger' size='small' onClick={googleSignupQuery}>
-                      <IonIcon icon={logoGoogle}></IonIcon>
-                      Sign Up
-                    </IonButton>
-                  </div>
-                  <div style={{ height: '20px' }}></div>
-                  <div>
-                    <IonButton fill='clear' href='/login' color='primary'><span style={{ textTransform: 'none' }}>Already have an account ?</span></IonButton>
-                  </div>
+                <div className="or-text">Or Sign Up Using</div>
+                <div className="social-buttons">
+                  <IonButton onClick={googleSignupQuery} fill="clear" className="social-icon-button animate__bounceIn animate__animated">
+                    <img src="assets/google.png" alt="Facebook" className="social-icon" />
+                  </IonButton>
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
+                <div className="signup-text">Already have an account ?</div>
+                <div className="signup-link" onClick={() => window.location.href = '/login'}>Go to Login</div>
+              </div>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       </IonContent>
     </IonPage>
   );
 };
 
 export default SignupPage;
-
-
-
