@@ -145,7 +145,8 @@ export const useResetPassword = () => {
 const initializeGoogleAuth = async () => {
   try {
     await GoogleAuth.initialize({
-      clientId: '312340865452-v83k8uchncmkgufublc2ee3da5bkhops.apps.googleusercontent.com',
+      // clientId: '312340865452-v83k8uchncmkgufublc2ee3da5bkhops.apps.googleusercontent.com',
+      clientId:'312340865452-g3vcao11ukkovh2o19ic8ka9h3pasdmj.apps.googleusercontent.com',
       scopes: ['profile', 'email'],
       grantOfflineAccess: true,
     });
