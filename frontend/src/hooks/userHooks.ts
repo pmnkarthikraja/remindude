@@ -52,9 +52,8 @@ export const useAuthUser = () => {
         queryClient.invalidateQueries('userDetails');
       },
       onError: (e) => {
-        alert("error on auth:"+e)
         console.log("Error during authentication", e);
-        window.location.href='/login'
+        // window.location.href='/login'
       }
     }
   );

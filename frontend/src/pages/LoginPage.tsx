@@ -31,15 +31,9 @@ const LoginPage: FunctionComponent = () => {
         window.location.href = '/home'
       } catch (e) {
         console.log("session not found: " + e)
-        window.location.href = '/login'
-
       }
     }
     const token = window.localStorage.getItem('token');
-
-    // if (token == null) {
-    //   window.location.href = '/login'
-    // }
 
     if (token != null) {
       validateSession(token)
