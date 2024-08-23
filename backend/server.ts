@@ -9,6 +9,7 @@ import bodyParser from 'body-parser';
 
 import taskRoutes from './routes/taskRoutes';
 import userRoutes from './routes/userRoutes';
+import holidayRoutes from './routes/holidayRoutes'
 
 export const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -33,12 +34,13 @@ app.use(cookieParser())
 app.use(express.json())
 app.use('/', userRoutes);
 app.use('/',taskRoutes)
+app.use('/',holidayRoutes)
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 
 let serverStarted=false
-export const startServer = () => {
-  app.listen(process.env.PORT, () => {
+export const startServer = async () => {
+  app.listen(process.env.PORT, async () => {
     console.log(`Server started listening on port ${process.env.PORT}`);
     serverStarted=true
   });

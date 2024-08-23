@@ -3,6 +3,8 @@ import { Strategy as GoogleStrategy, StrategyOptionsWithRequest } from 'passport
 import UserModel from '../models/UserModel';
 
 
+//CURRENTLY PASSPPORT IS NOT IN USE.
+
 //passport configuration
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET

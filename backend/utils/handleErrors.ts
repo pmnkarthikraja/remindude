@@ -46,7 +46,7 @@ export class DBErrTokenExpired extends Error {
 export class DBErrTaskTimeElapsed extends Error{
   constructor(){
     super();
-    this.name = "Task cannot be created for a past time"
+    this.name = "Task cannot be created or updated for a past time"
   }
 }
 
