@@ -30,12 +30,10 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
   buildPageNav,
   pageNav
 }) => {
-  const googlepic = user.googlePicture || ''
   const userAvatar = chooseAvatar(user)
   const currentTime = new Date().getHours()
   const greetMsg = currentTime < 12 && 'Good Morning' || currentTime < 18 && 'Good Afternoon' || 'Good Evening'
 
-  console.log("from home: ",{user})
   return (<IonCol className="sidebar" size="2">
     <IonItem>
       <img style={{ width: 'auto', height: 'auto' }} src={'/assets/logonew1.png'} alt="avatar" />

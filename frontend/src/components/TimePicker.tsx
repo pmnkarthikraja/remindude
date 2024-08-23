@@ -35,7 +35,6 @@ const StaticTimePickerLandscape: React.FunctionComponent<StaticTimePickerProps> 
 
   React.useEffect(() => {
     if (initialTime && selectedTimezone) {
-      console.log("initial time on timepicker:",initialTime)
       const parsedTime1 = dayjs(initialTime).utcOffset(0,false).tz(selectedTimezone)
 
       setTime(parsedTime1);

@@ -1,4 +1,4 @@
-import { IonAccordion, IonAccordionGroup, IonBadge, IonButton, IonCheckbox, IonImg, IonInput, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonPopover, IonRow, IonText, IonTitle } from '@ionic/react';
+import { IonAccordion, IonAccordionGroup, IonBadge, IonButton, IonButtons, IonCheckbox, IonImg, IonInput, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonPopover, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { Control, useFieldArray, useForm } from 'react-hook-form';
 import * as uuid from 'uuid';
@@ -100,7 +100,7 @@ const SubTaskForm: FunctionComponent<SubTaskFormProps> = ({
       <IonPopover mode='ios' id='add-subtask-popover' isOpen={popoverOpen} onDidDismiss={() => setPopoverOpen(false)}>
         <IonTitle>Add Subtask popover</IonTitle>
         <form id='add-subtask-form'>
-          <IonItem id='subtask-title' lines='none'>
+          <IonItem id='subtask-title' lines='full'>
             <IonInput id='subtitle-input'
               onIonInput={() => clearErrors('subtitle')}
               {...register("subtitle", {
@@ -112,20 +112,22 @@ const SubTaskForm: FunctionComponent<SubTaskFormProps> = ({
               label='Title' labelPlacement='floating'></IonInput>
             {errors.subtitle && <IonText color="danger">Title is required</IonText>}
           </IonItem>
-          <IonItem id='subtask-description' lines='none'>
+          <IonItem id='subtask-description' lines='full'>
             <IonInput id='subdescription-input'
               {...register("subdescription")}
               label='Description' labelPlacement='floating'></IonInput>
           </IonItem>
-          <IonItem id='subtask-optional' lines='none'>
+          <IonItem id='subtask-optional' lines='full'>
             <IonCheckbox checked={optionalValue} value={optionalValue}
               onIonChange={e => setValue('optional', !optionalValue)}>
               Optional</IonCheckbox>
           </IonItem>
-          <IonRow >
-            <IonButton onClick={() => { setPopoverOpen(false); }} color={'warning'}>Cancel</IonButton>
-            <IonButton id='subtask-submit' onClick={handleSubmit(onSubmit)} color={'success'}>Submit</IonButton>
-          </IonRow>
+          <IonToolbar>
+            <IonButtons slot='secondary'>
+            <IonButton size='small'  fill='solid' onClick={() => { setPopoverOpen(false); }} color={'warning'}>Cancel</IonButton>
+            <IonButton size='small'  fill='solid' id='subtask-submit' onClick={handleSubmit(onSubmit)} color={'success'}>Submit</IonButton>
+            </IonButtons>
+            </IonToolbar>
         </form>
       </IonPopover>
 

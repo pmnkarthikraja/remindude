@@ -15,7 +15,7 @@ export interface UserAPI{
 }
 
 // const BASE_URL = "http://localhost:4000"
-const BASE_URL="https://remindude.vercel.app"
+const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude.vercel.app" :  "http://localhost:4000"
 
 class UserAPIService implements UserAPI{
     async signup (user:User): Promise<AxiosResponse>{

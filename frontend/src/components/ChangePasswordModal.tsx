@@ -1,6 +1,6 @@
 import {
     IonAvatar,
-    IonButton, IonContent,
+    IonButton, IonButtons, IonContent,
     IonFooter,
     IonHeader,
     IonIcon,
@@ -10,7 +10,7 @@ import {
     IonNote,
     IonTitle, IonToolbar
 } from '@ionic/react';
-import { closeOutline } from 'ionicons/icons';
+import { arrowBack, closeOutline } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useResetPassword, useValidatePassword } from '../hooks/userHooks';
 import { User } from './user';
@@ -75,7 +75,11 @@ const ChangePasswordModal: FunctionComponent<ChangePasswordModalProps> = ({ isOp
         <IonModal isOpen={isOpen} onDidDismiss={onClose}>
             <IonHeader>
                 <IonToolbar>
+                    <IonButtons>
                     <IonTitle>{forgotPassword ? 'Reset Password' : 'Change Password'}</IonTitle>
+                    <IonIcon onClick={onClose} style={{ padding: '10px' }} icon={arrowBack} slot='start' size='default' />
+                    </IonButtons>
+                    
                     <IonAvatar slot='end' style={{ width: '80px', height: '80px', padding: '10px' }}>
                         {!forgotPassword && <img src={user.profilePicture || user.googlePicture} alt="avatar" style={{ width: '70px' }} />}
                         {forgotPassword &&

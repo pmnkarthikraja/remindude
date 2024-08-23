@@ -143,6 +143,9 @@ const SignupPage: React.FC = () => {
           ]} position="top" isOpen={true} message={(errors.email && "Email is required!") || (errors.password && 'Password is required!') || (errors.userName && "Username is required!") || '' } duration={3000}></IonToast>}
 
         <IonGrid>
+        <div className="header-content">
+            <img className='animate__bounceIn animate__animated'  src="assets/logonew1.png" alt="logo" style={{height:'100px',alignItems:'center', textAlign:'center',marginRight:'auto', marginLeft:'auto'}} />
+          </div>
           <IonRow className="ion-justify-content-center animate__fadeInDown animate__animated">
             <IonCol size="12" size-md="8" size-lg="6" sizeSm='8' sizeLg='4'>
               <div className="login-box">

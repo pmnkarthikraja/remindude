@@ -1,4 +1,4 @@
-import { IonApp, IonRouterOutlet, IonTitle, setupIonicReact } from '@ionic/react';
+import { IonApp, IonImg, IonLoading, IonRouterOutlet, IonTitle, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { CookiesProvider } from 'react-cookie';
 import { Redirect, Route } from 'react-router-dom';
@@ -47,20 +47,26 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  const show = async ()=>{
-    await SplashScreen.show({
-      showDuration: 2000,
-      autoHide: true,
-    });
-  }
+  // const show = async ()=>{
+  //   await SplashScreen.show({
+  //     showDuration: 2000,
+  //     autoHide: true,
+  //   });
+  // }
 
-  useEffect(()=>{
-    show()
-  },[])
+  // useEffect(()=>{
+  //   show()
+  // },[])
+
   const queryClient = new QueryClient()
 
   return<QueryClientProvider client={queryClient}> <CookiesProvider><IonApp>
-    <IonTitle>Remindude App</IonTitle>
+    {/* <div style={{width:'100%', height:'0'}}><iframe src="https://giphy.com/embed/jAYUbVXgESSti" width="100%" height="100%" style={{position:'absolute'}} frameBorder="0" className="giphy-embed" allowFullScreen={true}></iframe></div>
+     */}
+
+     <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} />
+
+
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/welcome" component={Welcome} exact={true} />
@@ -74,6 +80,7 @@ const App: React.FC = () => {
         <Route path="/login" component={LoginPageModel} exact={true}/>
         <Route path="/signup" component={SignupPageModel} exact={true}/>
         <Route exact path="/" render={() => <Redirect to="/home" />} />
+        <Route exact path="" render={() => <Redirect to="/home" />} />
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp></CookiesProvider></QueryClientProvider>

@@ -17,6 +17,13 @@ const config: CapacitorConfig = {
         launchAutoHide: true,
         backgroundColor: "#87ceeb"
     },
+    FilePicker:{
+      multiple:true
+    },
+    LocalNotifications: {
+      iconColor:'#488AFF',
+      sound:'sound.mp3',
+    }
   }
 };
 

@@ -11,6 +11,7 @@ import CreateEditTaskFabButton from './CreateUpdateTask';
 import '../styles/Sorting.css';
 import { EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
 import { localTimeZone } from '../utils/util';
+import { CalenderHoliday, HolidayData, LocalHolidayData } from '../api/calenderApi';
 
 export interface SortableCardsProps {
   email: string,
@@ -18,6 +19,8 @@ export interface SortableCardsProps {
   filters: { [key: string]: string[] },
   sortBy: { name: string, isDescending: boolean } | null
   handleRefresh: (event: CustomEvent<RefresherEventDetail>) => void
+  holidays:HolidayData[] | undefined
+  localHolidays:LocalHolidayData[]|undefined
 }
 
 const SortableCards: FunctionComponent<SortableCardsProps> = ({
@@ -25,7 +28,9 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
   tasksData,
   filters,
   sortBy,
-  handleRefresh
+  handleRefresh,
+  holidays,
+  localHolidays
 }) => {
   const [filteredTasks, setFilteredTasks] = useState<TaskRequestData[]>(tasksData);
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -302,7 +307,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
       />
       {<Fragment>
         {(!!editTask && editTask.isEdit) &&
-          <CreateEditTaskFabButton email={email} isEdit={true} taskData={editTask.task} toggleEditTask={toggleEditTask} />
+          <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={email} isEdit={true} taskData={editTask.task} toggleEditTask={toggleEditTask} />
         }
       </Fragment>}
 
@@ -369,7 +374,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                         <IonCol>
                           <IonItem lines='none'>
                             <IonImg slot='start' style={iconStyle} src={`/assets/${icon}.png`} />
-                            <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title}></IonTextarea>
+                            <IonTextarea  style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
                             <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "white", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
                           </IonItem>
                         </IonCol>

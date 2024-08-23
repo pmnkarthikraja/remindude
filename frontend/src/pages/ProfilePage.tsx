@@ -1,7 +1,7 @@
 import { FilePicker } from '@capawesome/capacitor-file-picker'
-import { IonAvatar, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonLoading, IonModal, IonPage, IonRow, IonSelect, IonSelectOption, IonTitle, IonToast, IonToggle, IonToolbar } from "@ionic/react"
-import { chevronForwardOutline, cloudUpload, logOutOutline, notificationsOutline, personOutline, remove, settingsOutline } from "ionicons/icons"
-import React, { Fragment, FunctionComponent, useState } from "react"
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonLoading, IonModal, IonPage, IonRow, IonSelect, IonSelectOption, IonTitle, IonToast, IonToggle, IonToolbar, isPlatform, useIonRouter } from "@ionic/react"
+import { arrowBack, chevronForwardOutline, cloudUpload, handLeft, logOutOutline, notificationsOutline, personOutline, remove, settingsOutline } from "ionicons/icons"
+import React, { Fragment, FunctionComponent, useEffect, useState } from "react"
 import { userApi } from '../api/userApi'
 import { User } from "../components/user"
 import { chooseAvatar } from '../utils/util'
@@ -10,6 +10,8 @@ import { useEditProfileMutation } from '../hooks/userHooks'
 import { useForm } from 'react-hook-form'
 import ChangePasswordModal from '../components/ChangePasswordModal'
 import { useWeekContext } from '../components/weekContext'
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { CalenderHoliday, holidayApi } from '../api/calenderApi'
 
 export interface ProfilePageProps {
   user: User,
@@ -20,10 +22,29 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   signOut,
   user
 }) => {
-  const {isLoading, isError, error, mutateAsync: editProfile } = useEditProfileMutation()
+  const { isLoading, isError, error, mutateAsync: editProfile } = useEditProfileMutation()
   const [profileModalIsOpen, setProfileModalIsOpen] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false);
   const { startOfWeek, setStartOfWeek } = useWeekContext();
+
+  const router = useIonRouter()
+
+  useEffect(() => {
+    // Request permission to send notifications (for iOS)
+    LocalNotifications.requestPermissions().then(result => {
+      if (result.display === 'granted') {
+        console.log('Notification permissions granted');
+      } else {
+        console.log('Notification permissions denied');
+      }
+    });
+
+    // Listen for notification events (optional)
+    LocalNotifications.addListener('localNotificationReceived', notification => {
+      console.log('Notification received:', notification);
+    });
+
+  }, []);
 
   const handleStartOfWeekChange = (value: string) => {
     setStartOfWeek(value);
@@ -78,15 +99,51 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     }
   }
   const userAvatar = chooseAvatar(userData)
+
+
+  const sendLocalNotification = async () => {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          title: "Task Reminder",
+          body: "You have a task scheduled for 5:00 PM. Don't forget to complete it!",
+          id: Math.random(),
+          schedule: { at: new Date() },
+          actionTypeId: "",
+          extra: null,
+          sound: 'default',
+        },
+      ],
+    });
+  }
+
+  // const getHolidays = async () => {
+  //   try{
+  //     const holidays:CalenderHoliday[] = await holidayApi.getHolidays()
+  //     holidays.map((holiday,idx)=>{
+  //       if (holiday.type['0']=='National holiday'){
+  //         console.log("holiday: ",holiday.name,holiday.country, holiday.date,  holiday.type, holiday.urlid)
+  //       }
+  //     })
+  //   }catch(e){
+  //     console.log("error on getting holidays: ",e)
+  //   }
+  // }
+
   return <Fragment>
     <IonPage>
-
-
-
       {profileModalIsOpen && (
         <IonModal isOpen={true} onDidDismiss={() => setProfileModalIsOpen(false)}>
           <IonHeader>
-            <IonToolbar className="mobile-header"></IonToolbar>
+            <IonToolbar className="mobile-header">
+              <IonButtons>
+                <IonTitle>Profile</IonTitle>
+                <IonIcon onClick={() => {
+                  setProfileModalIsOpen(false);
+                  reset()
+                }} style={{ padding: '10px' }} icon={arrowBack} slot='start' size='default' />
+              </IonButtons>
+            </IonToolbar>
           </IonHeader>
           <IonContent>
             <IonCard>
@@ -222,7 +279,10 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       />
 
       <IonHeader>
-        <IonToolbar>
+      <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/home"></IonBackButton>
+          </IonButtons>
           <IonTitle>Settings</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -301,6 +361,10 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
           </IonItem>
           <IonItem>
             <IonLabel>General Info</IonLabel>
+            <IonIcon slot="end" icon={chevronForwardOutline} />
+          </IonItem>
+          <IonItem onClick={() => { sendLocalNotification() }}>
+            <IonLabel>Test Notify</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
         </IonList>

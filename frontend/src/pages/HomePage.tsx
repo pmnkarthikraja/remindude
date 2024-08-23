@@ -1,5 +1,5 @@
-import { IonAvatar, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonLoading, IonMenu, IonMenuButton, IonMenuToggle, IonPage, IonRow, IonToolbar, RefresherEventDetail } from "@ionic/react"
-import { arrowForward, close, filterOutline } from "ionicons/icons"
+import { IonAvatar, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonImg, IonLoading, IonMenu, IonMenuButton, IonMenuToggle, IonPage, IonRow, IonToolbar, RefresherEventDetail } from "@ionic/react"
+import { close, filterOutline } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import InteractiveAnalogClock from "../components/AnalogClock"
 import Calender1 from "../components/Calender"
@@ -9,9 +9,11 @@ import FilterPopover from "../components/FilterPopover"
 import PriorityComponent from "../components/PriorityComponent"
 import SortBy from "../components/SortBy"
 import SortableCards from '../components/Sorting'
+import ExcelUploader from "../components/UploadCalender"
 import { filterTasks } from "../components/dateTimeRange"
 import { TaskRequestData } from "../components/task"
 import { User } from "../components/user"
+import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
 import { chooseAvatar } from "../utils/util"
@@ -62,6 +64,8 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [hideSidebar, setHidesibebar] = useState<boolean>(false);
   const { data: taskData, isLoading: isGetTasksLoading, refetch } = useGetTasks(user.email, 2000)
+  const { data: holidays, isLoading: isHolidaysLoading, error: holidaysErr, isError: isHolidayErr } = useGetHolidays()
+  const {data:localHolidays}=useGetLocalHolidays()
 
   const handleFiltersChange = (newFilters: { [key: string]: string[] }) => {
     setFilters(newFilters);
@@ -254,7 +258,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
       </IonContent>
     </IonMenu>
 
-    <IonLoading isOpen={isGetTasksLoading} message={'Load Tasks..'} duration={3000}/>
+    <IonLoading isOpen={isGetTasksLoading} message={'Load Tasks..'} duration={2000} />
 
     <IonPage id="main-content" >
       {platform !== 'Windows' && <IonHeader >
@@ -352,12 +356,12 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                   <ProfilePage signOut={signOut} user={user} />
                 </div>}
 
-                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} />
+                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays}/>
               </IonCol>
 
               <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
                 <div ref={calenderContentRef}>
-                  <Calender1 tasks={filteredTasks} />
+                  <Calender1 tasks={filteredTasks} holidays={holidays} localHolidays={localHolidays}/>
                 </div>
               </IonCol>
 
@@ -365,103 +369,13 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
 
             {pageNav.isSetting && <Fragment>
-              {/* <IonRow >
-                <IonCol sizeXs='28' sizeSm='30' sizeMd='35' sizeLg='35' sizeXl='30' >
-                  <IonCard >
-                    <IonItem>
-                      <IonCardHeader>
-                        <IonCardTitle>Profile</IonCardTitle>
-                        <IonCardSubtitle>{`hello ${user.userName}`}</IonCardSubtitle>
-                      </IonCardHeader>
-                    </IonItem>
-
-                    <IonCardContent>
-                      <IonList >
-                        <div >
-                          <IonRow>
-                            <IonCol>
-                              <IonItem lines='none'>
-                                <IonImg style={{ width: '30px', height: '30px', marginRight: '5px' }} src="/assets/profile.png" />
-                                <IonLabel>Edit Profile</IonLabel>
-                              </IonItem>
-                            </IonCol>
-                            <IonCol>
-                              <IonItem lines='none' >
-                                <IonButton fill='clear' size='default' >
-                                  <IonIcon icon={arrowForward} size='default' slot='end' />
-                                </IonButton>
-                              </IonItem>
-                            </IonCol>
-                          </IonRow>
-                        </div>
-
-                        <div >
-                          <IonRow>
-                            <IonCol>
-                              <IonItem lines='none'>
-                                <IonImg style={{ width: '30px', height: '30px', marginRight: '5px' }} src="/assets/termsandcondition.png" />
-                                <IonLabel>Terms & Condition</IonLabel>
-                              </IonItem>
-                            </IonCol>
-                            <IonCol>
-                              <IonItem lines='none' >
-                                <IonButton fill='clear' size='default' >
-                                  <IonIcon icon={arrowForward} size='default' slot='end' />
-                                </IonButton>
-                              </IonItem>
-                            </IonCol>
-                          </IonRow>
-                        </div>
-
-                        <div >
-                          <IonRow>
-                            <IonCol>
-                              <IonItem lines='none'>
-                                <IonImg style={{ width: '30px', height: '30px', marginRight: '5px' }} src="/assets/privacypolicy.png" />
-                                <IonLabel>Privacy Policy</IonLabel>
-                              </IonItem>
-                            </IonCol>
-                            <IonCol>
-                              <IonItem lines='none' >
-                                <IonButton fill='clear' size='default' >
-                                  <IonIcon icon={arrowForward} size='default' slot='end' />
-                                </IonButton>
-                              </IonItem>
-                            </IonCol>
-                          </IonRow>
-                        </div>
-
-                        <div >
-                          <IonRow>
-                            <IonCol>
-                              <IonItem lines='none'>
-                                <IonImg style={{ width: '30px', height: '30px', marginRight: '5px' }} src="/assets/faqs.png" />
-                                <IonLabel>FAQs</IonLabel>
-                              </IonItem>
-                            </IonCol>
-                            <IonCol>
-                              <IonItem lines='none' >
-                                <IonButton fill='clear' size='default' >
-                                  <IonIcon icon={arrowForward} size='default' slot='end' />
-                                </IonButton>
-                              </IonItem>
-                            </IonCol>
-                          </IonRow>
-                        </div>
-                      </IonList>
-                    </IonCardContent>
-
-                  </IonCard>
-                </IonCol>
-              </IonRow> */}
-              {/* <ProfilePage signOut={signOut} user={user} /> */}
-              <p>need to create seperate setting page for window screen</p>
+              <ExcelUploader/>
             </Fragment>}
 
           </IonRow>
         </IonGrid>
 
-        <CreateEditTaskFabButton email={user.email} isEdit={false} />
+        <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays}email={user.email} isEdit={false} />
 
         {(platform === 'Android' || platform === 'IOS') && (
           <IonFab vertical='top' horizontal="end" slot="fixed">

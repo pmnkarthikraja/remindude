@@ -1,25 +1,35 @@
-import { DatetimeChangeEventDetail, IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
+import { IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
+import dayjs from "dayjs"
 import { close, closeOutline } from "ionicons/icons"
 import moment from "moment-timezone"
-import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from "react"
-import { Control, FieldErrors, UseFormClearErrors, UseFormRegister, UseFormReturn, UseFormSetValue, UseFormWatch } from "react-hook-form"
+import React, { Fragment, FunctionComponent, useEffect, useMemo, useRef, useState } from "react"
+import { UseFormReturn } from "react-hook-form"
 import Select from 'react-select'
+import { HolidayData, LocalHolidayData } from "../api/calenderApi"
 import { getTimezoneOffset, localTimeZone, localTimeZoneLabel } from "../utils/util"
 import CategoryDropdown from "./CategoryDropdown"
 import SubTaskForm from './SubTask'
 import { EventData, TaskRequestData } from "./task"
+import StaticTimePickerLandscape from "./TimePicker"
 import ToggleWithLabel from "./Toggle"
 import { useWeekContext } from "./weekContext"
-import StaticTimePickerLandscape from "./TimePicker"
-import dayjs from "dayjs"
+import { CSSProperties } from "@mui/styled-engine"
+
+const colorMap: { [key: string]: { textColor: string, backgroundColor: string } } = {
+    'IN': { textColor: '#ffffff', backgroundColor: '#ffc0cb' },  // India
+    'SA': { textColor: '#ffffff', backgroundColor: '#c8e5d0' },  // Saudi Arabia
+    'Local': { textColor: '#ffffff', backgroundColor: '#FFA62F' },  // Local Holidays (Excel Data)
+};
 
 interface FormModalProps {
     id: string
-    formData:UseFormReturn<EventData, any, undefined>
+    formData: UseFormReturn<EventData, any, undefined>
     isEdit: boolean,
     setIsAlertOpen: (isOpen: boolean) => void
     onSubmit: (e: any) => void,
     datetimeRef: React.MutableRefObject<HTMLIonDatetimeElement | null>,
+    holidays: HolidayData[] | undefined
+    localHolidays: LocalHolidayData[] | undefined
     toggleEditTask?: (op: { isEdit: boolean, task: TaskRequestData | undefined }) => void,
 }
 
@@ -30,9 +40,11 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     datetimeRef,
     toggleEditTask,
     id,
-    formData
+    formData,
+    holidays,
+    localHolidays
 }) => {
-    const {clearErrors,control,formState:{errors:fieldErrors}, register, watch, setValue, } = formData 
+    const { clearErrors, control, formState: { errors: fieldErrors }, register, watch, setValue, } = formData
     const { eventType, category, emailNotification, priority, notifyFrequency, status, datetime, timezone } = watch()
     const modal = useRef<HTMLIonModalElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,6 +53,76 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     const [selectedTime, setSelectedTime] = useState<Date | null>(new Date());
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
     const [initialTime, setInitialTime] = useState<Date | null>(null);
+    const [popoverContent, setPopoverContent] = useState<string | null>(null);
+
+    const highlightedDates = useMemo(() => {
+        const calenderificHolidaysResult = holidays && holidays.flatMap(data => {
+            const color = colorMap[data.country];
+            return data.holidays
+                .filter(holiday => holiday.type.includes('National holiday'))
+                .map(holiday => ({
+                    date: holiday.date.iso,
+                    textColor: color.textColor,
+                    backgroundColor: color.backgroundColor,
+                }));
+        });
+        const localHolidaysResult = localHolidays && localHolidays.map(holiday => ({
+            date: holiday.iso_date,
+            textColor: colorMap['Local'].textColor,
+            backgroundColor: colorMap['Local'].backgroundColor,
+        }))
+
+        const mergedHolidaysResult = [
+            ...(calenderificHolidaysResult || []),
+            ...(localHolidaysResult || [])
+        ];
+
+        const mergedHolidaysResultSafe = (calenderificHolidaysResult || []).concat(localHolidaysResult || []);
+        return mergedHolidaysResultSafe
+
+    }, [holidays]);
+
+
+
+    const holidaysUpdate = (date: string) => {
+        let content = ''
+        const holidaysOnDate = holidays && holidays
+            .flatMap(data => data.holidays)
+            .filter(h => h.date.iso === date && h.type.includes('National holiday'));
+
+        const localHolidaysOnDate = localHolidays && localHolidays.filter(d => d.iso_date == date)
+
+        if (localHolidaysOnDate && localHolidaysOnDate.length > 0 && holidaysOnDate && holidaysOnDate.length > 0) {
+            content += localHolidaysOnDate.map(holiday => {
+              if (holiday.holidayName.includes('Bank Holiday')){
+                return `Bank Holiday (${holiday.region})`
+              }
+              return `${holiday.holidayName} (Local Holiday)`}).join(',')
+            content += ', '
+            content += holidaysOnDate
+              .map(holiday => `${holiday.name} (${holiday.country.name})`)
+              .join(',');
+            setPopoverContent(content)
+      
+          } else if (localHolidaysOnDate && localHolidaysOnDate.length > 0) {
+            const content = localHolidaysOnDate.map(holiday => {
+              if (holiday.holidayName.includes('Bank Holiday')){
+                return `Bank Holiday (${holiday.region})`
+              }
+              return `${holiday.holidayName} (Local Holiday)`}
+            ).join(',')
+            setPopoverContent(content)
+      
+          } else if (holidaysOnDate && holidaysOnDate.length > 0) {
+            const content = holidaysOnDate
+              .map(holiday => `${holiday.name} (${holiday.country.name})`)
+              .join(',');
+            setPopoverContent(content);
+            
+          } else {
+            setPopoverContent(null)
+          }
+    }
 
 
     useEffect(() => {
@@ -67,13 +149,19 @@ const FormModal: FunctionComponent<FormModalProps> = ({
             const time = localDateTimeInUserTZ.toDate();
 
             setSelectedDate(date);
+            holidaysUpdate(date)
             setSelectedTime(time);
         } else if (!isEdit) {
-            setSelectedDate(dayjs().format('YYYY-MM-DD'));
+            const date = dayjs().format('YYYY-MM-DD')
+            setSelectedDate(date);
+            holidaysUpdate(date)
             setSelectedTime(new Date());
             setInitialTime(new Date());
         }
     }, [isEdit, datetime]);
+
+
+
 
     // Save function to calculate final datetime with timezone
     const handleSave = () => {
@@ -127,12 +215,16 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     }
 
     const handleDateChange = (event: CustomEvent) => {
-        setSelectedDate(event.detail.value);
+        const date = event.detail.value as string
+        setSelectedDate(date);
+        holidaysUpdate(date)
     };
 
-    const onSkipDays = (days:number)=>{
-        const updated= dayjs().add(days,'day')
+
+    const onSkipDays = (days: number) => {
+        const updated = dayjs().add(days, 'day')
         setSelectedDate(updated.format('YYYY-MM-DD'))
+        holidaysUpdate(updated.format('YYYY-MM-DD'))
     }
 
     const openModal = () => {
@@ -178,6 +270,20 @@ const FormModal: FunctionComponent<FormModalProps> = ({
             color: state.isFocused ? '#333' : provided.color,
         }),
     };
+
+
+    const buildMaxYear = (): string => {
+        const currentYear = new Date().getFullYear();
+        const maxYear = currentYear + 10
+        const maxDate = `${maxYear}-12-31T23:59:59`
+        return maxDate
+    };
+
+    const titleTextAreaStyle: CSSProperties = {
+        height: '50px',
+        width: "100%",
+        marginTop: '-15px'
+      }
 
     return (
         <Fragment>
@@ -294,11 +400,11 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         {eventType == 'Meeting' && <SubTaskForm fieldName="checklists" isTask={false} control={control} />}
 
                         <IonLabel style={{ marginLeft: '15px' }} position="fixed" >
-                            Timezone: {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{marginTop:'-5px'}} onClick={()=>{setSelectedTimezone(localTimeZone)}}>Set Local</IonButton>}
-                            </IonLabel>
+                            Timezone: {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{ marginTop: '-5px' }} onClick={() => { setSelectedTimezone(localTimeZone) }}>Set Local</IonButton>}
+                        </IonLabel>
                         <Select
                             styles={customTimezoneSelectorStyles}
-                            value={{ value: selectedTimezone, label: selectedTimezone == localTimeZone ? `(Local) ${localTimeZoneLabel}` : `${selectedTimezone} ${ selectedTimezone && getTimezoneOffset(selectedTimezone)}` }}
+                            value={{ value: selectedTimezone, label: selectedTimezone == localTimeZone ? `(Local) ${localTimeZoneLabel}` : `${selectedTimezone} ${selectedTimezone && getTimezoneOffset(selectedTimezone)}` }}
                             onChange={handleChangeOnTimezone}
                             options={timezones}
                             placeholder="Select a timezone..."
@@ -315,61 +421,98 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 />
                             </div>
                         </IonItem>
-
                         <IonItem>
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/calender.png' />
-                            <IonBadge color='light' onClick={openModal} style={{ cursor: 'pointer' }}>{selectedDate}</IonBadge>
+                            <IonButton color='light' onClick={openModal} style={{ cursor: 'pointer' }}>{new Date(selectedDate).toLocaleDateString()}</IonButton>
 
 
-                            {isModalOpen && <IonModal aria-hidden={false} mode="ios" className="custom-modal" isOpen={isModalOpen} onDidDismiss={closeModal} >
-                                <IonItem>
-                                    <IonBadge color='light'>Saudi Calender</IonBadge>
-                                    <IonBadge color='light'>Indian Calender</IonBadge>
-                                    <IonButton size="small" slot="end" color={"light"} onClick={closeModal}>
-                                        <IonIcon slot="icon-only" icon={close}></IonIcon>
-                                    </IonButton>
-                                </IonItem>
+                            {isModalOpen && <IonModal title="Set Date" aria-hidden={false} mode="ios" className="custom-modal" isOpen={isModalOpen} onDidDismiss={closeModal} >
+                                <IonHeader>
+                                    <IonToolbar>
+                                        <IonTitle>Set Date</IonTitle>
+                                        <IonButton size="small" slot="end" color="light" onClick={closeModal}>
+                                            <IonIcon slot="icon-only" icon={close}></IonIcon>
+                                        </IonButton>
+                                    </IonToolbar>
+{/* 
+                                    {popoverContent && (
+                                        <IonItem lines="none">
+                                            {popoverContent.includes('India') && (
+                                                <IonBadge color="secondary">India Public Holiday</IonBadge>
+                                            )}
+                                            {popoverContent.includes('Saudi Arabia') && (
+                                                <IonBadge color="tertiary">Saudi Public Holiday</IonBadge>
+                                            )}
+                                            {popoverContent.includes('(Local Holiday)') && (
+                                                <IonBadge color="warning">Local Holiday</IonBadge>
+                                            )}
+                                        </IonItem>
+                                    )} */}
 
-                                <IonDatetime
-                                    value={selectedDate}
-                                    ref={datetimeRef}
-                                    onIonChange={(e) => {
-                                        handleDateChange(e)
-                                    }}
-                                    min={new Date().toISOString().split("T")[0]}
-                                    className="date-time"
-                                    presentation='date'
-                                    name="datetime"
-                                    formatOptions={{
-                                        date: {
-                                            weekday: 'short',
-                                            month: 'long',
-                                            day: '2-digit',
-                                        },
-                                    }}
-                                    isDateEnabled={(e) => !isDateDisabled(e)}
-                                    showDefaultTimeLabel
-                                    max="3000-12-30T23:59:59"
-                                />
-                                  <IonItem>
-                                    <IonButton fill="solid" color='success' onClick={() => onSkipDays(30)}>+30 days</IonButton>
-                                    <IonButton fill="solid" color='success' onClick={() => onSkipDays(60)}>+60 days</IonButton>
-                                    <IonButton fill="solid" color='success' onClick={() => onSkipDays(90)}>+90 days</IonButton>
-                                    <IonButton fill="solid" color='warning' onClick={() => setValue('datetime', new Date().toJSON())}>Reset</IonButton>
-                                </IonItem>
-                                <IonItem lines='inset'>
-                                    <IonInput
-                                        type='number' placeholder="Or Enter Manually" onIonChange={(e) => onSkipDays(parseInt(e.detail.value || '') || 3)} ></IonInput>
-                                </IonItem>
-                                <div style={{ height: '10px' }}></div>
+                                    <IonItem lines="none">
+                                        {popoverContent != null && (popoverContent?.includes('India')) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
+                                        {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (!popoverContent.includes('Bank Holiday (Saudi Arabia)'))) && <IonBadge color='tertiary'>Saudi Public Holiday</IonBadge>}
+
+                                        {popoverContent != null && (popoverContent?.includes('Bank Holiday')) && <IonBadge color='danger'>Bank Holiday</IonBadge>}
+
+
+                                        {popoverContent != null && popoverContent.includes('(Local Holiday)') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
+                                    </IonItem>
+
+                                </IonHeader>
+
+                                <IonContent>
+
+                                    <IonDatetime
+                                        mode="ios"
+                                        highlightedDates={highlightedDates}
+                                        value={selectedDate}
+                                        ref={datetimeRef}
+                                        id="datetime"
+                                        onIonChange={handleDateChange}
+                                        min={new Date().toISOString().split("T")[0]}
+                                        formatOptions={{
+                                            date: {
+                                                weekday: 'short',
+                                                month: 'long',
+                                                day: '2-digit',
+                                            },
+                                        }}
+                                        className="date-time"
+                                        name="datetime"
+                                        presentation='date'
+                                        showDefaultTimeLabel={true}
+                                        max={buildMaxYear()}
+                                    >
+                                        {popoverContent != null &&<IonTextarea  style={titleTextAreaStyle} shape='round' aria-label='task-title' value={popoverContent} slot="title" readonly></IonTextarea>
+                                    }
+                                    </IonDatetime>
+
+                                    <IonItem>
+                                        <IonButton fill="solid" color='success' onClick={() => onSkipDays(30)}>+30 days</IonButton>
+                                        <IonButton fill="solid" color='success' onClick={() => onSkipDays(60)}>+60 days</IonButton>
+                                        <IonButton fill="solid" color='success' onClick={() => onSkipDays(90)}>+90 days</IonButton>
+                                        <IonButton fill="solid" color='warning' onClick={() => {
+                                            setValue('datetime', new Date().toJSON());
+                                            datetimeRef.current?.reset()
+                                        }}>Reset</IonButton>
+                                    </IonItem>
+                                    <IonItem >
+                                        <IonInput
+                                            clearInput
+                                            clearOnEdit
+                                            type='number' placeholder="Or Enter Manually" onIonChange={(e) => onSkipDays(parseInt(e.detail.value || '') || 3)} ></IonInput>
+                                    </IonItem>
+                                    <div style={{ height: '10px' }}></div>
+                                </IonContent>
                             </IonModal>
                             }
 
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/clock.png' />
 
-                            <IonBadge color='light'>{selectedTime?.toLocaleTimeString('en-IN',
+                            <IonButton color='light'>{selectedTime?.toLocaleTimeString('en-IN',
                                 { hour: 'numeric', minute: 'numeric', hour12: true }) || ''}
-                            </IonBadge>
+                            </IonButton>
 
                         </IonItem>
 
@@ -430,7 +573,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                     </IonRow>
                 </IonFooter>
             </IonModal>
-        </Fragment>
+        </Fragment >
     );
 }
 

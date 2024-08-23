@@ -14,6 +14,7 @@ import { Platform, useGetPlatform } from "../utils/useGetPlatform";
 import FormModal from "./FormModal";
 import { getNotificationSchedule } from "./calculateRemindTime";
 import { EventData, TaskRequestData } from "./task";
+import { CalenderHoliday, HolidayData, LocalHolidayData } from "../api/calenderApi";
 
 export function formatISTDateToString(date: Date): string {
     const offset = date.getTimezoneOffset();
@@ -24,11 +25,13 @@ export function formatISTDateToString(date: Date): string {
 export interface CreateTaskFabButtonProps {
     isEdit: boolean;
     email: string;
+    holidays:HolidayData[] | undefined
+    localHolidays:LocalHolidayData[]|undefined
     taskData?: EventData;
     toggleEditTask?: (op: { isEdit: boolean, task: TaskRequestData | undefined }) => void
 }
 
-const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ email, isEdit, taskData, toggleEditTask }) => {
+const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ email, isEdit, taskData, toggleEditTask,holidays,localHolidays }) => {
     const formData = useForm<EventData>({
         defaultValues: isEdit && taskData ? {
             id: taskData.id,
@@ -167,7 +170,8 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                             <IonLoading isOpen={isCreateTaskMutationLoading} message={'Creating Task..'} className="loading" />
                             <FormModal
                                 id={platform === 'Windows' ? "responsive-modal-windows" : ''}
-
+                                holidays={holidays}
+                                localHolidays={localHolidays}
                                 isEdit={isEdit}
                                 datetimeRef={datetime}
                                 onSubmit={formData.handleSubmit(onSubmit)}
@@ -192,6 +196,8 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                         setIsAlertOpen={setIsModalOpen}
                         toggleEditTask={toggleEditTask}
                         formData={formData}
+                        holidays={holidays}
+                        localHolidays={localHolidays}
                     />
                 </Fragment>
             )}

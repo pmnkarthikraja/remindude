@@ -7,6 +7,7 @@ import {
   IonHeader,
   IonImg,
   IonInput,
+  IonInputPasswordToggle,
   IonItem,
   IonLoading,
   IonPage,
@@ -144,7 +145,11 @@ const LoginPage: React.FC = () => {
           ]} position="top" isOpen={true} message={'Email is required!'} duration={3000}></IonToast>}
 
         <IonGrid>
+      
           <IonRow className="ion-justify-content-center animate__fadeInDown animate__animated">
+          <div className="header-content">
+            <img className='animate__bounceIn animate__animated' src="assets/logonew1.png" alt="logo" style={{height:'100px',alignItems:'center', textAlign:'center',marginRight:'auto', marginLeft:'auto'}} />
+          </div>
             <IonCol size="12" size-md="8" size-lg="6" sizeSm='8' sizeLg='4'>
               <div className="login-box">
                 <IonImg src="/assets/login5.png" alt="Company Logo" className="header-logo animate__bounceIn animate__animated" />
@@ -163,7 +168,10 @@ const LoginPage: React.FC = () => {
                     <IonInput
                       {...register("password", { required: true })}
                       onIonInput={(e) => { clearErrors('password'); setValue('password', e.target.value as string) }}
-                      label='Password' labelPlacement='floating' type="password" />
+                      label='Password' labelPlacement='floating' type="password">
+                     <IonInputPasswordToggle slot={!!watch('password') && 'end' || ''}></IonInputPasswordToggle>
+                      </IonInput>
+
                   </IonItem>
 
                   <div className="forgot-password" onClick={() => setForgetPassword(true)}>Forgot password?</div>
