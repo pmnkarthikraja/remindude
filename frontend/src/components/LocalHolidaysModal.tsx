@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { Fragment, useRef, useState } from 'react';
 import {
   IonModal,
   IonButton,
@@ -22,7 +22,7 @@ const LocalHolidayModal: React.FC<HolidayModalProps> = ({ holidays, onDelete }) 
   const alertRef = useRef<HTMLIonAlertElement>(null);
   const [deleteId,setDeleteId]=useState<string|undefined>(undefined)
   return (
-    <>
+    <Fragment>
     <IonAlert
           ref={alertRef}
           isOpen={!!deleteId}
@@ -129,7 +129,7 @@ const LocalHolidayModal: React.FC<HolidayModalProps> = ({ holidays, onDelete }) 
         </div>
       </IonContent>
     </IonModal>
-    </>
+    </Fragment>
   );
 };
 

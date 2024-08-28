@@ -20,6 +20,8 @@
 
 .input-item {
   margin-bottom: 1rem;
+  --background:'inherit';
+  color: black;
 }
 
 .forgot-password {
@@ -91,8 +93,7 @@
 }
 
 .header-quote {
-  font-size: 1.2rem;
-  color:black;
+  color:inherit;
   text-align: center;
   flex-grow: 1;
   font-weight: bold;

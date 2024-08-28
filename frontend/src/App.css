@@ -53,14 +53,13 @@ ion-datetime.md::part(calendar-day active):focus {
 
 .table-container {
   padding: 16px;
-  background-color: white;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  background-color: #FFF7F1;
+  background-color: inherit;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
@@ -73,12 +72,12 @@ th, td {
 }
 
 th {
-  background-color: #f8f8f8;
+  background-color: inherit;
   font-weight: bold;
 }
 
 tr:hover {
-  background-color: #f1f1f1;
+  background-color: inherit;
 }
 
 ion-button {
@@ -130,4 +129,35 @@ ion-button {
 
 .static-time-picker{
   background-color: inherit;
+}
+
+
+.alert{
+  --background:white;
+}
+
+ion-alert {
+  --background: inherit;
+  --color: black;
+}
+
+
+ion-alert .alert-title {
+  color: inherit !important;
+}
+
+
+ion-alert {
+  --color:'inherit'
+}
+
+ion-alert .alert-input {
+  --color: black !important;
+  --placeholder-color: rgba(0, 0, 0, 0.6); 
+  color: black !important; 
+  caret-color: black !important; 
+}
+
+ion-alert .alert-input {
+  background-color: white !important; 
 }

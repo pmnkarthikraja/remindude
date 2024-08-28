@@ -82,7 +82,7 @@ const UploadCalendar = () => {
         <div style={{ padding: '20px', maxHeight: '100vh', overflowY: 'auto' }}>
 
             <HolidayModal holidays={localHolidaysData} onDelete={handleDelete} />
-            <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: '#000' }}>
+            <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>
                 Apply Local Calendar Holiday Data
             </p>
 
@@ -118,7 +118,6 @@ const UploadCalendar = () => {
                 <IonButton
                     fill='clear'
                     size="small"
-                    color="dark"
                     onClick={() => {
                         setParsedData([]);
                         setFileInputKey(Date.now().toString());
@@ -129,7 +128,6 @@ const UploadCalendar = () => {
                 </IonButton>
             </div>
 
-            {/* Display the parsed and validated data */}
             {parsedData.length > 0 && (
                 <div style={{ marginTop: '20px' }}>
                     <ResultsTable data={parsedData} reset={()=>{

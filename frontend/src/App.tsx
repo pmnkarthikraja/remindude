@@ -33,10 +33,9 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import { SplashScreen } from '@capacitor/splash-screen';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Calender from './components/Calender';
-import ConfirmationPage from './pages/ConfirmationPage';
 import Home from './pages/Home';
 import LoginPageModel from './pages/LoginPage';
 import SignupPageModel from './pages/SignupPage';
@@ -70,10 +69,7 @@ const App: React.FC = () => {
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/welcome" component={Welcome} exact={true} />
-        {/* <Route path="/login" component={LoginPage} exact={true} /> */}
-        {/* <Route path="/signup" component={SignupPage} exact={true} /> */}
         <Route path="/home" component={Home} exact={true} />
-        <Route path="/confirmation" component={ConfirmationPage} exact={true} />
         <Route path="/testpage" component={TestPage} exact={true} />
         <Route path="/calender" component={Calender} exact={true} />
         <Route path="/profile" component={Home} exact={true}/>

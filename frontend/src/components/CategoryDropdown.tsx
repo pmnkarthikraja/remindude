@@ -1,4 +1,3 @@
-// src/components/CategoryDropdown.tsx
 import React, { FunctionComponent, useState } from 'react';
 import { IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/react';
 import { TaskCategoryName, TaskCategory, categoryLabels } from './task';

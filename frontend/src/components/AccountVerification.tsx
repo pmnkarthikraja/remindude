@@ -1,4 +1,3 @@
-
 import { IonAlert, IonLoading } from '@ionic/react';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useVerifyOTPMutation } from '../hooks/userHooks';
@@ -67,7 +66,7 @@ const AccountVerification: FunctionComponent<AccountVerificationProps> = ({
         <Fragment>
             {otpVerifiedAlert.state && (
                 <IonAlert
-                    className='alert'
+                    className='custom-alert'
                     isOpen={true}
                     header={otpVerifiedAlert.title}
                     message={otpVerifiedAlert.msg}
@@ -76,7 +75,7 @@ const AccountVerification: FunctionComponent<AccountVerificationProps> = ({
             )}
             <IonLoading isOpen={isVerifyOtpLoading} message={'Verifying OTP...'} />
             {<IonAlert
-                className='alert'
+                className='custom-alert'
                 isOpen={true}
                 header={'We have sent a code'}
                 message={`Enter it below to verify ${signUpEmail}. Please enter the OTP below.`}

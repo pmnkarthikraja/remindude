@@ -1,15 +1,11 @@
 import { IonAlert, IonLoading } from '@ionic/react';
-import axios from 'axios';
-import { Fragment, FunctionComponent, useState } from 'react';
-import { userApi } from '../api/userApi';
-import React from 'react';
-import '../styles/alert.css'
+import React, { Fragment, FunctionComponent, useState } from 'react';
 import { useSendOTPMutation, useVerifyOTPMutation } from '../hooks/userHooks';
 import { User } from './user';
 
 export interface ForgotPasswordAlertWithResendProps {
     closeAlert: () => void,
-    otpVerified: (otpVerified: boolean, email: string, user:User | undefined) => void
+    otpVerified: (otpVerified: boolean, email: string, user: User | undefined) => void
 }
 
 const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithResendProps> = ({
@@ -17,7 +13,7 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
     otpVerified
 }) => {
     const { isLoading: isSendOtpLoading, isError: isSendOtpError, error: sendOtpError, mutateAsync: sendOtpMutation } = useSendOTPMutation()
-    const {data:verifyOtpData, isLoading: isVerifyOtpLoading, isError:isVerifyOtpError,error:verifyOtpError, mutateAsync: verifyOtpMutation } = useVerifyOTPMutation()
+    const { data: verifyOtpData, isLoading: isVerifyOtpLoading, isError: isVerifyOtpError, error: verifyOtpError, mutateAsync: verifyOtpMutation } = useVerifyOTPMutation()
     const [email, setEmail] = useState('');
     const [showOtpAlert, setShowOtpAlert] = useState(false);
     const [otpVerifiedAlert, setOtpVerifiedAlert] = useState<{ state: boolean, title: string, msg: string }>({
@@ -45,31 +41,31 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
                     state: true
                 });
                 setTimeout(() => {
-                    console.log("otp verified data on forgetpasssection:",res.data)
-                    otpVerified(true, email,res?.data.user);
+                    console.log("otp verified data on forgetpasssection:", res.data)
+                    otpVerified(true, email, res?.data.user);
                     closeAlert();
                 }, 3000);
                 return
             } else {
                 setTimeout(() => {
-                    otpVerified(false, email,res?.data.user);
+                    otpVerified(false, email, res?.data.user);
                     closeAlert();
                 }, 3000);
             }
         } catch (e) {
             setTimeout(() => {
-                otpVerified(false, email,undefined);
+                otpVerified(false, email, undefined);
                 closeAlert();
             }, 3000);
         }
     }
- 
+
 
 
     return (
         <Fragment>
             <IonAlert
-                className='alert'
+                className="custom-alert"
                 isOpen={true}
                 header={'Forget Password'}
                 inputs={[
@@ -78,6 +74,7 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
                         type: 'email',
                         placeholder: 'Enter your email',
                         value: email,
+                        cssClass: 'custom-alert'
                     },
                 ]}
                 buttons={[
@@ -93,31 +90,31 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
                         text: 'Send OTP',
                         handler: (e) => {
                             setEmail(e.email)
-                            // sendOtp(e.email)
                             sendOtpQuery(e.email)
                         },
                     },
                 ]}
             />
 
-            {otpVerifiedAlert.state &&  
-             <IonLoading
-             isOpen={!isSendOtpLoading && !isVerifyOtpLoading && otpVerifiedAlert.state}
-             message={otpVerifiedAlert.msg}
-         />}
+            {otpVerifiedAlert.state &&
+                <IonLoading
+                    isOpen={!isSendOtpLoading && !isVerifyOtpLoading && otpVerifiedAlert.state}
+                    message={otpVerifiedAlert.msg}
+                />}
 
             {isSendOtpError &&
-                <IonAlert className='alert'
+                <IonAlert
+                    className='custom-alert'
                     isOpen={true}
                     header={'Send OTP Failed!'}
                     message={sendOtpError.response?.status == 500 ? 'Check your internet connection' : sendOtpError.response?.data.message}
-                    buttons={['Ok']} 
-                    onClick={()=>window.location.reload()}
-                    />
+                    buttons={['Ok']}
+                    onClick={() => window.location.reload()}
+                />
             }
 
             {isVerifyOtpError &&
-                <IonAlert className='alert'
+                <IonAlert className='custom-alert'
                     isOpen={true}
                     header={'OTP Verification Failed!'}
                     message={verifyOtpError.response?.status == 500 ? 'Check your internet connection' : verifyOtpError.response?.data.message}

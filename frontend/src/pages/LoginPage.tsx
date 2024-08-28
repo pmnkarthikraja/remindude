@@ -81,7 +81,7 @@ const LoginPage: React.FC = () => {
 
         {(isEmailSigninError || isGoogleSigninError && googleSigninError.message !== 'popup_closed_by_user') && <>
           <IonAlert
-            className='alert'
+            className='custom-alert'
             isOpen={true}
             header="Login Failed!"
             cssClass={'alert-wrapper'}
@@ -97,7 +97,7 @@ const LoginPage: React.FC = () => {
 
         {isGoogleSigninError && googleSigninError.message == 'popup_closed_by_user' && <>
           <IonAlert
-            className='alert'
+            className='custom-alert'
             isOpen={true}
             header="Please complete sign up flow!"
             cssClass={'alert-wrapper'}

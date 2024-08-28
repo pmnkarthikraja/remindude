@@ -316,7 +316,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
           isOpen={confirmDelete.isOpen}
           header="Confirm Delete?"
           message={!!confirmDelete && `Title: ${confirmDelete.task?.title}`}
-          className="custom-alert"
+          // className="custom-alert"
           onDidDismiss={() => setConfirmDelete({
             task: undefined,
             isOpen: false
@@ -455,7 +455,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                                   </div>}
                                   {task.eventType == 'Task' && <div style={eventTypeStyle as HTMLStyle}>
                                     <IonImg src='/assets/task.png' style={eventImgStyle} />
-                                    <IonLabel >{task.eventType}</IonLabel>
+                                    <IonLabel>{task.eventType}</IonLabel>
                                   </div>}
                                 </IonRow>
                               </IonBadge>
@@ -464,7 +464,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                               <IonBadge style={{ color: '#089C82', backgroundColor: "inherit" }}>{task.categoryName}</IonBadge>
                             </IonCol>
                             <IonCol style={{ minWidth: '170px' }}>
-                              <IonBadge style={{ color: '#3A216E', background: 'inherit' }}>
+                              <IonBadge style={{ color: 'inherit', background: 'inherit' }}>
                                 {task.categoryLabel}
                               </IonBadge>
                             </IonCol>

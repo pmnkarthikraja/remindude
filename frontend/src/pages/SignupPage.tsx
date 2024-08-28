@@ -96,7 +96,7 @@ const SignupPage: React.FC = () => {
 
         {(isEmailSignupError || isSendOtpError || (isGoogleSignupError && googleSignupError.message !== 'popup_closed_by_user')) && <>
           <IonAlert
-            className='alert'
+            className='custom-alert'
             isOpen={true}
             header="Warning!"
             cssClass={'alert-wrapper'}
@@ -118,7 +118,7 @@ const SignupPage: React.FC = () => {
 
         {isGoogleSignupError && googleSignupError.message == 'popup_closed_by_user' &&
           <IonAlert
-            className='alert'
+            className='custom-alert'
             isOpen={true}
             header="Please complete sign up flow!"
             cssClass={'alert-wrapper'}
