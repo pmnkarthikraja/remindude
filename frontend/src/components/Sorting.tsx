@@ -271,7 +271,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
     paddingBottom: '100px',
     maxHeight: '200vh',
     overflowY: 'auto',
-    backgroundColor: 'inherit',
+    backgroundColor:'inherit',
   }
 
   const iconStyle: CSSProperties = {
@@ -368,14 +368,14 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
               return (
                 <Reorder.Item role='article' drag={false} key={task.id} value={task} initial="hidden" animate="visible" exit="removed" variants={variants} transition={{ duration: 0.2, ease: 'linear' }} >
-                  <IonCard style={{ backgroundColor: 'white' }}>
+                  <IonCard style={{boxShadow: '0 4px 8px rgba(1, 1, 100, 0.3)'}}>
                     <IonCardHeader>
                       <IonRow >
                         <IonCol>
                           <IonItem lines='none'>
                             <IonImg slot='start' style={iconStyle} src={`/assets/${icon}.png`} />
                             <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
-                            <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "white", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
+                            <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
                           </IonItem>
                         </IonCol>
                         <IonButtons >
@@ -410,7 +410,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                         {platform == 'Windows' &&
                           <Fragment>
                             <IonCol style={{ width: 'auto', minWidth: "100px" }}>
-                              <IonBadge style={{ color: '#7F0DB5', background: 'white' }}>
+                              <IonBadge style={{ color: '#7F0DB5', background: 'inherit' }}>
                                 <IonRow>
                                   {task.eventType == 'Meeting' && <div style={eventTypeStyle as HTMLStyle}>
                                     <IonImg src='/assets/meeting-new.png' style={eventImgStyle} />
@@ -432,7 +432,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                             </IonCol>
 
                             <IonCol>
-                              <IonBadge style={{ color: '#089C82', background: "white", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.categoryName}</IonBadge>
+                              <IonBadge style={{ color: '#089C82', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.categoryName}</IonBadge>
                             </IonCol>
 
                             <IonCol  >
@@ -447,7 +447,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                         {platform != 'Windows' && <Fragment>
                           <IonRow>
                             <IonCol >
-                              <IonBadge style={{ color: '#7F0DB5', background: 'white', marginTop: '-2px' }}>
+                              <IonBadge style={{ color: '#7F0DB5', background: 'inherit', marginTop: '-2px' }}>
                                 <IonRow>
                                   {task.eventType == 'Meeting' && <div style={eventTypeStyle as HTMLStyle}>
                                     <IonImg src='/assets/meeting-new.png' style={eventImgStyle} />
@@ -461,7 +461,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                               </IonBadge>
                             </IonCol>
                             <IonCol style={{ minWidth: '150px' }}>
-                              <IonBadge style={{ color: '#089C82', backgroundColor: "white" }}>{task.categoryName}</IonBadge>
+                              <IonBadge style={{ color: '#089C82', backgroundColor: "inherit" }}>{task.categoryName}</IonBadge>
                             </IonCol>
                             <IonCol style={{ minWidth: '170px' }}>
                               <IonBadge style={{ color: '#3A216E', background: 'inherit' }}>
@@ -491,13 +491,13 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
         {tasksData.length === 0 && (
           <Fragment>
-            <IonCard style={{ backgroundColor: 'white', textAlign: 'center', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '15px', animation: 'fadeIn 1s ease-in-out' }}>
+            <IonCard style={{ backgroundColor: 'inherit', textAlign: 'center', padding: '20px', boxShadow: '0 4px 8px rgba(1, 1, 100, 0.9)', borderRadius: '15px', animation: 'fadeIn 1s ease-in-out' }}>
               <IonCardHeader>
                 <IonItem lines="none" style={{ justifyContent: 'center', alignItems: 'center' }}>
                   <IonRow>
                     <IonCol style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       <IonIcon icon={sadOutline} style={{ fontSize: '40px', color: '#ff6b6b', marginBottom: '0px', animation: 'bounce 2s infinite' }} />
-                      <IonCardTitle style={{ fontSize: '18px', color: '#333', margin: '10px 0' }}>&nbsp; Sorry, No Data Found</IonCardTitle>
+                      <IonCardTitle style={{ fontSize: '18px', margin: '10px 0' }}>&nbsp; Sorry, No Data Found</IonCardTitle>
                     </IonCol>
                   </IonRow>
                 </IonItem>

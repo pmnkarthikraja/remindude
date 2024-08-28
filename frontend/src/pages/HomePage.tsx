@@ -262,7 +262,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
     <IonPage id="main-content" >
       {platform !== 'Windows' && <IonHeader >
-        <IonToolbar className="mobile-header">
+        <IonToolbar>
           <IonButtons slot="start">
             <IonMenuButton color='dark' ></IonMenuButton>
           </IonButtons>

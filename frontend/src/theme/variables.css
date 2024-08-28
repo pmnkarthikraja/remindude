@@ -8,10 +8,18 @@ http://ionicframework.com/docs/theming/ */
     --ion-background-color: #ecf9ff;    
     --ion-font-family: "Noto Sans", sans-serif;
     --no-scroll: hidden;
+    --primary-color: inherit;
+    --time-picker-number-color: black;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --time-picker-number-color: white;
+  }
 }
 
 ion-item{
-    --background:white
+    --background:inherit
 }
 
 ion-content::part(scroll)::-webkit-scrollbar {

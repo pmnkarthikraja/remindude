@@ -72,7 +72,7 @@ const FilterComponent: FunctionComponent<FilterComponentProps> = ({
                 <IonLabel color='warning'><b>Departmental Activities:</b></IonLabel>
             </IonItem>
             {departmentalActivities.map((depAct, idx) => (
-                <IonItem key={idx}>
+                <IonItem lines="none" key={idx}>
                     <IonGrid>
                         <IonItem lines='none'>
                             <IonCheckbox
@@ -103,10 +103,10 @@ const FilterComponent: FunctionComponent<FilterComponentProps> = ({
                 <IonLabel color='warning' ><b>Categories:</b></IonLabel>
             </IonItem>
 
-            <IonItem>
+            <IonItem lines="none">
                 <IonGrid>
                     {categories.map((category, index) => (
-                        <IonItem key={index}>
+                        <IonItem lines="none" key={index}>
                             <IonCheckbox
                                 checked={selectedOptions['category'].includes(category)}
                                 onIonChange={() => handleCheckboxChange("category", category)}
@@ -123,10 +123,10 @@ const FilterComponent: FunctionComponent<FilterComponentProps> = ({
                 <IonLabel color='warning' ><b>Priorities:</b></IonLabel>
             </IonItem>
 
-            <IonItem>
+            <IonItem lines="none">
                 <IonGrid>
                     {priorities.map((priority, index) => (
-                        <IonItem key={index}>
+                        <IonItem lines="none" key={index}>
                             <IonCheckbox
                                 checked={selectedOptions['priority'].includes(priority)}
                                 onIonChange={() => handleCheckboxChange("priority", priority)}
@@ -146,7 +146,7 @@ const FilterComponent: FunctionComponent<FilterComponentProps> = ({
             <IonItem>
                 <IonGrid>
                     {statuses.map((status, index) => (
-                        <IonItem key={index}>
+                        <IonItem lines="none" key={index}>
                             <IonCheckbox
                                 checked={selectedOptions['status'].includes(status)}
                                 onIonChange={() => handleCheckboxChange("status", status)}

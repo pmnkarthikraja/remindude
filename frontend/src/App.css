@@ -126,3 +126,8 @@ ion-button {
     transform: scale3d(1, 1, 1);
   }
 }
+
+
+.static-time-picker{
+  background-color: inherit;
+}

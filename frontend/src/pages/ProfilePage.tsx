@@ -134,7 +134,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       {profileModalIsOpen && (
         <IonModal isOpen={true} onDidDismiss={() => setProfileModalIsOpen(false)}>
           <IonHeader>
-            <IonToolbar className="mobile-header">
+            <IonToolbar>
               <IonButtons>
                 <IonTitle>Profile</IonTitle>
                 <IonIcon onClick={() => {

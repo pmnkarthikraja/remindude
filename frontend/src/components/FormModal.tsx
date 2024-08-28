@@ -257,6 +257,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
             ...provided,
             zIndex: 9999,
             border: '1px solid #ccc',
+            // backgroundColor:'inherit',
             boxShadow: 'none',
             padding: '2px',
             margin: '15px',
@@ -267,6 +268,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
         menu: (provided: any) => ({
             ...provided,
             zIndex: 9999,
+            color:'black',
+            backgroundColor:'#d7eee4'
         }),
         option: (provided: any, state: any) => ({
             ...provided,
@@ -427,7 +430,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         </IonItem>
                         <IonItem>
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/calender.png' />
-                            <IonButton color='light' onClick={openModal} style={{ cursor: 'pointer' }}>{new Date(selectedDate).toLocaleDateString()}</IonButton>
+                            <IonButton color={'light'} onClick={openModal} style={{ cursor: 'pointer', backgroundColor:'inherit' }}>{new Date(selectedDate).toLocaleDateString()}</IonButton>
 
 
                             {isModalOpen && <IonModal title="Set Date" aria-hidden={false} mode="ios" className="custom-modal" isOpen={isModalOpen} onDidDismiss={closeModal} >
@@ -454,9 +457,9 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 <IonContent>
 
                                     <IonDatetime
-                                        mode="ios"
                                         highlightedDates={highlightedDates}
                                         value={selectedDate}
+                                        size="fixed"
                                         ref={datetimeRef}
                                         id="datetime"
                                         onIonChange={handleDateChange}
@@ -468,7 +471,6 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                                 day: '2-digit',
                                             },
                                         }}
-                                        className="date-time"
                                         name="datetime"
                                         presentation='date'
                                         showDefaultTimeLabel={true}

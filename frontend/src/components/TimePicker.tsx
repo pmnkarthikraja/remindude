@@ -53,6 +53,25 @@ const StaticTimePickerLandscape: React.FunctionComponent<StaticTimePickerProps> 
     <div style={{ width: '200px' }}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <StaticTimePicker
+        sx={{
+          backgroundColor: 'inherit',
+          color: 'var(--primary-color)',
+
+          /* Apply styles to the entire time picker */
+          '.MuiClockNumber-root': {
+            color: 'var(--time-picker-color)', // Change clock numbers' color
+            WebkitTextFillColor: 'var(--time-picker-color)', // Ensures proper color in WebKit browsers
+          },
+          '.MuiButtonBase-root': {
+            color: 'var(--time-picker-color)', // Change button color
+          },
+          '.MuiPickersToolbarText-root': {
+            color: 'var(--time-picker-color)', // Change toolbar text color
+          },
+          '.MuiTypography-root': {
+            color: 'var(--time-picker-color)', // Change typography color
+          }
+        }}
           displayStaticWrapperAs="desktop"
           value={time}
           onChange={handleTimeChange}
