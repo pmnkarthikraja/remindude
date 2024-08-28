@@ -1,7 +1,7 @@
 
 import { IonAlert, IonBadge, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
 import { CSSProperties } from '@mui/styled-engine';
-import { AnimatePresence, Reorder } from 'framer-motion';
+import { AnimatePresence, color, Reorder } from 'framer-motion';
 import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline, sadOutline } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from 'react';
 import { useDeleteTaskMutation } from '../hooks/taskHooks';
@@ -418,7 +418,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                                   </div>}
                                   {task.eventType == 'Task' && <div style={eventTypeStyle as HTMLStyle}>
                                     <IonImg src='/assets/task.png' style={eventImgStyle} />
-                                    <IonLabel >{task.eventType}</IonLabel>
+                                    <IonLabel>{task.eventType}</IonLabel>
                                   </div>}
                                 </IonRow>
                               </IonBadge>
@@ -426,7 +426,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
 
                             <IonCol style={{ width: 'auto', minWidth: '150px' }}>
-                              <IonBadge style={{ color: '#3A216E', background: 'rgba(58,33,110,0.1)' }}>
+                              <IonBadge style={{ color: 'inherit', background: 'rgba(58,33,110,0.1)' }}>
                                 {task.categoryLabel}
                               </IonBadge>
                             </IonCol>

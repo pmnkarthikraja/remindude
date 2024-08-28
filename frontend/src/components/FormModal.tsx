@@ -336,7 +336,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 </IonButton>
                             </IonButtons>
                             <IonBadge style={{ width: '150px', textAlign: 'start' }} color={'light'}>
-                                Status: <span style={{ color: status === 'Done' ? 'green' : 'orange' }}>{status}</span>
+                                <b>Status:</b> <span style={{ color: status === 'Done' ? 'green' : 'orange' }}>{status}</span>
                                 {status === 'Done' && <span className="tick-mark">✔</span>}
                             </IonBadge>
                         </IonRow>
@@ -359,8 +359,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         handleSave();
                         onSubmit(e)
                     }} >
-                        <IonItem>
-                            <IonLabel position="fixed">Title</IonLabel>
+                        <IonItem  lines="none">
+                            <IonLabel position="fixed" color={'secondary'}><b>Title:</b></IonLabel>
                             <IonInput {...register("title", {
                                 required: {
                                     value: true,
@@ -370,8 +370,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         </IonItem>
 
 
-                        <IonItem>
-                            <IonLabel position="fixed">Priority</IonLabel>
+                        <IonItem lines="none">
+                            <IonLabel position="fixed" color={'secondary'}><b>Priority:</b></IonLabel>
                             <IonSelect class="ion-no-padding" {...register("priority")} value={priority} placeholder="Select Priority" onIonChange={e => setValue('priority', e.target.value)}>
                                 <IonSelectOption value={'Urgent'}>Urgent</IonSelectOption>
                                 <IonSelectOption value={'Moderate'}>Moderate</IonSelectOption>
@@ -379,22 +379,22 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             </IonSelect>
                         </IonItem>
 
-                        <IonItem>
-                            <IonLabel position="fixed">Type:</IonLabel>
+                        <IonItem lines="none">
+                            <IonLabel position="fixed" color={'secondary'}><b>Type:</b></IonLabel>
                             <ToggleWithLabel initialLabel={eventType} labels={["Task", "Meeting"]}
                                 onSelect={e => setValue('eventType', e)} />
                         </IonItem>
 
                         <CategoryDropdown initialValue={category} onSave={e => setValue('category', e)} />
 
-                        <IonItem>
-                            <IonLabel position="fixed">Description</IonLabel>
+                        <IonItem lines="none">
+                            <IonLabel position="fixed" color={'secondary'}><b>Description:</b></IonLabel>
                             <IonTextarea {...register("description")}></IonTextarea>
                         </IonItem>
 
 
-                        {isEdit && <IonItem>
-                            <IonLabel position="fixed">Status</IonLabel>
+                        {isEdit && <IonItem lines="none">
+                            <IonLabel position="fixed" color={'secondary'}><b>Status:</b></IonLabel>
                             <IonCheckbox
                                 checked={status == 'Done'}
                                 value={status}
@@ -406,8 +406,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         {eventType == 'Task' && <SubTaskForm fieldName="subTasks" isTask={true} control={control} />}
                         {eventType == 'Meeting' && <SubTaskForm fieldName="checklists" isTask={false} control={control} />}
 
-                        <IonLabel style={{ marginLeft: '15px' }} position="fixed" >
-                            Timezone: {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{ marginTop: '-5px' }} onClick={() => { setSelectedTimezone(localTimeZone) }}>Set Local</IonButton>}
+                        <IonLabel color={'secondary'}  style={{ marginLeft: '15px' }} position="fixed" >
+                           <b> Timezone:</b> {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{ marginTop: '-5px' }} onClick={() => { setSelectedTimezone(localTimeZone) }}>Set Local</IonButton>}
                         </IonLabel>
                         <Select
                             styles={customTimezoneSelectorStyles}
@@ -418,9 +418,9 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             isClearable={false}
                         />
 
-                        <IonItem>
+                        <IonItem lines="none">
                             <div>
-                                <IonLabel position="fixed">Set Time and Date:</IonLabel>
+                                <IonLabel position="fixed" color={'secondary'}><b>Set Time and Date:</b></IonLabel>
                                 <StaticTimePickerLandscape
                                     initialTime={initialTime?.toUTCString() || ''}
                                     selectedTimezone={selectedTimezone || ''}
@@ -428,7 +428,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 />
                             </div>
                         </IonItem>
-                        <IonItem>
+                        <IonItem lines="none">
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/calender.png' />
                             <IonButton color={'light'} onClick={openModal} style={{ cursor: 'pointer', backgroundColor:'inherit' }}>{new Date(selectedDate).toLocaleDateString()}</IonButton>
 
@@ -442,7 +442,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                         </IonButton>
                                     </IonToolbar>
 
-                                    <IonItem lines="none">
+                                    <IonItem lines="none" >
                                         {popoverContent != null && (popoverContent?.includes('India')) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
                                         {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (!popoverContent.includes('Bank Holiday (Saudi Arabia)'))) && <IonBadge color='tertiary'>Saudi Public Holiday</IonBadge>}
 
@@ -480,7 +480,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                     }
                                     </IonDatetime>
 
-                                    <IonItem>
+                                    <IonItem lines="none">
                                         <IonButton fill="solid" color='success' onClick={() => onSkipDays(30)}>+30 days</IonButton>
                                         <IonButton fill="solid" color='success' onClick={() => onSkipDays(60)}>+60 days</IonButton>
                                         <IonButton fill="solid" color='success' onClick={() => onSkipDays(90)}>+90 days</IonButton>
@@ -489,7 +489,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                             datetimeRef.current?.reset()
                                         }}>Reset</IonButton>
                                     </IonItem>
-                                    <IonItem >
+                                    <IonItem lines="none" >
                                         <IonInput
                                             clearInput
                                             clearOnEdit
@@ -508,8 +508,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
 
                         </IonItem>
 
-                        <IonItem>
-                            <IonLabel position="fixed"> Email Notification?</IonLabel>
+                        <IonItem lines="none">
+                            <IonLabel position="fixed" color={'secondary'}> <b>Email Notification</b></IonLabel>
                             <IonRadioGroup
                                 onIonChange={(e) => setValue('emailNotification', e.detail.value === 'yes')}
                                 {...register("emailNotification")}
@@ -522,8 +522,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         </IonItem>
 
                         {emailNotification && (
-                            <IonItem>
-                                <IonLabel position="fixed">Notify Frequency</IonLabel>
+                            <IonItem lines="none">
+                                <IonLabel position="fixed" color={'secondary'}><b>Notify Frequency</b></IonLabel>
                                 <IonSelect
                                     {...register("notifyFrequency")}
                                     value={notifyFrequency}

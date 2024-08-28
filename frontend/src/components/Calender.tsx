@@ -96,7 +96,6 @@ const Calender1: FunctionComponent<Calender1Props> = ({
 
 
   const holidaysUpdate = (date: string) => {
-    console.log("date:",date)
     let content = ''
     const selectedDate = new Date(date).getDate()
     const selectedMonth = new Date(date).getMonth()
@@ -181,17 +180,8 @@ const Calender1: FunctionComponent<Calender1Props> = ({
   return (
     <IonCol size='auto' >
       <IonCard >
-        {/* <IonCardContent > */}
         <IonRow>
           <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='6' sizeXl='7'>
-            {/* {popoverContent != null && (popoverContent?.includes('India') && (!popoverContent.includes('Bank Holiday') || popoverContent.includes(','))) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
-            {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (!popoverContent.includes('Bank Holiday') || popoverContent.includes(','))) && <IonBadge color='tertiary'>Saudi Public Holiday</IonBadge>}
-             */}
-            
-            {/* {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (popoverContent.includes('Bank Holiday (Saudi Arabia)') || !popoverContent.includes(','))) && <IonBadge color='warning'>Bank Holiday</IonBadge>}
-            {popoverContent != null && (popoverContent?.includes('India') && (popoverContent.includes('Bank Holiday (India)') || !popoverContent.includes(','))) && <IonBadge color='tertiary'>Bank Holiday</IonBadge>}
-            {popoverContent != null && (popoverContent?.includes('Both') && (popoverContent.includes('Bank Holiday (Both)') || !popoverContent.includes(','))) && <IonBadge color='danger'>Bank Holiday</IonBadge>} */}
-
             {popoverContent != null && (popoverContent?.includes('India')) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
             {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (!popoverContent.includes('Bank Holiday (Saudi Arabia)'))) && <IonBadge color='tertiary'>Saudi Public Holiday</IonBadge>}
           
@@ -296,8 +286,6 @@ const Calender1: FunctionComponent<Calender1Props> = ({
             }
           </IonCol>
         </IonRow>
-        {/* </IonCardContent> */}
-
       </IonCard>
     </IonCol>
   );

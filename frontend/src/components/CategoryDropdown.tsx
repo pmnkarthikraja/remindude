@@ -30,9 +30,8 @@ const CategoryDropdown: FunctionComponent<CategoryDropDownProps> = ({
         }
     };
     return (
-        <>
-            <IonItem>
-                <IonLabel>Category</IonLabel>
+            <IonItem lines='none'>
+                <IonLabel color={'secondary'}><b>Category:</b></IonLabel>
                 <IonSelect
                     style={{marginLeft:'-30px'}}
                     class='ion-text-wrap'
@@ -48,7 +47,6 @@ const CategoryDropdown: FunctionComponent<CategoryDropDownProps> = ({
                 </IonSelect>
 
                 {selectedCategory && (
-                    <>
                         <IonSelect
                          class='ion-text-wrap'
                             value={selectedLabel}
@@ -61,10 +59,8 @@ const CategoryDropdown: FunctionComponent<CategoryDropDownProps> = ({
                                 </IonSelectOption>
                             ))}
                         </IonSelect>
-                    </>
                 )}
             </IonItem>
-        </>
     );
 };
 

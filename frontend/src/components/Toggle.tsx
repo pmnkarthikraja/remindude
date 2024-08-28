@@ -21,6 +21,7 @@ const ToggleWithLabel: FunctionComponent<ToggleWithLabelProps> = ({ labels,onSel
         <div className="toggle-container">
             {labels.map((label:EventType) => (
                 <IonItem 
+                lines='none'
                     key={label} 
                     button 
                     onClick={() => handleLabelClick(label)}

@@ -78,7 +78,7 @@ const SubTaskForm: FunctionComponent<SubTaskFormProps> = ({
 
   return (
     <Fragment>
-      <IonItem >
+      <IonItem lines='none'>
         <div style={{ display: 'flex', cursor: 'pointer' }} onClick={() => setPopoverOpen(true)} >
           <div style={{
             borderRadius: '50%',
