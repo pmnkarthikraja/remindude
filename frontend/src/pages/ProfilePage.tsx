@@ -11,7 +11,6 @@ import { useForm } from 'react-hook-form'
 import ChangePasswordModal from '../components/ChangePasswordModal'
 import { useWeekContext } from '../components/weekContext'
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { CalenderHoliday, holidayApi } from '../api/calenderApi'
 
 export interface ProfilePageProps {
   user: User,
@@ -26,8 +25,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   const [profileModalIsOpen, setProfileModalIsOpen] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false);
   const { startOfWeek, setStartOfWeek } = useWeekContext();
-
-  const router = useIonRouter()
 
   useEffect(() => {
     // Request permission to send notifications (for iOS)
@@ -67,8 +64,9 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
 
 
   const pickImages = async (): Promise<string> => {
-    const result = await FilePicker.pickImages({
-      readData: true
+    const result = await FilePicker.pickFiles({
+      readData: true,
+      types:['image/jpeg','image/jpg','image/png']
     })
 
     const blobData1 = result.files[0].blob
@@ -81,6 +79,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     return img
   }
 
+  
 
   const onSubmit = async () => {
     // if (newPassword !== confirmNewPassword) {

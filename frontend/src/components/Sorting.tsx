@@ -2,7 +2,7 @@
 import { IonAlert, IonBadge, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
 import { CSSProperties } from '@mui/styled-engine';
 import { AnimatePresence, Reorder } from 'framer-motion';
-import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
+import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline, sadOutline } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from 'react';
 import { useDeleteTaskMutation } from '../hooks/taskHooks';
 import { getRemainingTime } from '../pages/HomePage';
@@ -19,8 +19,8 @@ export interface SortableCardsProps {
   filters: { [key: string]: string[] },
   sortBy: { name: string, isDescending: boolean } | null
   handleRefresh: (event: CustomEvent<RefresherEventDetail>) => void
-  holidays:HolidayData[] | undefined
-  localHolidays:LocalHolidayData[]|undefined
+  holidays: HolidayData[] | undefined
+  localHolidays: LocalHolidayData[] | undefined
 }
 
 const SortableCards: FunctionComponent<SortableCardsProps> = ({
@@ -243,7 +243,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
         status: taskReqData.status,
         checklists: taskReqData.checklists,
         subTasks: taskReqData.subTasks,
-        timezone:taskReqData.timezone
+        timezone: taskReqData.timezone
       }
       setEditTask({
         isEdit: op.isEdit,
@@ -267,8 +267,8 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
   const cardContentStyle: CSSProperties = {
     height: '120vh',
-    width:'100%',
-    paddingBottom:'100px',
+    width: '100%',
+    paddingBottom: '100px',
     maxHeight: '200vh',
     overflowY: 'auto',
     backgroundColor: 'inherit',
@@ -361,7 +361,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
           </IonRefresherContent>
         </IonRefresher>
 
-        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px', scrollBehavior:'smooth' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
+        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px', scrollBehavior: 'smooth' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
           <AnimatePresence >
             {filteredTasks.map((task, idx) => {
               const icon = task.priority === 'Urgent' ? 'highPriority' : task.priority === 'Moderate' ? 'mediumPriority1' : 'lowPriority';
@@ -374,7 +374,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                         <IonCol>
                           <IonItem lines='none'>
                             <IonImg slot='start' style={iconStyle} src={`/assets/${icon}.png`} />
-                            <IonTextarea  style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
+                            <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
                             <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "white", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
                           </IonItem>
                         </IonCol>
@@ -401,7 +401,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
                             <IonImg style={{ ...iconStyle, marginRight: '5px' }} src='/assets/clock.png' />
                             <IonCardTitle style={{ fontSize: '15px', marginRight: '10px', width: '70px', whiteSpace: 'nowrap' }}>{
-                            new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true,timeZone:localTimeZone,timeZoneName:'short' })}</IonCardTitle>
+                              new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' })}</IonCardTitle>
                           </IonItem>
                         </IonCol>
                       </IonRow>
@@ -489,21 +489,43 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
           </AnimatePresence>
         </Reorder.Group>
 
-      {tasksData.length == 0 && <Fragment>
-        <IonCard style={{ backgroundColor: 'white' }}>
-          <IonCardHeader>
-            <IonItem >
-              <IonRow >
-                <IonCol style={{ width: '250px' }} >
-                  <IonItem lines='none'>
-                    <IonCardTitle style={{ fontSize: '15px', }}>Sorry, No Data Found</IonCardTitle>
-                  </IonItem>
-                </IonCol>
-              </IonRow>
-            </IonItem>
-          </IonCardHeader>
-        </IonCard>
-      </Fragment>}
+        {tasksData.length === 0 && (
+          <Fragment>
+            <IonCard style={{ backgroundColor: 'white', textAlign: 'center', padding: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', borderRadius: '15px', animation: 'fadeIn 1s ease-in-out' }}>
+              <IonCardHeader>
+                <IonItem lines="none" style={{ justifyContent: 'center', alignItems: 'center' }}>
+                  <IonRow>
+                    <IonCol style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <IonIcon icon={sadOutline} style={{ fontSize: '40px', color: '#ff6b6b', marginBottom: '0px', animation: 'bounce 2s infinite' }} />
+                      <IonCardTitle style={{ fontSize: '18px', color: '#333', margin: '10px 0' }}>&nbsp; Sorry, No Data Found</IonCardTitle>
+                    </IonCol>
+                  </IonRow>
+                </IonItem>
+              </IonCardHeader>
+            </IonCard>
+            <style>
+              {`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounce {
+          0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-10px);
+          }
+          60% {
+            transform: translateY(-5px);
+          }
+        }
+      `}
+            </style>
+          </Fragment>
+        )}
+
       </IonContent>
 
     </div>

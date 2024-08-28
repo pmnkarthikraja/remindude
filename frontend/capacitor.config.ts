@@ -18,7 +18,10 @@ const config: CapacitorConfig = {
         backgroundColor: "#87ceeb"
     },
     FilePicker:{
-      multiple:true
+      multiple:true,
+      android:{
+        fileProviderAuthority: 'com.localhost.fileprovider'
+      }
     },
     LocalNotifications: {
       iconColor:'#488AFF',

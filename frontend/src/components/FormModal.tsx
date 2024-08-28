@@ -14,6 +14,8 @@ import StaticTimePickerLandscape from "./TimePicker"
 import ToggleWithLabel from "./Toggle"
 import { useWeekContext } from "./weekContext"
 import { CSSProperties } from "@mui/styled-engine"
+import { Capacitor } from '@capacitor/core';
+
 
 const colorMap: { [key: string]: { textColor: string, backgroundColor: string } } = {
     'IN': { textColor: '#ffffff', backgroundColor: '#ffc0cb' },  // India
@@ -54,6 +56,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
     const [initialTime, setInitialTime] = useState<Date | null>(null);
     const [popoverContent, setPopoverContent] = useState<string | null>(null);
+
+    // console.log("platform by capacitor: ",Capacitor.getPlatform())
 
     const highlightedDates = useMemo(() => {
         const calenderificHolidaysResult = holidays && holidays.flatMap(data => {
@@ -434,20 +438,6 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                             <IonIcon slot="icon-only" icon={close}></IonIcon>
                                         </IonButton>
                                     </IonToolbar>
-{/* 
-                                    {popoverContent && (
-                                        <IonItem lines="none">
-                                            {popoverContent.includes('India') && (
-                                                <IonBadge color="secondary">India Public Holiday</IonBadge>
-                                            )}
-                                            {popoverContent.includes('Saudi Arabia') && (
-                                                <IonBadge color="tertiary">Saudi Public Holiday</IonBadge>
-                                            )}
-                                            {popoverContent.includes('(Local Holiday)') && (
-                                                <IonBadge color="warning">Local Holiday</IonBadge>
-                                            )}
-                                        </IonItem>
-                                    )} */}
 
                                     <IonItem lines="none">
                                         {popoverContent != null && (popoverContent?.includes('India')) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
@@ -501,7 +491,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                         <IonInput
                                             clearInput
                                             clearOnEdit
-                                            type='number' placeholder="Or Enter Manually" onIonChange={(e) => onSkipDays(parseInt(e.detail.value || '') || 3)} ></IonInput>
+                                            type='number' placeholder="Or Enter days count to skip.." onIonChange={(e) => onSkipDays(parseInt(e.detail.value || '') || 3)} ></IonInput>
                                     </IonItem>
                                     <div style={{ height: '10px' }}></div>
                                 </IonContent>

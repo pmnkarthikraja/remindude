@@ -91,15 +91,19 @@ const UploadCalendar = () => {
                 <IonButton className='animate__animated animate__bounceIn' fill='solid' id="trigger-local-holidays" size="small" color="light" style={{ color: '#000' }}>
                     Local Holidays
                 </IonButton>
-                <IonButton className='animate__animated animate__bounceIn' fill='solid' id="trigger-local-holidays" size="small" color="light" style={{ color: '#000' }}>
+                <IonButton className='animate__animated animate__bounceIn' fill='solid' id="trigger-bank-holidays" size="small" color="light" style={{ color: '#000' }}>
                     Bank Holidays
                 </IonButton>
             </div>
+
+            <IonNote><b style={{color:'red'}}>Step 1</b></IonNote>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <IonNote><b>Note:</b> click to download the template excel file to fill up the data.</IonNote>
+            <IonNote><b>Note:</b> click to download the template excel file to fill up the data.</IonNote>
                 <DownloadTemplateButton />
             </div>
             
+            <IonNote><b style={{color:'red'}}>Step 2</b></IonNote>
+            <br/>
             <IonNote>Click '<b>Choose File</b>' to import .xslx or xlx file.</IonNote>
             <div style={{ height: '10px' }}></div>
             <div style={{ alignItems: 'center', marginBottom: '20px' }}>

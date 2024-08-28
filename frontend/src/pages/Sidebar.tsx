@@ -105,7 +105,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
       </IonItem>
     </div>
     <IonItem  button onClick={() => buildPageNav('setting')} >
-      <IonLabel>Settings</IonLabel>
+      <IonLabel>Holidays Upload</IonLabel>
       <IonImg style={{ width: '30px', height: '30px' }} src="/assets/sidebar/setting.png" />
     </IonItem>
     <IonItem button >

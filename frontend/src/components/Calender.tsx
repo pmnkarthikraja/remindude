@@ -13,7 +13,7 @@ import {
   IonLabel,
   IonRow
 } from '@ionic/react';
-import React, { Fragment, FunctionComponent, useMemo, useState } from 'react';
+import React, { Fragment, FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { getRemainingTime } from '../pages/HomePage';
 import '../styles/calender.css';
 import { TaskRequestData } from './task';
@@ -40,6 +40,11 @@ const Calender1: FunctionComponent<Calender1Props> = ({
 }) => {
   const [selectedDate, setSelectedDate] = useState<string | null>(today.toJSON());
   const [popoverContent, setPopoverContent] = useState<string | null>(null);
+
+  useEffect(()=>{
+    const today = new Date().toJSON()
+    holidaysUpdate(today)
+  },[tasks])
 
   const notes: { [key: string]: string } = {
     '2024-06-10': 'Meeting with team',
@@ -91,6 +96,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
 
 
   const holidaysUpdate = (date: string) => {
+    console.log("date:",date)
     let content = ''
     const selectedDate = new Date(date).getDate()
     const selectedMonth = new Date(date).getMonth()
@@ -254,12 +260,12 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                               <IonItem slot="header" color="light">
                                 <IonLabel style={{ fontSize: '14px' }}>{`${idx + 1}.${task.split('|')[0]} at ` || 'No Meetings'}<strong>{at}</strong></IonLabel>
                               </IonItem>
-                              <div className="ion-no-padding" slot="content">
+                             {task.split('|')[2].split(',').length>0 && <div className="ion-no-padding" slot="content">
                                 <ol>
                                   <strong style={{ color: 'red', fontSize: '13px', textAlign: 'center' }}>-- Checklists --</strong>
                                   {task.split('|')[2].split(',').map((r, listIndex) => <li key={listIndex}>{r}</li>)}
                                 </ol>
-                              </div>
+                              </div>}
                             </IonAccordion>
                           </del>}
                         {remainingTime > 0 &&
@@ -268,13 +274,13 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                               <IonItem slot="header" color="light">
                                 <IonLabel style={{ fontSize: '14px' }}>{`${idx + 1}.${task.split('|')[0]} at ` || 'No Meetings'}<strong>{at}</strong></IonLabel>
                               </IonItem>
-                              <div className="ion-no-padding" slot="content">
+                              {task.split('|')[2].split(',').length>0 && <div className="ion-no-padding" slot="content">
                                 <ol>
                                   <strong style={{ color: 'green', fontSize: '13px', textAlign: 'center' }}>-- Checklists --</strong>
                                   {task.split('|')[2].split(',').map((r, listIndex) =>
                                     <li key={listIndex}>{r}</li>)}
                                 </ol>
-                              </div>
+                              </div>}
                             </IonAccordion>
                           </Fragment>
                         }

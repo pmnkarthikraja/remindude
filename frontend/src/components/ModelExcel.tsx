@@ -98,8 +98,8 @@ const DownloadTemplateButton: React.FC = () => {
     return (
         <IonToolbar>
             <IonButtons onClick={createExcelTemplate} style={{ cursor: 'pointer' }}>
-                Download Template (.xlsx)
-                <IonIcon icon={downloadSharp}></IonIcon>
+                <IonButton style={{textTransform:'capitalize'}} color={'secondary'} strong>Download <p style={{textTransform:'lowercase'}}>(.xlsx)</p>
+                <IonIcon icon={downloadSharp}></IonIcon></IonButton>
             </IonButtons>
         </IonToolbar>
     );
