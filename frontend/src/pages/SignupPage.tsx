@@ -15,17 +15,18 @@ import {
   IonToolbar
 } from '@ionic/react';
 import React, { useEffect, useState } from 'react';
-import '../styles/LoginPageModel.css';
-import { User } from '../components/user';
 import { useForm } from 'react-hook-form';
-import { useEmailSignupMutation, useSendOTPMutation, useGoogleSignupMutation } from '../hooks/userHooks';
 import AccountVerification from '../components/AccountVerification';
+import { User } from '../components/user';
+import { useEmailSigninMutation, useEmailSignupMutation, useGoogleSignupMutation, useSendOTPMutation } from '../hooks/userHooks';
+import '../styles/LoginPageModel.css';
 
 const SignupPage: React.FC = () => {
   const { register, watch, handleSubmit, setValue, clearErrors, formState: { errors } } = useForm<User>();
-  const { isLoading: isEmailSignupLoading, isError: isEmailSignupError, error: emailSignupError, mutateAsync: emailSignupMutation } = useEmailSignupMutation(false)
-  const { isLoading: isSendOtpLoading, isError: isSendOtpError, error: sendOtpError, mutateAsync: sendOtpMutation } = useSendOTPMutation()
-  const { isLoading: isGoogleSignupLoading, isError: isGoogleSignupError, error: googleSignupError, status, mutateAsync: googleSignupMutation } = useGoogleSignupMutation()
+  const { isLoading: isEmailSignupLoading, isError: isEmailSignupError, error: emailSignupError, mutateAsync: emailSignupMutation,reset:resetsignin } = useEmailSignupMutation(false)
+  const { isLoading: isEmailSignInLoading, isError: isEmailSignInError, error: emailSignInError, mutateAsync: emailSignInMutation,reset:resetsignup } = useEmailSigninMutation(false)
+  const { isLoading: isSendOtpLoading, isError: isSendOtpError, error: sendOtpError, mutateAsync: sendOtpMutation, reset:resetsendotp } = useSendOTPMutation()
+  const { isLoading: isGoogleSignupLoading, isError: isGoogleSignupError, error: googleSignupError, mutateAsync: googleSignupMutation,reset:resetgooglesignup } = useGoogleSignupMutation()
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const email = watch('email');
@@ -49,10 +50,23 @@ const SignupPage: React.FC = () => {
 
 
   const onSubmit = async (data: User) => {
-    clearErrors()
-    await sendOtpQuery(data.email);
+    try {
+      await emailSignInMutation({
+        email: data.email,
+        googlePicture: '',
+        password: '',
+        profilePicture: '',
+        userName: ''
+      });
+  
+    } catch (error) {
+      if (error.response?.status === 404) {
+        await sendOtpQuery(data.email);
+      } else {
+        console.error("Sign-in failed:", error);
+      }
+    } 
   };
-
 
   const googleSignupQuery = async () => {
     try {
@@ -60,6 +74,10 @@ const SignupPage: React.FC = () => {
     } catch (e: any) {
       console.log("error on google", e)
     }
+  }
+
+  if (isEmailSignInError){
+    console.log("error on signin: ",emailSignInError)
   }
 
   const googlesignuperrmsg = googleSignupError?.message == 'popup_closed_by_user' && 'An error occurred during the Google sign-up process. Please try again.' || googleSignupError?.response?.data.message
@@ -89,7 +107,7 @@ const SignupPage: React.FC = () => {
         )}
 
         <IonLoading
-          isOpen={isSendOtpLoading || isEmailSignupLoading || (isGoogleSignupLoading)}
+          isOpen={isSendOtpLoading || isEmailSignupLoading || (isGoogleSignupLoading) || isEmailSignInLoading}
           message={isSendOtpLoading ? 'Sending OTP..' : 'Loading...'}
           duration={0}
         />
@@ -104,7 +122,28 @@ const SignupPage: React.FC = () => {
             buttons={[{
               text: 'Cancel',
               role: 'cancel',
-              handler: () => window.location.reload()
+            },
+            {
+              text: 'Go to Login',
+              role: 'confirm',
+              handler: () => {
+                window.location.href = '/login'
+              }
+            },]}
+          ></IonAlert>
+        </>}
+
+
+        {isEmailSignInError && emailSignInError.response?.status==401 && <>
+          <IonAlert
+            className='custom-alert'
+            isOpen={true}
+            header="Warning!"
+            cssClass={'alert-wrapper'}
+            message={'user already has an account'}
+            buttons={[{
+              text: 'Cancel',
+              role: 'cancel',
             },
             {
               text: 'Go to Login',
@@ -140,11 +179,11 @@ const SignupPage: React.FC = () => {
               role: 'cancel',
               handler: clearErrors
             },
-          ]} position="top" isOpen={true} message={(errors.email && "Email is required!") || (errors.password && 'Password is required!') || (errors.userName && "Username is required!") || '' } duration={3000}></IonToast>}
+          ]} position="top" isOpen={true} message={(errors.email && "Email is required!") || (errors.password && 'Password is required!') || (errors.userName && "Username is required!") || ''} duration={3000}></IonToast>}
 
         <IonGrid>
-        <div className="header-content">
-            <img className='animate__bounceIn animate__animated'  src="assets/logonew1.png" alt="logo" style={{height:'100px',alignItems:'center', textAlign:'center',marginRight:'auto', marginLeft:'auto'}} />
+          <div className="header-content">
+            <img className='animate__bounceIn animate__animated' src="assets/logonew1.png" alt="logo" style={{ height: '100px', alignItems: 'center', textAlign: 'center', marginRight: 'auto', marginLeft: 'auto' }} />
           </div>
           <IonRow className="ion-justify-content-center animate__fadeInDown animate__animated">
             <IonCol size="12" size-md="8" size-lg="6" sizeSm='8' sizeLg='4'>
@@ -154,15 +193,27 @@ const SignupPage: React.FC = () => {
                   <IonItem className="input-item" >
                     <IonInput
                       color={errors.userName && 'danger'}
-                      {...register('userName', { required: true})}
-                      onIonInput={() => clearErrors('userName')}
-                      label='Username' labelPlacement='floating' type="text"/>
+                      {...register('userName', { required: true })}
+                      onIonInput={() =>{
+                        clearErrors('userName');
+                        resetsendotp();
+                        resetsignin();
+                        resetsignup();
+                        resetgooglesignup()
+                      } }
+                      label='Username' labelPlacement='floating' type="text" />
                   </IonItem>
                   <IonItem className="input-item">
                     <IonInput
                       color={errors.email && 'danger'}
                       {...register("email", { required: true })}
-                      onIonInput={() => clearErrors('email')}
+                      onIonInput={() => {
+                        clearErrors('email');
+                        resetsendotp();
+                        resetsignin();
+                        resetsignup();
+                        resetgooglesignup()
+                      }}
                       label='Email' labelPlacement='floating' type="email" />
                   </IonItem>
                   <IonItem className="input-item">
@@ -171,6 +222,10 @@ const SignupPage: React.FC = () => {
                       {...register("password", { required: true })}
                       onIonInput={(e) => {
                         clearErrors('password');
+                        resetsendotp();
+                        resetsignin();
+                        resetsignup();
+                        resetgooglesignup()
                         setValue('password', e.target.value as string)
                       }}
                       label='Password' labelPlacement='floating' type="password" />

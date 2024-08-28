@@ -253,7 +253,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                              {task.split('|')[2].split(',').length>0 && <div className="ion-no-padding" slot="content">
                                 <ol>
                                   <strong style={{ color: 'red', fontSize: '13px', textAlign: 'center' }}>-- Checklists --</strong>
-                                  {task.split('|')[2].split(',').map((r, listIndex) => <li key={listIndex}>{r}</li>)}
+                                  {task.split('|')[2].split(',').map((r, listIndex) =><>{r!=='' && <li key={listIndex}>{r}</li>}</>)}
                                 </ol>
                               </div>}
                             </IonAccordion>
@@ -267,8 +267,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
                               {task.split('|')[2].split(',').length>0 && <div className="ion-no-padding" slot="content">
                                 <ol>
                                   <strong style={{ color: 'green', fontSize: '13px', textAlign: 'center' }}>-- Checklists --</strong>
-                                  {task.split('|')[2].split(',').map((r, listIndex) =>
-                                    <li key={listIndex}>{r}</li>)}
+                                  {task.split('|')[2].split(',').map((r, listIndex) =><>{r!=='' && <li key={listIndex}>{r}</li>}</>)}
                                 </ol>
                               </div>}
                             </IonAccordion>

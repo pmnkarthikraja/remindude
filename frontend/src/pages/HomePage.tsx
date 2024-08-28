@@ -361,7 +361,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
               <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
                 <div ref={calenderContentRef}>
-                  <Calender1 tasks={filteredTasks} holidays={holidays} localHolidays={localHolidays}/>
+                  <Calender1 tasks={tasks} holidays={holidays} localHolidays={localHolidays}/>
                 </div>
               </IonCol>
 
