@@ -4,7 +4,7 @@
     display: flex;
     flex-wrap: inherit;
     justify-content: center;
-    background: white; 
+    background: inherit; 
   }
 
   .date-time-range-picker-wrapper .picker{
@@ -31,3 +31,35 @@
     }
   }
   
+/* src/styles/AnalogClock.css */
+
+/* General styles for the picker */
+.custom-datetimerange-picker .react-calendar,
+.custom-datetimerange-picker .react-clock,
+.custom-datetimerange-picker .react-datetimerange-picker__wrapper,
+.custom-datetimerange-picker .react-datetimerange-picker__inputGroup {
+  background-color: black !important; /* Set background to black */
+  color: black !important; /* Set text color to black */
+}
+
+/* Specific styles for calendar tiles and other elements */
+.custom-datetimerange-picker .react-calendar__tile,
+.custom-datetimerange-picker .react-clock__face,
+.custom-datetimerange-picker .react-calendar__navigation button {
+  color: black !important; /* Ensure text/icons are black */
+}
+
+/* Ensure picker border and other UI elements are black */
+.picker,
+.date-time-range-picker-wrapper {
+  border-color: black !important; /* Set border color to black */
+}
+
+
+
+/* Optional: Placeholder color (slightly lighter for distinction) */
+.custom-datetimerange-picker .react-datetimerange-picker__inputGroup__input {
+  --placeholder-color: rgba(0, 0, 0, 0.6);
+  caret-color: black !important; /* Set cursor to black */
+}
+

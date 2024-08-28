@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import DateTimeRangePicker from '@wojtekmaj/react-datetimerange-picker';
 import React from 'react';
 import '@wojtekmaj/react-datetimerange-picker/dist/DateTimeRangePicker.css';
@@ -26,24 +26,26 @@ useEffect(()=>{
   }
 },[value])
   return (
-    <>
+    <Fragment>
   <IonItem lines='none'>
     <IonLabel >
       Select Date and Time Range here:
     </IonLabel>
   </IonItem>
     <div className='date-time-range-picker-wrapper'>
-      <DateTimeRangePicker isCalendarOpen={true}  calendarProps={{
+      <DateTimeRangePicker isCalendarOpen={true}
+        calendarProps={{
         showNavigation:true,
         view:'month',
+        className:'custom-datetimerange-picker'
       }} dayAriaLabel='day-aria' className={'picker'} 
         clearIcon={null}
         format='dd-MM-y / hh:mm a'   
       onChange={onChange} value={value} rangeDivider={
-        <><IonImg src='/assets/divider.png' style={{width:'30px',height:'20px'}}/></>
+        <IonImg src='/assets/divider.png' style={{width:'30px',height:'20px'}}/>
       }/>
       </div>
-      </>
+      </Fragment>
   );
 }
 
