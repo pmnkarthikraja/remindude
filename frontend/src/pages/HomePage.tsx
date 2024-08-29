@@ -16,7 +16,7 @@ import { User } from "../components/user"
 import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
-import { chooseAvatar } from "../utils/util"
+import {  useGetAvatar } from "../utils/util"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
 
@@ -244,7 +244,9 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     setPageNav((prevState) => ({ ...prevState, isCalenderRangeTaskPage: true }));
   }, []);
 
-  const userAvatar = chooseAvatar(user);
+  // const userAvatar = chooseAvatar(user);
+  const userAvatar = useGetAvatar(user)
+
   return <Fragment>
     <IonMenu contentId="main-content" disabled={hideSidebar} onIonDidClose={() => setHidesibebar(e => !e)}>
       <IonContent scrollX={false} className="sidebar-content">

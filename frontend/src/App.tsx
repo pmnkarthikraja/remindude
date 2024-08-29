@@ -33,7 +33,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import { SplashScreen } from '@capacitor/splash-screen';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Calender from './components/Calender';
 import Home from './pages/Home';
@@ -42,29 +42,37 @@ import SignupPageModel from './pages/SignupPage';
 import TestPage from './pages/TestPage';
 import Welcome from './pages/Welcome';
 import './theme/variables.css';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  // const show = async ()=>{
-  //   await SplashScreen.show({
-  //     showDuration: 2000,
-  //     autoHide: true,
-  //   });
-  // }
+  useEffect(() => {
+    const initializeApp = async () => {
+      await SplashScreen.show({
+        showDuration:2000,
+        autoHide: false
+      });
+      
+      await SplashScreen.hide();
+    };
 
-  // useEffect(()=>{
-  //   show()
-  // },[])
+    initializeApp();
+  }, []);
 
   const queryClient = new QueryClient()
 
+  const initLocalNotifications = async () => {
+    await LocalNotifications.requestPermissions();
+  };
+  
+  initLocalNotifications();
+
   return<QueryClientProvider client={queryClient}> <CookiesProvider><IonApp>
-    {/* <div style={{width:'100%', height:'0'}}><iframe src="https://giphy.com/embed/jAYUbVXgESSti" width="100%" height="100%" style={{position:'absolute'}} frameBorder="0" className="giphy-embed" allowFullScreen={true}></iframe></div>
-     */}
+    {/* <div style={{width:'100%', height:'0'}}><iframe src="https://giphy.com/embed/jAYUbVXgESSti" width="100%" height="100%" style={{position:'absolute'}} frameBorder="0" className="giphy-embed" allowFullScreen={true}></iframe></div> */}
+    {/* kUTME7ABmhYg5J3psM */}
 
-     <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} />
-
+     <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} animated/>
 
     <IonReactRouter>
       <IonRouterOutlet>

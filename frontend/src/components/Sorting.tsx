@@ -12,6 +12,7 @@ import '../styles/Sorting.css';
 import { EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
 import { localTimeZone } from '../utils/util';
 import { CalenderHoliday, HolidayData, LocalHolidayData } from '../api/calenderApi';
+import TaskTimer from './TaskTimer';
 
 export interface SortableCardsProps {
   email: string,
@@ -404,6 +405,10 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                               new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' })}</IonCardTitle>
                           </IonItem>
                         </IonCol>
+                      </IonRow>
+
+                      <IonRow>
+                            <TaskTimer task={task} key={idx}/>
                       </IonRow>
 
                       <IonItem lines='none' >

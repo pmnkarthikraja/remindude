@@ -2,7 +2,7 @@ import { IonCol, IonItem, IonAvatar, IonText, IonLabel, IonImg } from "@ionic/re
 import { FunctionComponent, useEffect, useState } from "react"
 import React from 'react'
 import { User } from "../components/user"
-import { chooseAvatar } from "../utils/util"
+import {  useGetAvatar } from "../utils/util"
 
 
 export interface PageNav {
@@ -30,7 +30,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
   buildPageNav,
   pageNav
 }) => {
-  const userAvatar = chooseAvatar(user)
+  const userAvatar = useGetAvatar(user)
   const currentTime = new Date().getHours()
   const greetMsg = currentTime < 12 && 'Good Morning' || currentTime < 18 && 'Good Afternoon' || 'Good Evening'
 
@@ -41,7 +41,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
     <IonItem lines="none">
       <IonCol size="auto">
         <IonAvatar>
-          <img style={{ width: '50px', height: '50px' }} src={userAvatar} alt="avatar" />
+          <img style={{ width: '50px', height: '50px' }} src={userAvatar || '/assets/avatar.png'} alt="avatar" />
         </IonAvatar>
       </IonCol>
       <IonCol>

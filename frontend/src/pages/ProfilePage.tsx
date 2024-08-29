@@ -1,16 +1,15 @@
+import { LocalNotifications, LocalNotificationSchema } from '@capacitor/local-notifications'
 import { FilePicker } from '@capawesome/capacitor-file-picker'
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonLoading, IonModal, IonPage, IonRow, IonSelect, IonSelectOption, IonTitle, IonToast, IonToggle, IonToolbar, isPlatform, useIonRouter } from "@ionic/react"
-import { arrowBack, chevronForwardOutline, cloudUpload, handLeft, logOutOutline, notificationsOutline, personOutline, remove, settingsOutline } from "ionicons/icons"
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonFooter, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonLoading, IonModal, IonPage, IonRow, IonSelect, IonSelectOption, IonTitle, IonToast, IonToggle, IonToolbar } from "@ionic/react"
+import { arrowBack, chevronForwardOutline, logOutOutline, notificationsOutline, personOutline, settingsOutline } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useEffect, useState } from "react"
-import { userApi } from '../api/userApi'
-import { User } from "../components/user"
-import { chooseAvatar } from '../utils/util'
-import '../styles/ProfilePage.css'
-import { useEditProfileMutation } from '../hooks/userHooks'
 import { useForm } from 'react-hook-form'
 import ChangePasswordModal from '../components/ChangePasswordModal'
+import { User } from "../components/user"
 import { useWeekContext } from '../components/weekContext'
-import { LocalNotifications } from '@capacitor/local-notifications';
+import { useEditProfileMutation } from '../hooks/userHooks'
+import '../styles/ProfilePage.css'
+import { chooseAvatar } from '../utils/util'
 
 export interface ProfilePageProps {
   user: User,
@@ -25,12 +24,29 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   const [profileModalIsOpen, setProfileModalIsOpen] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false);
   const { startOfWeek, setStartOfWeek } = useWeekContext();
+  const [blobData, setBlobData] = useState<Blob | string>('notset')
+  const { setValue, watch, reset } = useForm<User>({
+    defaultValues: { ...user }
+  })
+
+  const [userAvatar,setUserAvatar]=useState('')
+  const userData = watch()
+
+  const callAvatar = async (us:User)=>{
+    const image= await chooseAvatar(us)
+    setUserAvatar(image)
+   }
 
   useEffect(() => {
+    callAvatar(user)
     // Request permission to send notifications (for iOS)
     LocalNotifications.requestPermissions().then(result => {
+      const sendNotificationOnLoad = async () =>{
+        await sendScheduledNotifications()
+      }
       if (result.display === 'granted') {
         console.log('Notification permissions granted');
+        sendNotificationOnLoad()
       } else {
         console.log('Notification permissions denied');
       }
@@ -47,12 +63,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     setStartOfWeek(value);
   };
 
-  const [blobData, setBlobData] = useState<Blob | string>('notset')
-  const { setValue, watch, reset } = useForm<User>({
-    defaultValues: { ...user }
-  })
-
-  const userData = watch()
 
   const pickFile = async () => {
     try {
@@ -64,9 +74,8 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
 
 
   const pickImages = async (): Promise<string> => {
-    const result = await FilePicker.pickFiles({
+    const result = await FilePicker.pickImages({
       readData: true,
-      types:['image/jpeg','image/jpg','image/png']
     })
 
     const blobData1 = result.files[0].blob
@@ -74,17 +83,46 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     if (!!blobData1) {
       setBlobData(blobData1)
     }
-    // setUserData(data => { return { ...data, profilePicture: img } })
     setValue('profilePicture', img)
     return img
   }
 
-  
+  const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        // Create a Blob object from the file
+        const blobData = new Blob([file], { type: file.type });
+
+        // Create a FileReader to read the file as a Data URL (base64)
+        const reader = new FileReader();
+
+        reader.onloadend = async () => {
+          const base64String = reader.result as string;
+
+          setBlobData(blobData);  // Set Blob data
+          setValue('profilePicture', base64String); // Set base64 image data
+          const u:User={
+            email:user.email,
+            userName:user.userName,
+            googlePicture:'',
+            profilePicture:base64String,
+            password:''
+          }
+          await callAvatar(u)
+        };
+
+        // Read the file as a data URL
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error handling file upload:', error);
+      }
+    } else {
+      console.error('No file selected');
+    }
+  };
 
   const onSubmit = async () => {
-    // if (newPassword !== confirmNewPassword) {
-    //     throw new Error("both passwords should match!")
-    // }
     try {
       await editProfile({
         email: userData.email,
@@ -97,7 +135,33 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       console.log("failed to update profile :" + e)
     }
   }
-  const userAvatar = chooseAvatar(userData)
+  // const userAvatar = chooseAvatar(userData)
+
+  const today = new Date().toLocaleDateString()
+
+  const sendScheduledNotifications = async () => {
+  try {
+    const notifications: LocalNotificationSchema[] = [];
+
+    for (let i = 0; i < 10; i++) {
+      notifications.push({
+        title: `Reminder ${i + 1}`,
+        body: `This is notification ${i + 1} scheduled at ${i * 10} seconds.`,
+        id: i + 1,
+        schedule: { at: new Date(Date.now() + (i * 10000)) }, 
+        channelId: 'default',
+        sound: 'default',
+        largeIcon:'reminder.png',
+        smallIcon:'upcoming_task.png',
+        largeBody:`You have scheduled task at ${today}. Please complete it.` 
+      });
+    }
+
+    await LocalNotifications.schedule({ notifications });
+  } catch (error) {
+    console.error('Error scheduling local notifications:', error);
+  }
+};
 
 
   const sendLocalNotification = async () => {
@@ -106,28 +170,17 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
         {
           title: "Task Reminder",
           body: "You have a task scheduled for 5:00 PM. Don't forget to complete it!",
-          id: Math.random(),
-          schedule: { at: new Date() },
-          actionTypeId: "",
-          extra: null,
+          id: Math.floor(Date.now() / 1000), 
+          schedule: { at: new Date(Date.now()+2000) }, 
           sound: 'default',
+          channelId: "default",
+          smallIcon:'upcoming_task.png',
+          largeIcon:'reminder.png',
+          largeBody:"You have a task scheduled for 5:00 PM. Don't forget to complete it!"
         },
-      ],
+      ]
     });
-  }
-
-  // const getHolidays = async () => {
-  //   try{
-  //     const holidays:CalenderHoliday[] = await holidayApi.getHolidays()
-  //     holidays.map((holiday,idx)=>{
-  //       if (holiday.type['0']=='National holiday'){
-  //         console.log("holiday: ",holiday.name,holiday.country, holiday.date,  holiday.type, holiday.urlid)
-  //       }
-  //     })
-  //   }catch(e){
-  //     console.log("error on getting holidays: ",e)
-  //   }
-  // }
+  };
 
   return <Fragment>
     <IonPage>
@@ -173,37 +226,33 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
                   </IonRow>
                   <IonRow>
 
-
-                    <IonCol size="auto">
+                      <input
+                        type='file'
+                        accept=".jpg, .jpeg, .png, .webp, .gif, .bmp, .tiff, .svg"
+                        onChange={handleFile}
+                      />
+                   
                       <IonButton
+                      color={'dark'}
                         onClick={async () => {
-                          await pickFile();
-                        }}
-                        size="small"
-                        fill="outline"
-                      >
-                        <IonIcon slot="start" size="small" icon={cloudUpload} />
-                        Upload
-                      </IonButton>
-                    </IonCol>
-
-
-                    <IonCol>
-                      <IonButton
-                        onClick={() => {
                           setValue('profilePicture', '')
                           setValue('googlePicture', '')
                           setBlobData("removed")
+                          const u:User={
+                            email:user.email,
+                            googlePicture:'',
+                             profilePicture:'',
+                             password:'',
+                             userName:user.userName
+                          }
+                          await callAvatar(u)
                         }
                         }
                         size="small"
-                        fill="outline"
+                        fill="clear"
                       >
-                        <IonIcon slot="start" size="small" icon={remove} />
                         Remove
                       </IonButton>
-                    </IonCol>
-
 
                   </IonRow>
                 </IonGrid>
@@ -278,7 +327,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       />
 
       <IonHeader>
-      <IonToolbar>
+        <IonToolbar>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/home"></IonBackButton>
           </IonButtons>
@@ -362,7 +411,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             <IonLabel>General Info</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
-          <IonItem onClick={() => { sendLocalNotification() }}>
+          <IonItem button onClick={() => { sendLocalNotification() }}>
             <IonLabel>Test Notify</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
