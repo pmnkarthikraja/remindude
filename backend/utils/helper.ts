@@ -3,6 +3,8 @@ import axios from 'axios'
 import CalenderHolidayModel from '../models/HolidayModel'; // Adjust path as needed
 import schedule from 'node-schedule'
 import HolidayDataModel from "../models/HolidayModel";
+import TaskModel from "../models/TaskModel";
+import UserModel from "../models/UserModel";
 
 
 export const getRemainingTime = (dateTime: string): number => {
@@ -126,3 +128,23 @@ schedule.scheduleJob('0 0 */4 * *', async () => { //this means, 0 minute, 0 hour
   console.log('Running scheduled task to refresh holiday data (every 4 days)');
   await refreshHolidays();
 });
+
+
+// cleanup tasks, if user not exists
+
+export async function cleanupTasks() {
+  try {
+      const tasks = await TaskModel.find();
+
+      for (const task of tasks) {
+          const userExists = await UserModel.exists({ email: task.email });
+
+          if (!userExists) {
+              await TaskModel.deleteOne({ id:task.id,email:task.email });
+              console.log(`Deleted task with ID: ${task._id}`);
+          }
+      }
+  } catch (error) {
+      console.error('Error during task cleanup:', error);
+  }
+}

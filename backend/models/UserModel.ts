@@ -1,6 +1,7 @@
-import mongoose from 'mongoose'
+import mongoose, { CallbackError } from 'mongoose'
 import bcrypt from 'bcrypt'
 import  { Document } from 'mongoose';
+import TaskModel from './TaskModel';
 
 
 const Schema = mongoose.Schema
@@ -44,5 +45,25 @@ UserSchema.pre('save', async function(next) {
     next();
   });
 
+UserSchema.pre('deleteOne',{ document: true, query: false },async function(next){
+    try {
+        await TaskModel.deleteMany({ email: this.email });
+        next();
+    } catch (err:any) {
+        next(err);
+    }
+})
+
+UserSchema.pre('findOneAndDelete', async function(next) {
+    try {
+        const user = await this.model.findOne(this.getFilter());
+        if (user) {
+            await TaskModel.deleteMany({ email: user.email });
+        }
+        next();
+    } catch (err:any) {
+        next(err);
+    }
+});
 
 export default mongoose.model<UserModel>('User', UserSchema);

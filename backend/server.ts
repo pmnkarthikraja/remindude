@@ -3,6 +3,8 @@ import cors from 'cors';
 import express from 'express';
 require('dotenv').config();
 import bodyParser from 'body-parser';
+import axios from 'axios'
+
 // import YAML from 'yamljs';
 // import swaggerUi from 'swagger-ui-express';
 // const swaggerDocument = YAML.load('./swagger/swagger.yml')
@@ -35,8 +37,24 @@ app.use(express.json())
 app.use('/', userRoutes);
 app.use('/',taskRoutes)
 app.use('/',holidayRoutes)
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
+app.get('/google-image', async (req, res) => {
+  const imageUrl:string = req.query.url as string;
+
+  try {
+    const response = await axios.get(imageUrl,{
+      responseType:'arraybuffer'
+    });
+
+    res.set('Content-Type', response.headers['content-type']);
+    res.send(response.data);
+  } catch (error) {
+    console.error('Error fetching image:', error);
+    res.status(500).send('Error fetching image');
+  }
+});
+
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 let serverStarted=false
 export const startServer = async () => {

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { startServer,checkIsServerStarted } from '../server';
-import { checkAndRefreshDatabase } from '../utils/helper';
+import { checkAndRefreshDatabase, cleanupTasks } from '../utils/helper';
 
 dotenv.config();
 
@@ -13,6 +13,7 @@ const connectDBwithRetry = async (): Promise<void> => {
       }
       console.log('MongoDB connected successfully');
       if (checkIsServerStarted()==false){
+        await cleanupTasks()
         await checkAndRefreshDatabase();
       }
     } catch (error) {
