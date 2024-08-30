@@ -47,19 +47,6 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 setupIonicReact();
 
 const App: React.FC = () => {
-  useEffect(() => {
-    const initializeApp = async () => {
-      await SplashScreen.show({
-        showDuration:2000,
-        autoHide: false
-      });
-      
-      await SplashScreen.hide();
-    };
-
-    initializeApp();
-  }, []);
-
   const queryClient = new QueryClient()
 
   const initLocalNotifications = async () => {
