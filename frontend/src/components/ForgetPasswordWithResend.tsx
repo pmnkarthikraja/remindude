@@ -24,7 +24,7 @@ const ForgotPasswordAlertWithResend: FunctionComponent<ForgotPasswordAlertWithRe
 
 
     const sendOtpQuery = async (email: string) => {
-        await sendOtpMutation({ email, accountVerification: false })
+        await sendOtpMutation({ email, accountVerification: false,type:'forgotPassword',userName:undefined})
         setShowOtpAlert(true)
     }
 

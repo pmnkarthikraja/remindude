@@ -41,12 +41,12 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     callAvatar(user)
     // Request permission to send notifications (for iOS)
     LocalNotifications.requestPermissions().then(result => {
-      const sendNotificationOnLoad = async () =>{
-        await sendScheduledNotifications()
-      }
+      // const sendNotificationOnLoad = async () =>{
+      //   await sendScheduledNotifications()
+      // }
       if (result.display === 'granted') {
         console.log('Notification permissions granted');
-        sendNotificationOnLoad()
+        // sendNotificationOnLoad()
       } else {
         console.log('Notification permissions denied');
       }

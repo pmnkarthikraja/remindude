@@ -7,7 +7,7 @@ export interface UserAPI{
     googleLogin:(googleId:string,email:string)=>Promise<AxiosResponse>;
     signup:(user:User)=>Promise<AxiosResponse>
     login:(user:User)=>Promise<AxiosResponse>
-    sendOTP:(email:string,accountVerification:boolean)=>Promise<AxiosResponse>
+    sendOTP:(email:string,accountVerification:boolean,type:'verification'|'forgotPassword',userName:string|undefined)=>Promise<AxiosResponse>
     verifyOTP:(email:string,otp:string)=>Promise<AxiosResponse>
     resetPassword:(email:string,password:string)=>Promise<AxiosResponse>
     editProfile:(email:string,password:string,userName:string,profilePicture:Blob|string)=>Promise<AxiosResponse>
@@ -48,8 +48,8 @@ class UserAPIService implements UserAPI{
          }})
      }
  
-     async sendOTP (email:string,accountVerification:boolean):Promise<AxiosResponse>{
-         return await axios.post(`${BASE_URL}/send-otp`,{email,accountVerification})
+     async sendOTP (email:string,accountVerification:boolean, type:'verification'|'forgotPassword',userName:string|undefined):Promise<AxiosResponse>{
+         return await axios.post(`${BASE_URL}/send-otp`,{email,accountVerification,type,userName})
      }
 
      async verifyOTP (email:string,otp:string):Promise<AxiosResponse>{

@@ -1,3 +1,4 @@
+import { LocalNotifications, LocalNotificationSchema } from "@capacitor/local-notifications";
 import {
     IonFab, IonFabButton,
     IonIcon,
@@ -8,13 +9,13 @@ import { add } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useCallback, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as uuid from 'uuid';
+import { HolidayData, LocalHolidayData } from "../api/calenderApi";
 import { useCreateTaskMutation, useUpdateTaskMutation } from "../hooks/taskHooks";
 import '../styles/CreateTask.css';
 import { Platform, useGetPlatform } from "../utils/useGetPlatform";
 import FormModal from "./FormModal";
 import { getNotificationSchedule } from "./calculateRemindTime";
 import { EventData, TaskRequestData } from "./task";
-import { CalenderHoliday, HolidayData, LocalHolidayData } from "../api/calenderApi";
 
 export function formatISTDateToString(date: Date): string {
     const offset = date.getTimezoneOffset();
@@ -57,7 +58,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                 label: 'Employee Onboarding'
             },
             description: '',
-            emailNotification: false,
+            emailNotification: true,
             eventType: 'Task',
             priority: 'Urgent',
             notifyFrequency: '0',
@@ -77,7 +78,21 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
     const onSubmit = useCallback(async (data: EventData) => {
         const taskId = uuid.v4();
         const notificationIntervals = getNotificationSchedule(new Date(data.datetime) || new Date(), parseInt(data.notifyFrequency || '0'));
-
+        //set the push notification
+        const localNotifications: LocalNotificationSchema[] = notificationIntervals.map((interval,idx)=>{
+            return {
+                title: `Reminder for Upcoming ${data.eventType}: ${data.title}`,
+                body: `Scheduled for ${new Date(data.datetime).toLocaleDateString()} at ${new Date(data.datetime).toLocaleTimeString('en-IN',{ hour: 'numeric', minute: 'numeric', hour12: true })}`,
+                id: idx+parseInt(`${interval.getTime()}`),
+                schedule: { at: interval }, 
+                channelId: 'default',
+                sound: 'default',
+                largeIcon:'reminder.png',
+                smallIcon:'upcoming_task.png',
+                largeBody:`You have a ${data.eventType} for ${new Date(data.datetime).toLocaleDateString()} at ${new Date(data.datetime).toLocaleTimeString('en-IN',{ hour: 'numeric', minute: 'numeric', hour12: true })}. Please be prepare.` 
+            }
+        })
+        
         const createTaskPayload: TaskRequestData = {
             id: taskId,
             priority: data.priority,
@@ -118,6 +133,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
 
         if (isEdit) {
             await onUpdateTask(updateTaskPayload);
+            await LocalNotifications.schedule({ notifications: localNotifications });
             if (typeof toggleEditTask === 'function') {
                 toggleEditTask({
                     isEdit: false,
@@ -128,6 +144,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             setIsModalOpen(false);
         } else {
             await onCreateTask(createTaskPayload);
+            await LocalNotifications.schedule({ notifications: localNotifications });
             formData.clearErrors();
             setIsModalOpen(false);
         }

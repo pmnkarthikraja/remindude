@@ -30,6 +30,7 @@ const SignupPage: React.FC = () => {
   const [alertIsOpen, setAlertIsOpen] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
   const email = watch('email');
+  const userName= watch('userName') || ''
 
   useEffect(() => {
     if (otpVerified) {
@@ -39,7 +40,7 @@ const SignupPage: React.FC = () => {
 
 
   const sendOtpQuery = async (email: string) => {
-    await sendOtpMutation({ email, accountVerification: true })
+    await sendOtpMutation({ email, accountVerification: true,type:'verification',userName })
     setAlertIsOpen(true);
   }
 

@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 import { userApi } from "../api/userApi";
 import { User } from "../components/user";
-import { useCookies } from "react-cookie";
 
 interface AxiosErrorType {
   message: string,
@@ -61,14 +60,16 @@ export const useAuthUser = () => {
 
 interface OTPPayload {
   email: string,
-  accountVerification: boolean
+  accountVerification: boolean,
+  type:'forgotPassword'|'verification',
+  userName:string | undefined
 }
 
 export const useSendOTPMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    (payload: OTPPayload) => userApi.sendOTP(payload.email, payload.accountVerification),
+    (payload: OTPPayload) => userApi.sendOTP(payload.email, payload.accountVerification,payload.type,payload.userName),
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('userclient');
