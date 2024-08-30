@@ -83,7 +83,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             return {
                 title: `Reminder for Upcoming ${data.eventType}: ${data.title}`,
                 body: `Scheduled for ${new Date(data.datetime).toLocaleDateString()} at ${new Date(data.datetime).toLocaleTimeString('en-IN',{ hour: 'numeric', minute: 'numeric', hour12: true })}`,
-                id: idx+parseInt(`${interval.getTime()}`),
+                id: (idx+1)*Math.PI*Math.random(),
                 schedule: { at: interval }, 
                 channelId: 'default',
                 sound: 'default',
