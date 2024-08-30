@@ -126,10 +126,10 @@ const Calender1: FunctionComponent<Calender1Props> = ({
         if (holiday.holidayName.includes('Bank Holiday')){
           return `Bank Holiday (${holiday.region})`
         }
-        return `${holiday.holidayName} (Local Holiday)`}).join(',')
+        return `${holiday.holidayName} [${holiday.region}]`}).join(',')
       content += ', '
       content += holidaysOnDate
-        .map(holiday => `${holiday.name} (${holiday.country.name})`)
+        .map(holiday => `${holiday.name}-${holiday.country.name}`)
         .join(',');
       setPopoverContent(content)
 
@@ -138,13 +138,13 @@ const Calender1: FunctionComponent<Calender1Props> = ({
         if (holiday.holidayName.includes('Bank Holiday')){
           return `Bank Holiday (${holiday.region})`
         }
-        return `${holiday.holidayName} (Local Holiday)`}
+        return `${holiday.holidayName} [${holiday.region}]`}
       ).join(',')
       setPopoverContent(content)
 
     } else if (holidaysOnDate && holidaysOnDate.length > 0) {
       const content = holidaysOnDate
-        .map(holiday => `${holiday.name} (${holiday.country.name})`)
+        .map(holiday => `${holiday.name}-${holiday.country.name}`)
         .join(',');
       setPopoverContent(content);
       
@@ -182,14 +182,13 @@ const Calender1: FunctionComponent<Calender1Props> = ({
       <IonCard >
         <IonRow>
           <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='6' sizeXl='7'>
-            {popoverContent != null && (popoverContent?.includes('India')) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
-            {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (!popoverContent.includes('Bank Holiday (Saudi Arabia)'))) && <IonBadge color='tertiary'>Saudi Public Holiday</IonBadge>}
-          
+
+            {popoverContent!=null && popoverContent.includes('-India') && <IonBadge color={'tertiary'}>Indian Public Holiday</IonBadge>}
+            {popoverContent!=null && popoverContent.includes('-Saudi') && <IonBadge color={'tertiary'}>Saudi Public Holiday</IonBadge>}
             {popoverContent != null && (popoverContent?.includes('Bank Holiday')) && <IonBadge color='danger'>Bank Holiday</IonBadge>}
-
-
-            {popoverContent != null && popoverContent.includes('(Local Holiday)') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
+            {popoverContent != null && popoverContent.includes('[') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
             {popoverContent != null && <p>{popoverContent}</p>}
+
             <IonDatetime
               name="datetime"
               highlightedDates={highlightedDates}

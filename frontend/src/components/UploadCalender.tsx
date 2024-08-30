@@ -1,11 +1,11 @@
+import { IonAlert, IonButton, IonIcon, IonLoading, IonNote, IonToast } from '@ionic/react';
+import { checkmark } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import * as XLSX from 'xlsx';
-import { checkmark } from 'ionicons/icons';
-import { IonAlert, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonLoading, IonModal, IonNote, IonTitle, IonToast, IonToolbar } from '@ionic/react';
-import DownloadTemplateButton from './ModelExcel';
 import { holidayApi, LocalHolidayData } from '../api/calenderApi';
 import { useDeleteLocalHoliday, useGetLocalHolidays } from '../hooks/calenderHooks';
 import HolidayModal from './LocalHolidaysModal';
+import DownloadTemplateButton from './ModelExcel';
 
 type Region = 'India' | 'Saudi Arabia' | 'Both'
 
@@ -21,7 +21,7 @@ const UploadCalendar = () => {
     const [fileInputKey, setFileInputKey] = useState<string>(Date.now().toString());
     const [err, setErr] = useState<string | null>(null)
     const { data: localHolidaysData, isLoading: isGetLocalHolidaysLoading } = useGetLocalHolidays()
-    const {status:deleteHolidayStatus, isLoading: isDeleteLoading, isError: isDeleteErr, error: deleteErr, mutateAsync: deleteLocalHoliday } = useDeleteLocalHoliday()
+    const { isLoading: isDeleteLoading, isError: isDeleteErr, error: deleteErr, mutateAsync: deleteLocalHoliday } = useDeleteLocalHoliday()
 
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,6 +200,7 @@ const validateData = (jsonData: (ExcelParsedData | undefined)[]): any[] => {
         }
 
         const datePattern = /^\d{4}-\d{2}-\d{2}$/;  // Regular expression for yyyy-mm-dd format
+        const mobileDatePattern = /^\d{2}-\d{2}-\d{4}$/
 
         if (row[1] && row[1] !== '') {
             // format the date with excel
@@ -217,7 +218,7 @@ const validateData = (jsonData: (ExcelParsedData | undefined)[]): any[] => {
         }
 
         // Check if the date is in the correct format
-        if (!row[1] || !datePattern.test(row[1])) {
+        if (!row[1] || (!datePattern.test(row[1]) && !mobileDatePattern.test(row[1]))) {
             return {
                 type: 'Invalid',
                 row: row,
@@ -354,20 +355,18 @@ const ResultsTable:FunctionComponent<ResultsTableProps> = ({
                 <tbody>
                     {data.map((row, index) => {
                         const invalidColor = (row.type === 'Invalid' && '#ffc0cb') || (row.type == 'New' && '#BFF6C3') || '#f1f8e8';
-                        // #FFEEA9
-                        // const rowKey = row.row.join(', ');
                         const rowKey = row.row[0] + ', ' + row.row[1]
 
                         return (
                             <Fragment key={index}>
                                 <tr>
-                                    <td style={{ border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
+                                    <td style={{ color:'black', border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
                                         {row.type}
                                     </td>
-                                    <td style={{ border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
+                                    <td style={{color:'black', border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
                                         {row.row.join(', ')}
                                     </td>
-                                    <td style={{ border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
+                                    <td style={{color:'black', border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
                                         {row.actions ? (
                                             row.actions.map((action: string) => {
                                                 const buttonName = (action == 'Ok' && (status.get(rowKey) == 'Success' ? 'Added' : 'Ok') || (action == 'Cancel' && 'Cancel'))
@@ -390,10 +389,10 @@ const ResultsTable:FunctionComponent<ResultsTableProps> = ({
                                             <span>-</span>
                                         )}
                                     </td>
-                                    <td style={{ border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
+                                    <td style={{color:'black', border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
                                         {(status.get(rowKey) == 'Pending' && (row.type === 'Invalid' && 'Failed' || row.type == 'New' && 'Pending' || row.type == 'Duplicated' && 'Pending')) || (status.get(rowKey) == 'Success' && status.get(rowKey)) || (row.type == 'Invalid' ? 'Failed' : 'Pending')}
                                     </td>
-                                    <td style={{ border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
+                                    <td style={{color:'black', border: '1px solid black', backgroundColor: invalidColor, padding: '8px' }}>
                                         {row.reason || '-'}
                                     </td>
                                 </tr>

@@ -28,7 +28,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   const { setValue, watch, reset } = useForm<User>({
     defaultValues: { ...user }
   })
-
   const [userAvatar,setUserAvatar]=useState('')
   const userData = watch()
 
@@ -41,12 +40,8 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     callAvatar(user)
     // Request permission to send notifications (for iOS)
     LocalNotifications.requestPermissions().then(result => {
-      // const sendNotificationOnLoad = async () =>{
-      //   await sendScheduledNotifications()
-      // }
       if (result.display === 'granted') {
         console.log('Notification permissions granted');
-        // sendNotificationOnLoad()
       } else {
         console.log('Notification permissions denied');
       }
@@ -135,52 +130,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       console.log("failed to update profile :" + e)
     }
   }
-  // const userAvatar = chooseAvatar(userData)
-
-  const today = new Date().toLocaleDateString()
-
-  const sendScheduledNotifications = async () => {
-  try {
-    const notifications: LocalNotificationSchema[] = [];
-
-    for (let i = 0; i < 10; i++) {
-      notifications.push({
-        title: `Reminder ${i + 1}`,
-        body: `This is notification ${i + 1} scheduled at ${i * 10} seconds.`,
-        id: i + 1,
-        schedule: { at: new Date(Date.now() + (i * 10000)) }, 
-        channelId: 'default',
-        sound: 'default',
-        largeIcon:'reminder.png',
-        smallIcon:'upcoming_task.png',
-        largeBody:`You have scheduled task at ${today}. Please complete it.` 
-      });
-    }
-
-    await LocalNotifications.schedule({ notifications });
-  } catch (error) {
-    console.error('Error scheduling local notifications:', error);
-  }
-};
-
-
-  const sendLocalNotification = async () => {
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          title: "Task Reminder",
-          body: "You have a task scheduled for 5:00 PM. Don't forget to complete it!",
-          id: Math.floor(Date.now() / 1000), 
-          schedule: { at: new Date(Date.now()+2000) }, 
-          sound: 'default',
-          channelId: "default",
-          smallIcon:'upcoming_task.png',
-          largeIcon:'reminder.png',
-          largeBody:"You have a task scheduled for 5:00 PM. Don't forget to complete it!"
-        },
-      ]
-    });
-  };
 
   return <Fragment>
     <IonPage>
@@ -409,10 +358,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
           </IonItem>
           <IonItem>
             <IonLabel>General Info</IonLabel>
-            <IonIcon slot="end" icon={chevronForwardOutline} />
-          </IonItem>
-          <IonItem button onClick={() => { sendLocalNotification() }}>
-            <IonLabel>Test Notify</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
         </IonList>

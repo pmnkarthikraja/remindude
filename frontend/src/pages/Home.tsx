@@ -4,7 +4,8 @@ import {
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
-  IonTabs
+  IonTabs,
+  useIonRouter
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
@@ -18,6 +19,7 @@ import ProfilePage from './ProfilePage';
 
 
 const Home: FunctionComponent = () => {
+  const router = useIonRouter()
   const [token, setToken] = useState<string | null>(null)
   const [user, setUser] = useState<User>({
     email: '',
@@ -28,7 +30,6 @@ const Home: FunctionComponent = () => {
   })
   const {status, mutateAsync: authMutation } = useAuthUser()
   const [platform, setPlatform] = useState<Platform>('Unknown')
-  // const onSignOut=useSignOutUser()
   const handlePlatformChange = (newPlatform: Platform) => {
     setPlatform(newPlatform);
   };
@@ -49,13 +50,13 @@ const Home: FunctionComponent = () => {
         })
       } catch (e) {
         console.log("session not found: " + e)
-        window.location.href = '/login'
+        router.push('/login')
       }
     }
     const token = window.localStorage.getItem('token');
     setToken(token)
     if (token == null) {
-      window.location.href = '/login'
+      router.push('/login')
     }
     if (token != null) {
       validateSession(token)
@@ -65,7 +66,7 @@ const Home: FunctionComponent = () => {
   const signOut = async () => {
     try {
       localStorage.removeItem('token')
-      window.location.href = '/login'
+      router.push('/login')
     } catch (e) {
       console.log("signout failed: ", e)
     }

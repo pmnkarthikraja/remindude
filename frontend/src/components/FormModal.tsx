@@ -1,4 +1,5 @@
 import { IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
+import { CSSProperties } from "@mui/styled-engine"
 import dayjs from "dayjs"
 import { close, closeOutline } from "ionicons/icons"
 import moment from "moment-timezone"
@@ -13,8 +14,6 @@ import { EventData, TaskRequestData } from "./task"
 import StaticTimePickerLandscape from "./TimePicker"
 import ToggleWithLabel from "./Toggle"
 import { useWeekContext } from "./weekContext"
-import { CSSProperties } from "@mui/styled-engine"
-import { Capacitor } from '@capacitor/core';
 
 
 const colorMap: { [key: string]: { textColor: string, backgroundColor: string } } = {
@@ -56,8 +55,6 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
     const [initialTime, setInitialTime] = useState<Date | null>(null);
     const [popoverContent, setPopoverContent] = useState<string | null>(null);
-
-    // console.log("platform by capacitor: ",Capacitor.getPlatform())
 
     const highlightedDates = useMemo(() => {
         const calenderificHolidaysResult = holidays && holidays.flatMap(data => {
@@ -101,10 +98,10 @@ const FormModal: FunctionComponent<FormModalProps> = ({
               if (holiday.holidayName.includes('Bank Holiday')){
                 return `Bank Holiday (${holiday.region})`
               }
-              return `${holiday.holidayName} (Local Holiday)`}).join(',')
+              return `${holiday.holidayName} [${holiday.region}]`}).join(',')
             content += ', '
             content += holidaysOnDate
-              .map(holiday => `${holiday.name} (${holiday.country.name})`)
+              .map(holiday => `${holiday.name}-${holiday.country.name}`)
               .join(',');
             setPopoverContent(content)
       
@@ -113,13 +110,13 @@ const FormModal: FunctionComponent<FormModalProps> = ({
               if (holiday.holidayName.includes('Bank Holiday')){
                 return `Bank Holiday (${holiday.region})`
               }
-              return `${holiday.holidayName} (Local Holiday)`}
+              return `${holiday.holidayName} [${holiday.region}]`}
             ).join(',')
             setPopoverContent(content)
       
           } else if (holidaysOnDate && holidaysOnDate.length > 0) {
             const content = holidaysOnDate
-              .map(holiday => `${holiday.name} (${holiday.country.name})`)
+              .map(holiday => `${holiday.name}-${holiday.country.name}`)
               .join(',');
             setPopoverContent(content);
             
@@ -242,22 +239,11 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     const addCardTitle = 'Add Task/Meeting'
     const editCardTitle = `Edit ${eventType == 'Meeting' ? "Meeting" : 'Task'}`
 
-    const isDateDisabled = (dateIsoString: string) => {
-        const date = new Date(dateIsoString);
-        const day = date.getUTCDay();
-        if (startOfWeek == 'Sunday') {
-            return day === 0 || day === 6;
-        } else if (startOfWeek == 'Monday') {
-            return day === 5 || day === 6;
-        }
-    };
-
     const customTimezoneSelectorStyles = {
         control: (provided: any) => ({
             ...provided,
             zIndex: 9999,
             border: '1px solid #ccc',
-            // backgroundColor:'inherit',
             boxShadow: 'none',
             padding: '2px',
             margin: '15px',
@@ -344,7 +330,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                     </IonToolbar>
                 </IonHeader>
                 <IonContent
-                >
+>
                     {fieldErrors.title && <IonToast color={'danger'}
                         onDidDismiss={() => clearErrors()}
                         buttons={[
@@ -443,13 +429,10 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                     </IonToolbar>
 
                                     <IonItem lines="none" >
-                                        {popoverContent != null && (popoverContent?.includes('India')) && <IonBadge color='secondary'>India Public Holiday</IonBadge>}
-                                        {popoverContent != null && (popoverContent?.includes('Saudi Arabia') && (!popoverContent.includes('Bank Holiday (Saudi Arabia)'))) && <IonBadge color='tertiary'>Saudi Public Holiday</IonBadge>}
-
-                                        {popoverContent != null && (popoverContent?.includes('Bank Holiday')) && <IonBadge color='danger'>Bank Holiday</IonBadge>}
-
-
-                                        {popoverContent != null && popoverContent.includes('(Local Holiday)') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
+                                    {popoverContent!=null && popoverContent.includes('-India') && <IonBadge color={'tertiary'}>Indian Public Holiday</IonBadge>}
+                                    {popoverContent!=null && popoverContent.includes('-Saudi') && <IonBadge color={'tertiary'}>Saudi Public Holiday</IonBadge>}
+                                    {popoverContent != null && (popoverContent?.includes('Bank Holiday')) && <IonBadge color='danger'>Bank Holiday</IonBadge>}
+                                    {popoverContent != null && popoverContent.includes('[') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
                                     </IonItem>
 
                                 </IonHeader>

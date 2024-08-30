@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 import { userApi } from "../api/userApi";
 import { User } from "../components/user";
+import { useIonRouter } from "@ionic/react";
 
 interface AxiosErrorType {
   message: string,
@@ -52,7 +53,6 @@ export const useAuthUser = () => {
       },
       onError: (e) => {
         console.log("Error during authentication", e);
-        // window.location.href='/login'
       }
     }
   );
@@ -286,7 +286,7 @@ interface EditProfilePayload{
 
 export const useEditProfileMutation = () => {
   const queryClient = useQueryClient();
-  const history = useHistory()
+  const router = useIonRouter()
 
   return useMutation(
     (user: EditProfilePayload) => userApi.editProfile(user.email,user.password,user.userName,user.profilePicture),
@@ -294,7 +294,7 @@ export const useEditProfileMutation = () => {
       onSuccess: (data) => {
         queryClient.invalidateQueries('userDetails');
         setTimeout(() => {
-          window.location.href='/home'
+          router.push('/home')
         }, 1000)
         console.log("on edit profile mutation success: ", data);
       },
