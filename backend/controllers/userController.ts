@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UserModel } from "../models/UserModel";
 import userRepo from "../repo/userRepo";
 import UserService from "../services/userService";
-import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from "../utils/handleErrors";
+import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from "../utils/handleErrors";
 
 let inMemoryOTP:Map<string,string>=new Map()
 
@@ -154,14 +154,14 @@ class UserController {
 
     public async sendOTP(req:Request,res:Response,next:NextFunction):Promise<void>{
       try{
-        const { email, accountVerification } = req.body;
-        const {msg,otp}= await UserService.SendOTP(email,accountVerification)
+        const { email, accountVerification,type,userName } = req.body;
+        const {msg,otp}= await UserService.SendOTP(email,accountVerification,type,userName)
        //saving otp in inmemory
         inMemoryOTP.set(email,otp)
         res.status(200).json({message:msg,status:true})
         next();
       }catch(err:any){
-       if (err instanceof DBErrOTPUserSignedUpByEmail){
+       if (err instanceof DBErrOTPUserSignedUpByGoogle){
          res.status(409).json({message: err.name, success:false})
        }else if (err instanceof DBErrInternal) {
          res.status(500).json({ message: err.name, success: false });

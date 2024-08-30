@@ -3,9 +3,10 @@ import jwt, { JwtPayload as BaseJwtPayload } from 'jsonwebtoken';
 import { UserModel } from '../models/UserModel';
 import userRepo from '../repo/userRepo';
 import createJSONWebToken from '../utils/authToken';
-import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByEmail, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from '../utils/handleErrors';
+import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from '../utils/handleErrors';
 import { getUserInfo } from '../utils/helper';
 import { sendEmail } from '../utils/sendEmail';
+import { accountVerificationHTMLTemplate, forgotPasswordHTMLTemplate } from '../utils/mailTemplates';
 require("dotenv").config();
 
 export interface JwtPayload extends BaseJwtPayload {
@@ -18,7 +19,7 @@ interface UserServiceImplementation{
     GoogleSignUp:(accessToken:string)=>Promise<{user:UserModel; token:string}>
     GoogleSignIn:(googleId:string,email:string)=>Promise<{user:UserModel;token:string}>
     AuthUser:(token:string)=>Promise<{user:UserModel}>
-    SendOTP:(email:string, accountVerification:boolean )=>Promise<{msg:string,otp:string}>
+    SendOTP:(email:string, accountVerification:boolean,type:'verification'|'forgotPassword',userName:string|undefined )=>Promise<{msg:string,otp:string}>
     UpdateUser:(email:string,userName:string,profilePicture:Express.Multer.File | undefined,isProfilePicSet:string)=>Promise<{user:UserModel}>
     ResetPassword:(email:string,password:string)=>Promise<{user:UserModel}>
     ValidatePassword:(email:string,password:string)=>Promise<{user:UserModel}>
@@ -118,7 +119,7 @@ class UserService implements UserServiceImplementation {
     }
   }
 }
-async SendOTP(email:string,accountVerification:boolean):Promise<{msg:string,otp:string}>{
+async SendOTP(email:string,accountVerification:boolean,type:'verification'|'forgotPassword',userName:string|undefined):Promise<{msg:string,otp:string}>{
   if (!accountVerification){
     const user= await userRepo.findOneByEmail(email)
     if (user==null){
@@ -126,13 +127,17 @@ async SendOTP(email:string,accountVerification:boolean):Promise<{msg:string,otp:
     }
     if (user){
       if (!!user.googleId){
-        throw new DBErrOTPUserSignedUpByEmail()
+        throw new DBErrOTPUserSignedUpByGoogle()
       }
     }
   }
   const otp = Math.floor(100000 + Math.random() * 900000) ;
-  const onSendMail = await sendEmail(email,'Reset Your Password-OTP','',`Your OTP for resetting password is: ${otp}`)
 
+  const subject = type =='verification' ? 'Verify your email address':'Request to reset your password'
+  const template = type =='verification' ? accountVerificationHTMLTemplate(userName || '', otp) : forgotPasswordHTMLTemplate(otp)
+  
+  const onSendMail = await sendEmail(email,subject,template,'')
+   
   if (onSendMail.rejected.length!=0){
     throw new DBErrInternal("failed to send otp")
   }

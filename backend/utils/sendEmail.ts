@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import schedule from 'node-schedule'
 import { TaskModel } from '../models/TaskModel';
+import { reminderTemplateHTMLContent } from './mailTemplates';
 require('dotenv').config();
 const scheduledJobs: { [key: string]: schedule.Job[] } = {};
 
@@ -98,7 +99,7 @@ export const scheduleNotifications = async (task:TaskModel) => {
       </body>
       </html>
         `
-      await sendEmail(task.email, `Kind Reminder for task- ${task.title}`, template, `This is the kind reminder for your task!`);
+      await sendEmail(task.email, `Kind Reminder for ${task.eventType} - ${task.title}`, reminderTemplateHTMLContent(task), `This is the kind reminder for your ${task.eventType}!`);
       });
       scheduledJobs[task.id].push(job);
   });

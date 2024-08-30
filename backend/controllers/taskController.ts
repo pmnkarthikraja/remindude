@@ -122,7 +122,46 @@ class TaskController{
         //     task,
         //   })
 
-        res.redirect('https://www.google.co.in')
+        const appUrl = 'remindude://'; 
+        const fallbackUrl = 'https://remindude-theta.vercel.app';  
+    
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Redirecting...</title>
+                <script>
+                    function redirectToApp() {
+                        var appUrl = "${appUrl}";
+                        var fallbackUrl = "${fallbackUrl}";
+    
+                        // Create an iframe to attempt opening the app
+                        var iframe = document.createElement("iframe");
+                        iframe.style.display = "none";
+                        iframe.src = appUrl;
+    
+                        // Append iframe to body
+                        document.body.appendChild(iframe);
+    
+                        // Set a timeout to redirect to fallback URL if app isn't opened
+                        setTimeout(function() {
+                            window.location.href = fallbackUrl;
+                        }, 1000); // Adjust the timeout as needed
+                    }
+    
+                    // Redirect when the page loads
+                    window.onload = redirectToApp;
+                </script>
+            </head>
+            <body>
+                <p>If you are not redirected automatically, <a href="${fallbackUrl}">click here</a>.</p>
+            </body>
+            </html>
+        `);
+
+        // res.redirect('https://www.google.co.in')
         // res.send(`<p>Congratulation! your task <b>${task.title}</b> has been modified!</p>`) 
 
         }catch(err:any){

@@ -57,10 +57,10 @@ export class DBErrTaskNotFound extends Error{
   }
 }
 
-export class DBErrOTPUserSignedUpByEmail extends Error{
+export class DBErrOTPUserSignedUpByGoogle extends Error{
   constructor(){
     super();
-    this.name = "user signed up by email"
+    this.name = "user signed up by google"
   }
 }
 

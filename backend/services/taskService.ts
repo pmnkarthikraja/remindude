@@ -3,6 +3,7 @@ import { DBErrTaskTimeElapsed, DBErrUserNotFound } from "../utils/handleErrors";
 import { getRemainingTime } from "../utils/helper";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "../utils/sendEmail";
+import { createTemplateHTMLContent } from "../utils/mailTemplates";
 
 interface TaskServiceImplementation {
     CreateTask: (task: TaskModel) => Promise<{ task: TaskModel }>
@@ -35,7 +36,7 @@ class TaskService implements TaskServiceImplementation {
       <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Kind Reminder for your task</title>
+      <title>${gotTask.eventType} has successfully created!</title>
       <style>
         body {
           font-family: Arial, sans-serif;
@@ -112,7 +113,8 @@ class TaskService implements TaskServiceImplementation {
       </body>
       </html>
   `;
-        await sendEmail(task.email, "Task has successfully created!", emailContent, "You can change the task setting here!")
+
+        await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false), "You can change the task setting here!")
 
         await cancelScheduledNotifications(gotTask.id)
         if (task.emailNotification) {
@@ -135,8 +137,12 @@ class TaskService implements TaskServiceImplementation {
         }
 
         const gotTask = await taskRepo.UpdateTask(task)
+        await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true), "You can change the task setting here!")
+
         await cancelScheduledNotifications(gotTask.id)
+        console.log("task email notificaiotn:",task.emailNotification)
         if (task.emailNotification) {
+          console.log("task has emailnotification:")
             scheduleNotifications(task)
             return {
                 task: gotTask,
