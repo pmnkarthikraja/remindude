@@ -38,9 +38,6 @@ function calculateTimeLeft(targetDate: string) {
 
 
 export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) => {
-    console.log("localtimezone: ",localTimeZone)
-    console.log("incoming time: ",task.dateTime)
-    console.log("formated time raw: ",new Date(task.dateTime).toLocaleTimeString())
     console.log("formated time as mail: ",new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' }))
     
     const formattedTime = formatTimeWithZone(new Date(task.dateTime), localTimeZone)
