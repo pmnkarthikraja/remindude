@@ -1,4 +1,6 @@
 import { TaskModel } from "../models/TaskModel";
+import { format, toZonedTime } from 'date-fns-tz'
+
 export const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
 
@@ -26,9 +28,22 @@ function calculateTimeLeft(targetDate: string) {
 }
 
 
+const formatDateTime = (taskDateTime:string)=>{
+    const zonedDateTime = toZonedTime(taskDateTime, localTimeZone)
+    const formattedDate = format(zonedDateTime, 'P') 
+    const formattedTime = format(zonedDateTime, 'p zzz', { timeZone: localTimeZone }) 
+
+    return {
+        date:formattedDate,
+        time:formattedTime
+    }
+}   
+
 export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) => {
     const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
     const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
+   
+    const {date,time} =formatDateTime(task.dateTime)
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -149,7 +164,8 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
             <div class="content">
                 <p><span class="type">Type: </span>${task.eventType}</p>
                 <p><span class="title">Title: </span>${task.title}</p>
-                <p><span class="type">Scheduled At: </span>${new Date(task.dateTime).toLocaleDateString()} and ${new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' })}</p>
+                <p><span class="type">Scheduled At: 
+                </span>${date} and ${time}</p>
             </div>
                 <div class="priority ${task.priority.toLowerCase()}">
                 ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
@@ -168,6 +184,7 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
 export const reminderTemplateHTMLContent = (task: TaskModel) => {
     const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
     const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
+    const {date,time} = formatDateTime(task.dateTime)
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -290,7 +307,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
         </div>
         <div class="content">
             <p><strong>Description: </strong>${task.description}</p>
-            <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' })} </p>
+            <p><strong>Date & Time: </strong>${date} and ${time} </p>
             <p class="time-left">${calculateTimeLeft(task.dateTime)}</p>
         </div>
         <div class="footer">
