@@ -15,6 +15,7 @@ export interface TaskModel extends Document{
     categoryName:string,
     categoryLabel:string,
     status:'InProgress'|'Done',
+    localTimezone:string,
     subTasks?:SubTaskData[],
     checklists?:SubTaskData[],
     timezone?:string
@@ -104,6 +105,10 @@ const TaskSchema = new Schema({
     checklists:{
         type:[subTaskDataSchema],
         require:false
+    },
+    localTimezone:{
+    type:String,
+    require:true
     },
     timezone:{
         type:String,

@@ -1,7 +1,4 @@
 import { TaskModel } from "../models/TaskModel";
-export const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-console.log("localtimezone: ",localTimeZone)
 
 const formatTimeWithZone = (date: Date, timeZone: string) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -38,9 +35,7 @@ function calculateTimeLeft(targetDate: string) {
 
 
 export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) => {
-    console.log("formated time as mail: ",new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' }))
-    
-    const formattedTime = formatTimeWithZone(new Date(task.dateTime), localTimeZone)
+    const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
     const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
     const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
     return `
@@ -182,7 +177,7 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
 export const reminderTemplateHTMLContent = (task: TaskModel) => {
     const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
     const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
-    const formattedTime = formatTimeWithZone(new Date(task.dateTime), localTimeZone)
+    const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
 
     return `
 <!DOCTYPE html>
