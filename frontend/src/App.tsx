@@ -43,23 +43,37 @@ import TestPage from './pages/TestPage';
 import Welcome from './pages/Welcome';
 import './theme/variables.css';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { Filesystem } from '@capacitor/filesystem';
 
 setupIonicReact();
 
 const App: React.FC = () => {
   const queryClient = new QueryClient()
 
-  const initLocalNotifications = async () => {
-    await LocalNotifications.requestPermissions();
-  };
   
-  initLocalNotifications();
+  useEffect(() => {
+    const initPermissions = async () => {
+      // Request notification permissions
+      const notificationPermission = await LocalNotifications.requestPermissions();
+      if (notificationPermission.display !== 'granted') {
+        console.error('Notification permissions not granted');
+      }
+
+      // Request file system permissions
+      const fileSystemPermission = await Filesystem.requestPermissions();
+      if (fileSystemPermission.publicStorage !== 'granted') {
+        console.error('File system permissions not granted');
+      }
+    };
+
+    initPermissions();
+  }, []);
 
   return<QueryClientProvider client={queryClient}> <CookiesProvider><IonApp>
     {/* <div style={{width:'100%', height:'0'}}><iframe src="https://giphy.com/embed/jAYUbVXgESSti" width="100%" height="100%" style={{position:'absolute'}} frameBorder="0" className="giphy-embed" allowFullScreen={true}></iframe></div> */}
     {/* kUTME7ABmhYg5J3psM */}
 
-     <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} animated/>
+    <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} animated/>
 
     <IonReactRouter>
       <IonRouterOutlet>

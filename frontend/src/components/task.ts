@@ -28,7 +28,8 @@ export interface TaskRequestData{
     categoryName:string,
     categoryLabel:string,
     status:TaskStatus,
-    timezone?:string
+    localTimezone:string,
+    timezone?:string,
 }
 
 
@@ -101,6 +102,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -116,6 +118,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Large Title Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque minima incidunt, perspiciatis ex ducimus vel voluptas, harum blanditiis veniam quibusdam accusamus, nulla adipisci magnam explicabo excepturi animi iusto totam culpa.",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -131,6 +134,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -146,6 +150,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -161,6 +166,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -176,6 +182,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -191,6 +198,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -206,6 +214,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   },
   {
@@ -221,6 +230,7 @@ export const dummyTasks:TaskRequestData[]=[{
     priority:'Urgent',
     title:"Dummy Title",
     eventType:'Meeting',
+    localTimezone:'Asia/kolkata',
     status:'InProgress'
   }
 ]

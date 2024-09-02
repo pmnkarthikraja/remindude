@@ -16,6 +16,7 @@ import { Platform, useGetPlatform } from "../utils/useGetPlatform";
 import FormModal from "./FormModal";
 import { getNotificationSchedule } from "./calculateRemindTime";
 import { EventData, TaskRequestData } from "./task";
+import { localTimeZone } from "../utils/util";
 
 export function formatISTDateToString(date: Date): string {
     const offset = date.getTimezoneOffset();
@@ -109,6 +110,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             status: 'InProgress',
             checklists: data.checklists,
             subTasks: data.subTasks,
+            localTimezone:localTimeZone,
             timezone: data.timezone
         }
 
@@ -128,6 +130,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             status: data.status,
             checklists: data.checklists,
             subTasks: data.subTasks,
+            localTimezone:localTimeZone,
             timezone: data.timezone
         }
 

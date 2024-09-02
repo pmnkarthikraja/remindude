@@ -19,7 +19,6 @@ import ProfilePage from './ProfilePage';
 
 
 const Home: FunctionComponent = () => {
-  const router = useIonRouter()
   const [token, setToken] = useState<string | null>(null)
   const [user, setUser] = useState<User>({
     email: '',
@@ -50,13 +49,13 @@ const Home: FunctionComponent = () => {
         })
       } catch (e) {
         console.log("session not found: " + e)
-        router.push('/login')
+        window.location.href='/login'
       }
     }
     const token = window.localStorage.getItem('token');
     setToken(token)
     if (token == null) {
-      router.push('/login')
+      window.location.href='/login'
     }
     if (token != null) {
       validateSession(token)
@@ -66,7 +65,7 @@ const Home: FunctionComponent = () => {
   const signOut = async () => {
     try {
       localStorage.removeItem('token')
-      router.push('/login')
+      window.location.href='/login'
     } catch (e) {
       console.log("signout failed: ", e)
     }

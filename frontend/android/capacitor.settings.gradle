@@ -34,3 +34,6 @@ project(':codetrix-studio-capacitor-google-auth').projectDir = new File('../node
 
 include ':capacitor-file-picker'
 project(':capacitor-file-picker').projectDir = new File('../node_modules/capacitor-file-picker/android')
+
+include ':capacitor-native-settings'
+project(':capacitor-native-settings').projectDir = new File('../node_modules/capacitor-native-settings/android')

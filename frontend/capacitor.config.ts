@@ -25,9 +25,6 @@ const config: CapacitorConfig = {
     },
     FilePicker:{
       multiple:true,
-      android:{
-        fileProviderAuthority: 'com.localhost.fileprovider'
-      }
     },
     LocalNotifications: {
       smallIcon: "ic_stat_icon_config_sample",

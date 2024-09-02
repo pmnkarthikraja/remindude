@@ -286,7 +286,6 @@ interface EditProfilePayload{
 
 export const useEditProfileMutation = () => {
   const queryClient = useQueryClient();
-  const router = useIonRouter()
 
   return useMutation(
     (user: EditProfilePayload) => userApi.editProfile(user.email,user.password,user.userName,user.profilePicture),
@@ -294,7 +293,7 @@ export const useEditProfileMutation = () => {
       onSuccess: (data) => {
         queryClient.invalidateQueries('userDetails');
         setTimeout(() => {
-          router.push('/home')
+          window.location.href='/home'
         }, 1000)
         console.log("on edit profile mutation success: ", data);
       },

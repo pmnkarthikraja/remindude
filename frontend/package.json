@@ -12,7 +12,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@capacitor/android": "6.0.0",
+    "@capacitor/android": "6.1.2",
     "@capacitor/app": "6.0.0",
     "@capacitor/core": "^6.1.2",
     "@capacitor/filesystem": "^6.0.0",
@@ -37,7 +37,9 @@
     "@use-gesture/react": "^10.3.1",
     "@wojtekmaj/react-datetimerange-picker": "^6.0.0",
     "axios": "^1.7.2",
+    "browser-image-compression": "^2.0.2",
     "capacitor-file-picker": "^1.0.10",
+    "capacitor-native-settings": "^6.0.1",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "exceljs": "^4.4.0",

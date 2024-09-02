@@ -10,6 +10,7 @@ import { useWeekContext } from '../components/weekContext'
 import { useEditProfileMutation } from '../hooks/userHooks'
 import '../styles/ProfilePage.css'
 import { chooseAvatar } from '../utils/util'
+import imageCompression from 'browser-image-compression'
 
 export interface ProfilePageProps {
   user: User,
@@ -30,6 +31,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   })
   const [userAvatar,setUserAvatar]=useState('')
   const userData = watch()
+  const [warningToast,setWarningToast]=useState(false)
 
   const callAvatar = async (us:User)=>{
     const image= await chooseAvatar(us)
@@ -68,17 +70,28 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   };
 
 
-  const pickImages = async (): Promise<string> => {
+  //not using this function
+  const pickImages = async (): Promise<string|null> => {
     const result = await FilePicker.pickImages({
       readData: true,
     })
 
     const blobData1 = result.files[0].blob
-    const img = 'data:image/*;base64,' + result.files[0].data
+    let img = 'data:image/*;base64,' + result.files[0].data
     if (!!blobData1) {
+      const imgSizeMB = blobData1.size / (1024 * 1024)
+      console.log('Image size in MB:', imgSizeMB) 
+      if (imgSizeMB > 2) {
+        setWarningToast(true)
+        console.log('Warning: Image size exceeds 2 MB')
+        return null
+      }
+  
+
       setBlobData(blobData1)
+      setValue('profilePicture', img)
+
     }
-    setValue('profilePicture', img)
     return img
   }
 
@@ -86,27 +99,38 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     const file = event.target.files?.[0];
     if (file) {
       try {
+        // Check the file size
+        const fileSizeMB = file.size / (1024 * 1024); // Convert size to MB
+        if (fileSizeMB > 2) {
+          // Display a warning toast or alert
+          setWarningToast(true);
+          console.error('The selected image is too large. Please upload an image smaller than 2 MB.');
+          return; // Exit the function if the file is too large
+        }
+  
         // Create a Blob object from the file
         const blobData = new Blob([file], { type: file.type });
-
+  
         // Create a FileReader to read the file as a Data URL (base64)
         const reader = new FileReader();
-
+  
         reader.onloadend = async () => {
           const base64String = reader.result as string;
-
-          setBlobData(blobData);  // Set Blob data
-          setValue('profilePicture', base64String); // Set base64 image data
-          const u:User={
-            email:user.email,
-            userName:user.userName,
-            googlePicture:'',
-            profilePicture:base64String,
-            password:''
-          }
-          await callAvatar(u)
+  
+          setBlobData(blobData);  
+          setValue('profilePicture', base64String); 
+          
+          const u: User = {
+            email: user.email,
+            userName: user.userName,
+            googlePicture: '',
+            profilePicture: base64String,
+            password: ''
+          };
+          
+          await callAvatar(u);
         };
-
+  
         // Read the file as a data URL
         reader.readAsDataURL(file);
       } catch (error) {
@@ -116,6 +140,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       console.error('No file selected');
     }
   };
+  
 
   const onSubmit = async () => {
     try {
@@ -134,6 +159,15 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   return <Fragment>
     <IonPage>
       {profileModalIsOpen && (
+        <Fragment>
+         <IonToast
+                color={'danger'}
+                isOpen={warningToast}
+                onDidDismiss={() => setWarningToast(false)}
+                message={'The selected image is too large. Please upload an image smaller than 2 MB.'}
+                duration={3000}
+                position="top"
+            />
         <IonModal isOpen={true} onDidDismiss={() => setProfileModalIsOpen(false)}>
           <IonHeader>
             <IonToolbar>
@@ -162,7 +196,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
                     role: 'cancel',
                     handler: () => { }
                   },
-                ]} position="top" isOpen={true} message={'Sorry, Please try again later!' + error.response?.data.message} duration={3000}></IonToast>}
+                ]} position="top" isOpen={true} message={'Sorry, Please try again later!' + (error.response?.data.message || error.message)} duration={3000}></IonToast>}
               {isLoading && <IonLoading isOpen={true} message="Updating Profile.." />}
               <IonCardContent>
                 <IonGrid>
@@ -266,6 +300,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             </IonCard>
           </IonContent>
         </IonModal>
+        </Fragment>
       )}
 
       <ChangePasswordModal

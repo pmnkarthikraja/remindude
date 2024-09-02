@@ -20,6 +20,7 @@ dependencies {
     implementation project(':capawesome-capacitor-file-picker')
     implementation project(':codetrix-studio-capacitor-google-auth')
     implementation project(':capacitor-file-picker')
+    implementation project(':capacitor-native-settings')
 
 }
 
