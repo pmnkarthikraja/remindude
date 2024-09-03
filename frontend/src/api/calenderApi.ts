@@ -20,8 +20,6 @@ export interface CalenderHoliday{
     primary_type:string
 }
 
-// export type HolidayData = { [key: string]: CalenderHoliday[] }
-
 export interface HolidayData{
   country:string,
   holidays:CalenderHoliday[],
@@ -64,7 +62,9 @@ export interface LocalHolidayData{
         "states": "All"
       },
 `
-const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude.vercel.app" :  "http://localhost:4000"
+// const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude.vercel.app" :  "http://localhost:4000"
+const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
+
 
 class CalenderHolidayApiService {
     async getHolidays ():Promise<HolidayData[]>{

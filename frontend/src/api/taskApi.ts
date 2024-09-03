@@ -10,7 +10,8 @@ interface TaskAPI{
 
 // const BASE_URL="http://localhost:4000"
 // const BASE_URL="https://remindude.vercel.app"
-const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude.vercel.app" :  "http://localhost:4000"
+// const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude.vercel.app" :  "http://localhost:4000"
+const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
 
 
 class TaskAPIService implements TaskAPI{
