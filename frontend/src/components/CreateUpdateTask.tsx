@@ -24,6 +24,16 @@ export function formatISTDateToString(date: Date): string {
     return adjustedDate.toJSON();
 }
 
+const generateUniqueId = (prefix: string = ''): number => {
+    // Generate a timestamp and a small random number, then combine them
+    const timestamp = Date.now(); // Get the current timestamp in milliseconds
+    const randomNum = Math.floor(Math.random() * 1000); // Generate a random number between 0 and 999
+    const uniqueId = parseInt(`${prefix}${timestamp}${randomNum}`, 10); // Combine and parse as an integer
+    
+    // Ensure the ID is within the 32-bit integer range
+    return uniqueId % 2147483647; // 2147483647 is the maximum value for a 32-bit signed integer
+  };
+  
 export interface CreateTaskFabButtonProps {
     isEdit: boolean;
     email: string;
@@ -86,7 +96,8 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             return {
                 title: `Reminder for Upcoming ${data.eventType}: ${data.title}`,
                 body: `Scheduled for ${new Date(data.datetime).toLocaleDateString()} at ${new Date(data.datetime).toLocaleTimeString('en-IN',{ hour: 'numeric', minute: 'numeric', hour12: true })}`,
-                id: (idx+1)*Math.PI*Math.random(),
+                // id: (idx+1)*Math.PI*Math.random(),
+                id:generateUniqueId(idx.toString()),
                 schedule: { at: interval }, 
                 channelId: 'default',
                 sound: 'default',
