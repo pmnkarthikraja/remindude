@@ -27,6 +27,7 @@
     "nodemailer": "^6.9.13",
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
