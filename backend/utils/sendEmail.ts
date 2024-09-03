@@ -17,6 +17,7 @@ export const scheduleNotifications = async (task:TaskModel) => {
       await sendEmail(task.email, `Kind Reminder for ${task.eventType} - ${task.title}`, reminderTemplateHTMLContent(task), `This is the kind reminder for your ${task.eventType}!`);
       });
       scheduledJobs[task.id].push(job);
+    //   console.log("scheduling for task: ",task.email,": ",task.title, ": ",notificationTime)
   });
 };
 

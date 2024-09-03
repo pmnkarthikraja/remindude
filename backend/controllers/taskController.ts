@@ -8,11 +8,13 @@ class TaskController{
         const taskReq:TaskModel = req.body
         try {
           const {task,successMsg}=await  taskService.CreateTask(taskReq)
-          res.status(201).json({
-            message:successMsg,
-            success:true,
-            task,
-          })
+          if (task){
+            res.status(201).json({
+                message:successMsg,
+                success:true,
+                task,
+              })
+          }
         }catch(err:any){
             if (err instanceof DBErrTaskTimeElapsed){
                 res.status(400).json({
@@ -34,11 +36,13 @@ class TaskController{
 
         try {
           const {task,successMsg}=await  taskService.UpdateTask(taskReq)
-          res.status(201).json({
-            message:successMsg,
-            success:true,
-            task,
-          })
+          if (task){
+            res.status(201).json({
+                message:successMsg,
+                success:true,
+                task,
+              })
+          }
         }catch(err:any){
             if (err instanceof DBErrTaskTimeElapsed){
                 res.status(400).json({

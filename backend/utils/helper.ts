@@ -5,6 +5,8 @@ import schedule from 'node-schedule'
 import HolidayDataModel from "../models/HolidayModel";
 import TaskModel from "../models/TaskModel";
 import UserModel from "../models/UserModel";
+import taskRepo from '../repo/taskRepo'
+import { cancelScheduledNotifications, scheduleNotifications } from "./sendEmail";
 
 
 export const getRemainingTime = (dateTime: string): number => {
@@ -141,6 +143,7 @@ export async function cleanupTasks() {
 
           if (!userExists) {
               await TaskModel.deleteOne({ id:task.id,email:task.email });
+              await cancelScheduledNotifications(task.id)
               console.log(`Deleted task with ID: ${task._id}`);
           }
       }
@@ -148,3 +151,25 @@ export async function cleanupTasks() {
       console.error('Error during task cleanup:', error);
   }
 }
+
+export const pollAndReschedule = async () => {
+  try {
+    console.log('Polling for tasks to reschedule...');
+
+    const { tasks} = await taskRepo.GetRawAllTasks(); 
+
+    tasks.forEach((task) => {
+      const remainingTime = getRemainingTime(task.dateTime);
+      if (remainingTime > 0) {
+        if (task.emailNotification){
+          scheduleNotifications(task);
+        }
+      }
+    });
+
+    console.log('Rescheduling completed.');
+  } catch (error) {
+    console.error('Error during polling and rescheduling:', error);
+  }
+};
+

@@ -1,5 +1,5 @@
 import { TaskModel } from "../models/TaskModel";
-import { DBErrTaskTimeElapsed, DBErrUserNotFound } from "../utils/handleErrors";
+import { DBErrTaskTimeElapsed } from "../utils/handleErrors";
 import { getRemainingTime } from "../utils/helper";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "../utils/sendEmail";
@@ -68,7 +68,7 @@ class TaskService implements TaskServiceImplementation {
             return {
                 task: gotTask,
                 successMsg: 'Task Updated Successfully with email notification'
-            }
+}
         } else {
             return {
                 task: gotTask,
@@ -83,8 +83,8 @@ class TaskService implements TaskServiceImplementation {
         }
     }
     async DeleteTask(email: string, id: string): Promise<void> {
-        await taskRepo.DeleteTask(email, id)
-        await cancelScheduledNotifications(id)
+            await taskRepo.DeleteTask(email, id)
+            await cancelScheduledNotifications(id)
     }
     async GetAllTasks(email: string): Promise<{ tasks: TaskModel[], msg: string }> {
         const { tasks } = await taskRepo.GetAllTasks(email)
