@@ -1,4 +1,4 @@
-import { IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
+import { IonBadge, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonDatetime, IonFooter, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonModal, IonNote, IonRadio, IonRadioGroup, IonRow, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToast, IonToolbar } from "@ionic/react"
 import { CSSProperties } from "@mui/styled-engine"
 import dayjs from "dayjs"
 import { close, closeOutline } from "ionicons/icons"
@@ -83,8 +83,6 @@ const FormModal: FunctionComponent<FormModalProps> = ({
 
     }, [holidays]);
 
-
-
     const holidaysUpdate = (date: string) => {
         let content = ''
         const holidaysOnDate = holidays && holidays
@@ -95,34 +93,36 @@ const FormModal: FunctionComponent<FormModalProps> = ({
 
         if (localHolidaysOnDate && localHolidaysOnDate.length > 0 && holidaysOnDate && holidaysOnDate.length > 0) {
             content += localHolidaysOnDate.map(holiday => {
-              if (holiday.holidayName.includes('Bank Holiday')){
-                return `Bank Holiday (${holiday.region})`
-              }
-              return `${holiday.holidayName} [${holiday.region}]`}).join(',')
+                if (holiday.holidayName.includes('Bank Holiday')) {
+                    return `Bank Holiday (${holiday.region})`
+                }
+                return `${holiday.holidayName} [${holiday.region}]`
+            }).join(',')
             content += ', '
             content += holidaysOnDate
-              .map(holiday => `${holiday.name}-${holiday.country.name}`)
-              .join(',');
+                .map(holiday => `${holiday.name}-${holiday.country.name}`)
+                .join(',');
             setPopoverContent(content)
-      
-          } else if (localHolidaysOnDate && localHolidaysOnDate.length > 0) {
+
+        } else if (localHolidaysOnDate && localHolidaysOnDate.length > 0) {
             const content = localHolidaysOnDate.map(holiday => {
-              if (holiday.holidayName.includes('Bank Holiday')){
-                return `Bank Holiday (${holiday.region})`
-              }
-              return `${holiday.holidayName} [${holiday.region}]`}
+                if (holiday.holidayName.includes('Bank Holiday')) {
+                    return `Bank Holiday (${holiday.region})`
+                }
+                return `${holiday.holidayName} [${holiday.region}]`
+            }
             ).join(',')
             setPopoverContent(content)
-      
-          } else if (holidaysOnDate && holidaysOnDate.length > 0) {
+
+        } else if (holidaysOnDate && holidaysOnDate.length > 0) {
             const content = holidaysOnDate
-              .map(holiday => `${holiday.name}-${holiday.country.name}`)
-              .join(',');
+                .map(holiday => `${holiday.name}-${holiday.country.name}`)
+                .join(',');
             setPopoverContent(content);
-            
-          } else {
+
+        } else {
             setPopoverContent(null)
-          }
+        }
     }
 
 
@@ -254,8 +254,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
         menu: (provided: any) => ({
             ...provided,
             zIndex: 9999,
-            color:'black',
-            backgroundColor:'#d7eee4'
+            color: 'black',
+            backgroundColor: '#d7eee4'
         }),
         option: (provided: any, state: any) => ({
             ...provided,
@@ -276,7 +276,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
         height: '50px',
         width: "100%",
         marginTop: '-15px'
-      }
+    }
 
     return (
         <Fragment>
@@ -330,7 +330,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                     </IonToolbar>
                 </IonHeader>
                 <IonContent
->
+                >
                     {fieldErrors.title && <IonToast color={'danger'}
                         onDidDismiss={() => clearErrors()}
                         buttons={[
@@ -339,15 +339,17 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                 role: 'cancel',
                                 handler: clearErrors
                             },
-                        ]} position="top" isOpen={true} message={'Please Enter a valid data!'} duration={3000}></IonToast>}
+                        ]} position="top" isOpen={true} message={'Please Enter a Valid Title!'} duration={3000}></IonToast>}
 
                     <form id="task-form" onSubmit={(e) => {
                         handleSave();
                         onSubmit(e)
                     }} >
-                        <IonItem  lines="none">
-                            <IonLabel position="fixed" color={'secondary'}><b>Title:</b></IonLabel>
-                            <IonInput {...register("title", {
+                        <IonItem lines="none">
+                            <IonLabel position="fixed" color={fieldErrors.title ? 'danger' : 'secondary'}><b>Title: <IonText color="danger">*</IonText>
+                            </b></IonLabel>
+                            <IonInput
+                             {...register("title", {
                                 required: {
                                     value: true,
                                     message: 'Title is required!'
@@ -357,7 +359,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
 
 
                         <IonItem lines="none">
-                            <IonLabel position="fixed" color={'secondary'}><b>Priority:</b></IonLabel>
+                            <IonLabel position="fixed" color={'secondary'} ><b>Priority:</b></IonLabel>
                             <IonSelect class="ion-no-padding" {...register("priority")} value={priority} placeholder="Select Priority" onIonChange={e => setValue('priority', e.target.value)}>
                                 <IonSelectOption value={'Urgent'}>Urgent</IonSelectOption>
                                 <IonSelectOption value={'Moderate'}>Moderate</IonSelectOption>
@@ -375,7 +377,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
 
                         <IonItem lines="none">
                             <IonLabel position="fixed" color={'secondary'}><b>Description:</b></IonLabel>
-                            <IonTextarea {...register("description")}></IonTextarea>
+                            <IonTextarea  maxlength={500} counter={true} {...register("description")}></IonTextarea>
                         </IonItem>
 
 
@@ -392,8 +394,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         {eventType == 'Task' && <SubTaskForm fieldName="subTasks" isTask={true} control={control} />}
                         {eventType == 'Meeting' && <SubTaskForm fieldName="checklists" isTask={false} control={control} />}
 
-                        <IonLabel color={'secondary'}  style={{ marginLeft: '15px' }} position="fixed" >
-                           <b> Timezone:</b> {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{ marginTop: '-5px' }} onClick={() => { setSelectedTimezone(localTimeZone) }}>Set Local</IonButton>}
+                        <IonLabel color={'secondary'} style={{ marginLeft: '15px' }} position="fixed" >
+                            <b> Timezone:</b> {selectedTimezone != localTimeZone && <IonButton size="small" fill="solid" color={'warning'} style={{ marginTop: '-5px' }} onClick={() => { setSelectedTimezone(localTimeZone) }}>Set Local</IonButton>}
                         </IonLabel>
                         <Select
                             styles={customTimezoneSelectorStyles}
@@ -416,7 +418,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         </IonItem>
                         <IonItem lines="none">
                             <IonImg style={{ width: '20px', height: '20px', marginRight: '5px' }} src='/assets/calender.png' />
-                            <IonButton color={'light'} onClick={openModal} style={{ cursor: 'pointer', backgroundColor:'inherit' }}>{new Date(selectedDate).toLocaleDateString()}</IonButton>
+                            <IonButton color={'light'} onClick={openModal} style={{ cursor: 'pointer', backgroundColor: 'inherit' }}>{new Date(selectedDate).toLocaleDateString()}</IonButton>
 
 
                             {isModalOpen && <IonModal title="Set Date" aria-hidden={false} mode="ios" className="custom-modal" isOpen={isModalOpen} onDidDismiss={closeModal} >
@@ -429,10 +431,10 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                     </IonToolbar>
 
                                     <IonItem lines="none" >
-                                    {popoverContent!=null && popoverContent.includes('-India') && <IonBadge color={'tertiary'}>Indian Public Holiday</IonBadge>}
-                                    {popoverContent!=null && popoverContent.includes('-Saudi') && <IonBadge color={'tertiary'}>Saudi Public Holiday</IonBadge>}
-                                    {popoverContent != null && (popoverContent?.includes('Bank Holiday')) && <IonBadge color='danger'>Bank Holiday</IonBadge>}
-                                    {popoverContent != null && popoverContent.includes('[') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
+                                        {popoverContent != null && popoverContent.includes('-India') && <IonBadge color={'tertiary'}>Indian Public Holiday</IonBadge>}
+                                        {popoverContent != null && popoverContent.includes('-Saudi') && <IonBadge color={'tertiary'}>Saudi Public Holiday</IonBadge>}
+                                        {popoverContent != null && (popoverContent?.includes('Bank Holiday')) && <IonBadge color='danger'>Bank Holiday</IonBadge>}
+                                        {popoverContent != null && popoverContent.includes('[') && (<IonBadge color="warning">Local Holiday</IonBadge>)}
                                     </IonItem>
 
                                 </IonHeader>
@@ -459,8 +461,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                                         showDefaultTimeLabel={true}
                                         max={buildMaxYear()}
                                     >
-                                        {popoverContent != null &&<IonTextarea  style={titleTextAreaStyle} shape='round' aria-label='task-title' value={popoverContent} slot="title" readonly></IonTextarea>
-                                    }
+                                        {popoverContent != null && <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={popoverContent} slot="title" readonly></IonTextarea>
+                                        }
                                     </IonDatetime>
 
                                     <IonItem lines="none">

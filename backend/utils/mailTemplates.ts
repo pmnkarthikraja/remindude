@@ -158,7 +158,7 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
             <div class="content">
                 <p><span class="type">Type: </span>${task.eventType}</p>
                 <p><span class="title">Title: </span>${task.title}</p>
-                <p><span class="type">Scheduled At: </span>${new Date(task.dateTime).toLocaleDateString()} and ${formattedTime}</p>
+                <p><span class="type">Scheduled At: </span>${new Date(task.dateTime).toLocaleDateString()} and ${formattedTime} (${task.localTimezone})</p>
             </div>
                 <div class="priority ${task.priority.toLowerCase()}">
                 ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
@@ -301,7 +301,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
         </div>
         <div class="content">
             <p><strong>Description: </strong>${task.description}</p>
-            <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${formattedTime} </p>
+            <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${formattedTime} (${task.localTimezone})</p>
             <p class="time-left">${calculateTimeLeft(task.dateTime)}</p>
         </div>
         <div class="footer">

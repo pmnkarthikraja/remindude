@@ -6,8 +6,8 @@ import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "
 import { createTemplateHTMLContent } from "../utils/mailTemplates";
 
 interface TaskServiceImplementation {
-    CreateTask: (task: TaskModel) => Promise<{ task: TaskModel }>
-    UpdateTask: (task: TaskModel) => Promise<{ task: TaskModel }>
+    CreateTask: (task: TaskModel) => Promise<{ task: TaskModel|undefined,successMsg:string }>
+    UpdateTask: (task: TaskModel) => Promise<{ task: TaskModel|undefined,successMsg:string }>
     DeleteTask: (email: string, id: string) => Promise<void>
     GetAllTasks: (email: string) => Promise<{ tasks: TaskModel[], msg: string }>
     UpdateTaskStatusViaEmail: (email: string, id: string, status: "InProgress" | "Done") => Promise<TaskModel>
@@ -18,7 +18,7 @@ class TaskService implements TaskServiceImplementation {
         return await taskRepo.UpdateTaskStatusViaEmail(email, id, status)
     }
 
-    async CreateTask(task: TaskModel): Promise<{ task: TaskModel, successMsg: string }> {
+    async CreateTask(task: TaskModel): Promise<{ task: TaskModel|undefined, successMsg: string }> {
         const remainingTime = getRemainingTime(task.dateTime);
         if (remainingTime <= 0) {
             throw new DBErrTaskTimeElapsed()
@@ -26,118 +26,39 @@ class TaskService implements TaskServiceImplementation {
 
         const gotTask = await taskRepo.CreateTask(task)
 
-        //send email once the user successfully created the task - testing the status change by email
-        const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
-        const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
+        if (gotTask){
+          await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false), "You can change the task setting here!")
 
-        const emailContent = `
-        <!DOCTYPE html>
-      <html>
-      <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>${gotTask.eventType} has successfully created!</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
-          background-color: #f6f6f6;
-        }
-        .container {
-          width: 100%;
-          max-width: 600px;
-          margin: 0 auto;
-          background-color: #ffffff;
-          padding: 20px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-          background-color: #007bff;
-          color: white;
-          padding: 10px 20px;
-          text-align: center;
-          font-size: 24px;
-        }
-        .content {
-          margin: 20px 0;
-        }
-        .content p {
-          font-size: 16px;
-          line-height: 1.5;
-        }
-        .content .date-time {
-          font-weight: bold;
-          color: #333;
-        }
-        .buttons {
-          text-align: center;
-          margin: 20px 0;
-        }
-        .buttons a {
-          text-decoration: none;
-          padding: 10px 20px;
-          margin: 0 10px;
-          color: white;
-          border-radius: 5px;
-          font-size: 16px;
-        }
-        .postpone {
-          background-color: #ffc107;
-        }
-        .prepone {
-          background-color: #28a745;
-        }
-        .delete {
-          background-color: #dc3545;
-        }
-      </style>
-      </head>
-      <body>
-      <div class="container">
-        <div class="header">
-          ${task.title}
-        </div>
-        <div class="content">
-          <p>${task.description}</p>
-          <p class="date-time">Date & Time: ${new Date(task.dateTime).toLocaleDateString()}</p>
-        </div>
-        <div>
-        <p>Priority: ${task.priority}</p>
-        </div>
-        <div class="buttons">
-          <a href="${inProgressLink}" class="postpone">Set InProgress</a>
-          <a href="${doneLink}" class="prepone">Set Done</a>
-        </div>
-      </div>
-      </body>
-      </html>
-  `;
-
-        await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false), "You can change the task setting here!")
-
-        await cancelScheduledNotifications(gotTask.id)
-        if (task.emailNotification) {
-            scheduleNotifications(task)
-            return {
-                task: gotTask,
-                successMsg: 'Task Created Successfully with email notification'
-            }
-        } else {
-            return {
-                task: gotTask,
-                successMsg: "Task Created Successfully without email notification"
-            }
+          await cancelScheduledNotifications(gotTask.id)
+          if (task.emailNotification) {
+            console.log("schedule notifications upon creation: ",task.notificationIntervals)
+              scheduleNotifications(task)
+              return {
+                  task: gotTask,
+                  successMsg: 'Task Created Successfully with email notification'
+              }
+          } else {
+              return {
+                  task: gotTask,
+                  successMsg: "Task Created Successfully without email notification"
+              }
+          } 
+        }else{
+          return {
+            task:undefined,
+            successMsg:''
+          }
         }
     }
-    async UpdateTask(task: TaskModel): Promise<{ task: TaskModel, successMsg: string }> {
+    async UpdateTask(task: TaskModel): Promise<{ task: TaskModel|undefined, successMsg: string }> {
         const remainingTime = getRemainingTime(task.dateTime);
         if (remainingTime <= 0) {
             throw new DBErrTaskTimeElapsed()
         }
 
         const gotTask = await taskRepo.UpdateTask(task)
-        await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true), "You can change the task setting here!")
+        if (gotTask){
+          await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true), "You can change the task setting here!")
 
         await cancelScheduledNotifications(gotTask.id)
         console.log("task email notificaiotn:",task.emailNotification)
@@ -153,6 +74,12 @@ class TaskService implements TaskServiceImplementation {
                 task: gotTask,
                 successMsg: "Task Updated Successfully without email notification"
             }
+        }
+        }else{
+          return {
+            task:undefined,
+            successMsg:''
+          }
         }
     }
     async DeleteTask(email: string, id: string): Promise<void> {

@@ -88,7 +88,6 @@ const DownloadTemplateButton: FunctionComponent = () => {
                     path: 'HolidayTemplate.xlsx',
                     data: base64Data,
                     directory: Directory.Documents,
-                    encoding: Encoding.UTF8
                 });
                 console.log('File saved successfully:', result.uri);
                 setShowToast(`File Saved in ${result.uri}`);
