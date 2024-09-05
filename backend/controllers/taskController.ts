@@ -74,6 +74,7 @@ class TaskController{
             success:true,
           })
         }catch(err:any){
+            console.log("error on delete:",err)
            if (err instanceof DBErrTaskNotFound){
                 res.status(404).json({
                     message:err.name,success:false

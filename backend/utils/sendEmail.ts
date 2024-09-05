@@ -12,19 +12,21 @@ export const scheduleNotifications = async (task:TaskModel) => {
 
   task.notificationIntervals.forEach((notificationTime: string) => {
       const job = schedule.scheduleJob(notificationTime, async () => {
-          console.log("sending mail...", notificationTime);
+          console.log(`sending mail to ${task.email}...`, new Date(notificationTime).toLocaleString());
 
       await sendEmail(task.email, `Kind Reminder for ${task.eventType} - ${task.title}`, reminderTemplateHTMLContent(task), `This is the kind reminder for your ${task.eventType}!`);
       });
       scheduledJobs[task.id].push(job);
-    //   console.log("scheduling for task: ",task.email,": ",task.title, ": ",notificationTime)
   });
 };
 
 export const cancelScheduledNotifications = async (taskId: string) => {
     if (scheduledJobs[taskId]) {
         scheduledJobs[taskId].forEach(job => {
-          job.cancel()});
+            if (job){
+                job.cancel();
+            }
+        });
         delete scheduledJobs[taskId];
     }
 };
