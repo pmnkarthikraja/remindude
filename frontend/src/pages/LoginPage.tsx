@@ -66,7 +66,7 @@ const LoginPage: React.FC = () => {
     }
   }
 
-  const googlesigninerrmsg = googleSigninError?.message == 'popup_closed_by_user' && 'An error occurred during the Google sign-up process. Please try again.' || googleSigninError?.response?.data.message
+  const googlesigninerrmsg = googleSigninError?.message == 'popup_closed_by_user' && 'An error occurred during the Google sign-up process. Please try again.' || (googleSigninError?.response?.data.message || googleSigninError?.message)
 
   return (
     <IonPage>
@@ -85,7 +85,7 @@ const LoginPage: React.FC = () => {
             isOpen={true}
             header="Login Failed!"
             cssClass={'alert-wrapper'}
-            message={isEmailSigninError && emailSigninError.response?.data.message || googlesigninerrmsg}
+            message={isEmailSigninError && (emailSigninError.response?.data.message || emailSigninError.message) || googlesigninerrmsg}
             buttons={[{
               text: 'Ok',
               role: 'cancel',

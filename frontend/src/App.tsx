@@ -44,6 +44,7 @@ import Welcome from './pages/Welcome';
 import './theme/variables.css';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Filesystem } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 
 setupIonicReact();
 
@@ -54,15 +55,17 @@ const App: React.FC = () => {
   useEffect(() => {
     const initPermissions = async () => {
       // Request notification permissions
-      const notificationPermission = await LocalNotifications.requestPermissions();
-      if (notificationPermission.display !== 'granted') {
-        console.error('Notification permissions not granted');
-      }
-
-      // Request file system permissions
-      const fileSystemPermission = await Filesystem.requestPermissions();
-      if (fileSystemPermission.publicStorage !== 'granted') {
-        console.error('File system permissions not granted');
+      if (Capacitor.isNativePlatform()){
+        const notificationPermission = await LocalNotifications.requestPermissions();
+        if (notificationPermission.display !== 'granted') {
+          console.error('Notification permissions not granted');
+        }
+  
+        // Request file system permissions
+        const fileSystemPermission = await Filesystem.requestPermissions();
+        if (fileSystemPermission.publicStorage !== 'granted') {
+          console.error('File system permissions not granted');
+        }
       }
     };
 

@@ -1,4 +1,5 @@
 import {
+  IonAlert,
   IonImg,
   IonLabel,
   IonLoading,
@@ -36,7 +37,6 @@ const Home: FunctionComponent = () => {
 
   useEffect(() => {
     const validateSession = async (token: string) => {
-      try {
         const res = await authMutation(token)
         const userData: User = res.data.user
         const img = 'data:image/*;base64,' + userData.profilePicture
@@ -47,10 +47,6 @@ const Home: FunctionComponent = () => {
           profilePicture: img,
           googlePicture: userData.profilePicture
         })
-      } catch (e) {
-        console.log("session not found: " + e)
-        window.location.href='/login'
-      }
     }
     const token = window.localStorage.getItem('token');
     console.log("Token found: ", token);
@@ -104,7 +100,22 @@ const Home: FunctionComponent = () => {
         {platform == 'Windows' && <HomePage signOut={signOut} user={user} />}
       </Fragment>
     }
-    {status=='loading' && <IonLoading isOpen={true} duration={5000} message={'App Starting..'} />}
+    {status=='loading' && <IonLoading isOpen={true} message={'App Starting..'} />}
+    {status=='error' && <IonAlert
+                className='custom-alert'
+                isOpen={true}
+                header={'Oops'}
+                message={"Something happened but we'll be back soon. Meanwhile check your network connection."}
+                buttons={[
+                    {
+                        text: 'Ok',
+                        role: 'cancel',
+                        cssClass: 'secondary',
+                        handler:()=>{window.location.href='/login'}
+                    },
+                ]}
+            />}
+    
   </Fragment>
   );
 };

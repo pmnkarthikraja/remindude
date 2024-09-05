@@ -4,7 +4,6 @@ import { useMutation, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
 import { userApi } from "../api/userApi";
 import { User } from "../components/user";
-import { useIonRouter } from "@ionic/react";
 
 interface AxiosErrorType {
   message: string,
