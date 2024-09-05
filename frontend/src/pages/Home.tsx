@@ -1,6 +1,7 @@
 import {
   IonImg,
   IonLabel,
+  IonLoading,
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
@@ -103,6 +104,7 @@ const Home: FunctionComponent = () => {
         {platform == 'Windows' && <HomePage signOut={signOut} user={user} />}
       </Fragment>
     }
+    {status=='loading' && <IonLoading isOpen={true} duration={5000} message={'App Starting..'} />}
   </Fragment>
   );
 };

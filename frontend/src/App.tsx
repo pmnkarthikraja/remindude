@@ -73,7 +73,7 @@ const App: React.FC = () => {
     {/* <div style={{width:'100%', height:'0'}}><iframe src="https://giphy.com/embed/jAYUbVXgESSti" width="100%" height="100%" style={{position:'absolute'}} frameBorder="0" className="giphy-embed" allowFullScreen={true}></iframe></div> */}
     {/* kUTME7ABmhYg5J3psM */}
 
-    <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} animated/>
+    {/* <IonLoading isOpen duration={500} spinner={'bubbles'} message={'Remindude App'} animated/> */}
 
     <IonReactRouter>
       <IonRouterOutlet>
