@@ -4,6 +4,9 @@ const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'remindude',
   webDir: 'dist',
+  // server:{
+  //   androidScheme:'remindude',
+  // },
   plugins:{
     GoogleAuth:{
       scopes:[

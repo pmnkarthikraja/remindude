@@ -18,7 +18,6 @@ import { Platform, useGetPlatform } from '../utils/useGetPlatform';
 import HomePage from './HomePage';
 import ProfilePage from './ProfilePage';
 
-
 const Home: FunctionComponent = () => {
   const [tok, setToken] = useState<string | null>(null)
   const [user, setUser] = useState<User>({
@@ -28,7 +27,7 @@ const Home: FunctionComponent = () => {
     profilePicture: '',
     googlePicture: undefined
   })
-  const {status, mutateAsync: authMutation } = useAuthUser()
+  const {status,error:authError, mutateAsync: authMutation } = useAuthUser()
   const [platform, setPlatform] = useState<Platform>('Unknown')
   const handlePlatformChange = (newPlatform: Platform) => {
     setPlatform(newPlatform);
@@ -88,7 +87,6 @@ const Home: FunctionComponent = () => {
                   <IonLabel >Home</IonLabel>
                 </IonTabButton>
 
-
                 <IonTabButton tab="profile" href="/profile">
                   <IonImg style={{ width: '30px', height: '30px' }} src='/assets/profile.png' />
                   <IonLabel>Settings</IonLabel>
@@ -100,12 +98,13 @@ const Home: FunctionComponent = () => {
         {platform == 'Windows' && <HomePage signOut={signOut} user={user} />}
       </Fragment>
     }
-    {status=='loading' && <IonLoading isOpen={true} message={'App Starting..'} />}
+    {(status=='loading' ) && <IonLoading isOpen={true} duration={3000} message={'App Starting..'} onDidDismiss={()=>window.location.href='/home'} />}
+
     {status=='error' && <IonAlert
                 className='custom-alert'
                 isOpen={true}
                 header={'Oops'}
-                message={"Something happened but we'll be back soon. Meanwhile check your network connection."}
+                message={authError.response?.data.message || authError.message}
                 buttons={[
                     {
                         text: 'Ok',

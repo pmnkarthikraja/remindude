@@ -1,17 +1,17 @@
 
 import { IonAlert, IonBadge, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
 import { CSSProperties } from '@mui/styled-engine';
-import { AnimatePresence, color, Reorder } from 'framer-motion';
+import { AnimatePresence, Reorder } from 'framer-motion';
 import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline, sadOutline } from 'ionicons/icons';
-import React, { Fragment, FunctionComponent, useEffect, useRef, useState } from 'react';
+import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
+import { HolidayData, LocalHolidayData } from '../api/calenderApi';
 import { useDeleteTaskMutation } from '../hooks/taskHooks';
 import { getRemainingTime } from '../pages/HomePage';
-import { Platform, useGetPlatform } from '../utils/useGetPlatform';
-import CreateEditTaskFabButton from './CreateUpdateTask';
 import '../styles/Sorting.css';
-import { dummyTasks, EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
+import { Platform, useGetPlatform } from '../utils/useGetPlatform';
 import { localTimeZone } from '../utils/util';
-import { CalenderHoliday, HolidayData, LocalHolidayData } from '../api/calenderApi';
+import CreateEditTaskFabButton from './CreateUpdateTask';
+import { EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
 import TaskTimer from './TaskTimer';
 
 export interface SortableCardsProps {
@@ -271,7 +271,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
     width: '100%',
     paddingBottom: '100px',
     maxHeight: '200vh',
-    backgroundColor:'inherit',
+    backgroundColor: 'inherit',
   }
 
   const iconStyle: CSSProperties = {
@@ -361,140 +361,137 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
           </IonRefresherContent>
         </IonRefresher>
 
-        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
-          <AnimatePresence >
-            {filteredTasks.map((task, idx) => {
-              const icon = task.priority === 'Urgent' ? 'highPriority' : task.priority === 'Moderate' ? 'mediumPriority1' : 'lowPriority';
+        {/* <Reorder.Group axis='y' drag={false} style={{ listStyle: 'none', marginLeft: '-40px',scrollBehavior:'smooth',transition:'ease-in' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
+    
+        </Reorder.Group> */}
 
-              return (
-                <Reorder.Item role='article' drag={false} key={task.id} value={task} initial="hidden" animate="visible" exit="removed" variants={variants} transition={{ duration: 0.2, ease: 'linear' }} >
-                  <IonCard key={idx} style={{boxShadow: '0 4px 8px rgba(1, 1, 100, 0.3)'}}>
-                    <IonCardHeader>
-                      <IonRow >
-                        <IonCol>
-                          <IonItem lines='none'>
-                            <IonImg slot='start' style={iconStyle} src={`/assets/${icon}.png`} />
-                            <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
-                            <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
-                          </IonItem>
-                        </IonCol>
-                        <IonButtons >
-                          <IonImg onClick={() => toggleEditTask({
-                            isEdit: true,
-                            task
-                          })} style={{ ...iconStyle, marginRight: '15px', cursor: 'pointer' }} src='/assets/edit1.png' />
+        {filteredTasks.map((task, idx) => {
+          const icon = task.priority === 'Urgent' ? 'highPriority' : task.priority === 'Moderate' ? 'mediumPriority1' : 'lowPriority';
+          return (
+            // <Reorder.Item key={task.id} value={task} >
+            <IonCard key={idx} style={{ boxShadow: '0 4px 8px rgba(1, 1, 100, 0.3)' }}>
+              <IonCardHeader>
+                <IonRow >
+                  <IonCol>
+                    <IonItem lines='none'>
+                      <IonImg slot='start' style={iconStyle} src={`/assets/${icon}.png`} />
+                      <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
+                      <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
+                    </IonItem>
+                  </IonCol>
+                  <IonButtons >
+                    <IonImg onClick={() => toggleEditTask({
+                      isEdit: true,
+                      task
+                    })} style={{ ...iconStyle, marginRight: '15px', cursor: 'pointer' }} src='/assets/edit1.png' />
 
-                          <IonImg onClick={() => {
-                            setConfirmDelete({
-                              isOpen: true,
-                              task: task,
-                            });
+                    <IonImg onClick={() => {
+                      setConfirmDelete({
+                        isOpen: true,
+                        task: task,
+                      });
 
-                          }} style={{ ...iconStyle, cursor: 'pointer' }} src='/assets/trash1.png' />
-                        </IonButtons>
-                      </IonRow>
-                      <IonRow>
-                        <IonCol style={{ width: '300px' }}>
-                          <IonItem lines='none'>
-                            <IonImg style={{ ...iconStyle, marginRight: '5px' }} src='/assets/calender.png' />
-                            <IonCardTitle style={{ fontSize: '15px', marginRight: '10px' }}>{new Date(task.dateTime).toLocaleDateString()}</IonCardTitle>
+                    }} style={{ ...iconStyle, cursor: 'pointer' }} src='/assets/trash1.png' />
+                  </IonButtons>
+                </IonRow>
+                <IonRow>
+                  <IonCol style={{ width: '300px' }}>
+                    <IonItem lines='none'>
+                      <IonImg style={{ ...iconStyle, marginRight: '5px' }} src='/assets/calender.png' />
+                      <IonCardTitle style={{ fontSize: '15px', marginRight: '10px' }}>{new Date(task.dateTime).toLocaleDateString()}</IonCardTitle>
 
-                            <IonImg style={{ ...iconStyle, marginRight: '5px' }} src='/assets/clock.png' />
-                            <IonCardTitle style={{ fontSize: '15px', marginRight: '10px', width: '70px', whiteSpace: 'nowrap' }}>{
-                              new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' })}</IonCardTitle>
-                          </IonItem>
-                        </IonCol>
-                      </IonRow>
+                      <IonImg style={{ ...iconStyle, marginRight: '5px' }} src='/assets/clock.png' />
+                      <IonCardTitle style={{ fontSize: '15px', marginRight: '10px', width: '70px', whiteSpace: 'nowrap' }}>{
+                        new Date(task.dateTime).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: localTimeZone, timeZoneName: 'short' })}</IonCardTitle>
+                    </IonItem>
+                  </IonCol>
+                </IonRow>
 
-                      <IonRow>
-                            <TaskTimer task={task} key={idx}/>
-                      </IonRow>
+                <IonRow>
+                  <TaskTimer task={task} key={idx} />
+                </IonRow>
 
-                      <IonItem lines='none' >
-                        {platform == 'Windows' &&
-                          <Fragment>
-                            <IonCol style={{ width: 'auto', minWidth: "100px" }}>
-                              <IonBadge style={{ color: '#7F0DB5', background: 'inherit' }}>
-                                <IonRow>
-                                  {task.eventType == 'Meeting' && <div style={eventTypeStyle as HTMLStyle}>
-                                    <IonImg src='/assets/meeting-new.png' style={eventImgStyle} />
-                                    <IonLabel >{task.eventType}</IonLabel>
-                                  </div>}
-                                  {task.eventType == 'Task' && <div style={eventTypeStyle as HTMLStyle}>
-                                    <IonImg src='/assets/task.png' style={eventImgStyle} />
-                                    <IonLabel>{task.eventType}</IonLabel>
-                                  </div>}
-                                </IonRow>
-                              </IonBadge>
-                            </IonCol>
-
-
-                            <IonCol style={{ width: 'auto', minWidth: '150px' }}>
-                              <IonBadge style={{ color: 'inherit', background: 'rgba(58,33,110,0.1)' }}>
-                                {task.categoryLabel}
-                              </IonBadge>
-                            </IonCol>
-
-                            <IonCol>
-                              <IonBadge style={{ color: '#089C82', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.categoryName}</IonBadge>
-                            </IonCol>
-
-                            <IonCol  >
-                              <IonChip className='chip' key={idx} outline={true} color='secondary' onClick={() => toggleContent(idx)}>
-                                <IonLabel>Description</IonLabel>
-                                <IonIcon icon={isItemOpen(idx) ? chevronUpOutline : chevronDownOutline} />
-                              </IonChip>
-                            </IonCol>
-                          </Fragment>
-                        }
-
-                        {platform != 'Windows' && <Fragment>
+                <IonItem lines='none' >
+                  {platform == 'Windows' &&
+                    <Fragment>
+                      <IonCol style={{ width: 'auto', minWidth: "100px" }}>
+                        <IonBadge style={{ color: '#7F0DB5', background: 'inherit' }}>
                           <IonRow>
-                            <IonCol >
-                              <IonBadge style={{ color: '#7F0DB5', background: 'inherit', marginTop: '-2px' }}>
-                                <IonRow>
-                                  {task.eventType == 'Meeting' && <div style={eventTypeStyle as HTMLStyle}>
-                                    <IonImg src='/assets/meeting-new.png' style={eventImgStyle} />
-                                    <IonLabel >{task.eventType}</IonLabel>
-                                  </div>}
-                                  {task.eventType == 'Task' && <div style={eventTypeStyle as HTMLStyle}>
-                                    <IonImg src='/assets/task.png' style={eventImgStyle} />
-                                    <IonLabel>{task.eventType}</IonLabel>
-                                  </div>}
-                                </IonRow>
-                              </IonBadge>
-                            </IonCol>
-                            <IonCol style={{ minWidth: '150px' }}>
-                              <IonBadge style={{ color: '#089C82', backgroundColor: "inherit" }}>{task.categoryName}</IonBadge>
-                            </IonCol>
-                            <IonCol style={{ minWidth: '170px' }}>
-                              <IonBadge style={{ color: 'inherit', background: 'inherit' }}>
-                                {task.categoryLabel}
-                              </IonBadge>
-                            </IonCol>
-                            <IonCol >
-                              <IonIcon onClick={() => toggleContent(idx)} icon={isItemOpen(idx) ? chevronUpOutline : chevronDownOutline} />
-                            </IonCol>
+                            {task.eventType == 'Meeting' && <div style={eventTypeStyle as HTMLStyle}>
+                              <IonImg src='/assets/meeting-new.png' style={eventImgStyle} />
+                              <IonLabel >{task.eventType}</IonLabel>
+                            </div>}
+                            {task.eventType == 'Task' && <div style={eventTypeStyle as HTMLStyle}>
+                              <IonImg src='/assets/task.png' style={eventImgStyle} />
+                              <IonLabel>{task.eventType}</IonLabel>
+                            </div>}
                           </IonRow>
-                        </Fragment>}
-                      </IonItem>
-                    </IonCardHeader>
-                    <IonCardContent>
-                      {isItemOpen(idx) && (
-                        <div className={`content ${isOpen ? 'open' : 'closed'}`}>
-                          <IonText color='dark'>{task.description} </IonText><br />
-                        </div>
-                      )}
-                    </IonCardContent>
-                  </IonCard>
-                </Reorder.Item>
-              );
-            })}
-          </AnimatePresence>
-        </Reorder.Group>
-        {tasksData.length !==0 &&<IonContent style={{marginLeft:'-40px', height:'400px',width:'100px',overflowY:'auto'}}></IonContent>}
+                        </IonBadge>
+                      </IonCol>
 
 
+                      <IonCol style={{ width: 'auto', minWidth: '150px' }}>
+                        <IonBadge style={{ color: 'inherit', background: 'rgba(58,33,110,0.1)' }}>
+                          {task.categoryLabel}
+                        </IonBadge>
+                      </IonCol>
+
+                      <IonCol>
+                        <IonBadge style={{ color: '#089C82', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.categoryName}</IonBadge>
+                      </IonCol>
+
+                      <IonCol  >
+                        <IonChip className='chip' key={idx} outline={true} color='secondary' onClick={() => toggleContent(idx)}>
+                          <IonLabel>Description</IonLabel>
+                          <IonIcon icon={isItemOpen(idx) ? chevronUpOutline : chevronDownOutline} />
+                        </IonChip>
+                      </IonCol>
+                    </Fragment>
+                  }
+
+                  {platform != 'Windows' && <Fragment>
+                    <IonRow>
+                      <IonCol >
+                        <IonBadge style={{ color: '#7F0DB5', background: 'inherit', marginTop: '-2px' }}>
+                          <IonRow>
+                            {task.eventType == 'Meeting' && <div style={eventTypeStyle as HTMLStyle}>
+                              <IonImg src='/assets/meeting-new.png' style={eventImgStyle} />
+                              <IonLabel >{task.eventType}</IonLabel>
+                            </div>}
+                            {task.eventType == 'Task' && <div style={eventTypeStyle as HTMLStyle}>
+                              <IonImg src='/assets/task.png' style={eventImgStyle} />
+                              <IonLabel>{task.eventType}</IonLabel>
+                            </div>}
+                          </IonRow>
+                        </IonBadge>
+                      </IonCol>
+                      <IonCol style={{ minWidth: '150px' }}>
+                        <IonBadge style={{ color: '#089C82', backgroundColor: "inherit" }}>{task.categoryName}</IonBadge>
+                      </IonCol>
+                      <IonCol style={{ minWidth: '170px' }}>
+                        <IonBadge style={{ color: 'inherit', background: 'inherit' }}>
+                          {task.categoryLabel}
+                        </IonBadge>
+                      </IonCol>
+                      <IonCol >
+                        <IonIcon onClick={() => toggleContent(idx)} icon={isItemOpen(idx) ? chevronUpOutline : chevronDownOutline} />
+                      </IonCol>
+                    </IonRow>
+                  </Fragment>}
+                </IonItem>
+              </IonCardHeader>
+              <IonCardContent>
+                {isItemOpen(idx) && (
+                  <div className={`content ${isOpen ? 'open' : 'closed'}`}>
+                    <IonText color='dark'>{task.description} </IonText><br />
+                  </div>
+                )}
+              </IonCardContent>
+            </IonCard>
+            //  </Reorder.Item>
+          );
+        })}
+        {tasksData.length !== 0 && <IonContent style={{ marginLeft: '-40px', height: '400px', width: '100px', overflowY: 'auto' }}></IonContent>}
         {tasksData.length === 0 && (
           <Fragment>
             <IonCard style={{ backgroundColor: 'inherit', textAlign: 'center', padding: '20px', boxShadow: '0 4px 8px rgba(1, 1, 100, 0.9)', borderRadius: '15px', animation: 'fadeIn 1s ease-in-out' }}>
