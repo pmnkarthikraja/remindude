@@ -173,3 +173,9 @@ export const pollAndReschedule = async () => {
   }
 };
 
+const POLL_INTERVAL = 15 * 60 * 1000;
+
+export const startPolling = async () => {
+  await pollAndReschedule();
+  setInterval(pollAndReschedule, POLL_INTERVAL);
+};

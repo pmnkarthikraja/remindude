@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { startServer,checkIsServerStarted } from '../server';
-import { checkAndRefreshDatabase, cleanupTasks, pollAndReschedule } from '../utils/helper';
+import { checkAndRefreshDatabase, cleanupTasks, pollAndReschedule, startPolling } from '../utils/helper';
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ const connectDBwithRetry = async (): Promise<void> => {
         await cleanupTasks()
         await checkAndRefreshDatabase();
         // reschedule all the upcoming tasks upon restart
-        await pollAndReschedule();
+        await startPolling();
       }
     } catch (error) {
       console.error('Error connecting to MongoDB:', error);
