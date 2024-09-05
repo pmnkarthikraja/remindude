@@ -21,7 +21,6 @@ const config: CapacitorConfig = {
         showSpinner: true,
         splashFullScreen: true,
         splashImmersive: true
-
     },
     FilePicker:{
       multiple:true,

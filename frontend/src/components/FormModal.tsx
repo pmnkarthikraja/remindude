@@ -51,9 +51,9 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { startOfWeek } = useWeekContext();
     const [selectedTimezone, setSelectedTimezone] = useState<string | null>(timezone || localTimeZone);
-    const [selectedTime, setSelectedTime] = useState<Date | null>(new Date());
+    const [selectedTime, setSelectedTime] = useState<Date | null>(new Date(datetime));
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
-    const [initialTime, setInitialTime] = useState<Date | null>(null);
+    const [initialTime, setInitialTime] = useState<Date | null>(new Date(datetime));
     const [popoverContent, setPopoverContent] = useState<string | null>(null);
 
     const highlightedDates = useMemo(() => {
@@ -154,15 +154,12 @@ const FormModal: FunctionComponent<FormModalProps> = ({
             setSelectedTime(time);
         } else if (!isEdit) {
             const date = dayjs().format('YYYY-MM-DD')
-            setSelectedDate(date);
+            // setSelectedDate(date);
             holidaysUpdate(date)
-            setSelectedTime(new Date());
-            setInitialTime(new Date());
+            // setSelectedTime(new Date());
+            // setInitialTime(new Date());
         }
     }, [isEdit, datetime]);
-
-
-
 
     // Save function to calculate final datetime with timezone
     const handleSave = () => {

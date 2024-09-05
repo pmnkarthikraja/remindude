@@ -9,7 +9,7 @@ import { getRemainingTime } from '../pages/HomePage';
 import { Platform, useGetPlatform } from '../utils/useGetPlatform';
 import CreateEditTaskFabButton from './CreateUpdateTask';
 import '../styles/Sorting.css';
-import { EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
+import { dummyTasks, EventData, TaskCategory, TaskCategoryName, TaskRequestData } from './task';
 import { localTimeZone } from '../utils/util';
 import { CalenderHoliday, HolidayData, LocalHolidayData } from '../api/calenderApi';
 import TaskTimer from './TaskTimer';
@@ -271,7 +271,6 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
     width: '100%',
     paddingBottom: '100px',
     maxHeight: '200vh',
-    overflowY: 'auto',
     backgroundColor:'inherit',
   }
 
@@ -299,7 +298,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
   type HTMLStyle = { [key: string]: string }
 
   return (
-    <div style={cardContentStyle as HTMLStyle} role='feed' >
+    <div style={cardContentStyle as HTMLStyle}  >
       <IonSearchbar
         value={searchQuery}
         onIonInput={e => handleSearch(e.detail.value!)}
@@ -349,7 +348,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
         </IonAlert>
       }
 
-      <IonToast isOpen={isDeleteTaskMutationError} message={deleteTaskMutationError?.response?.data.message} position='top' duration={3000} />
+      <IonToast color={'danger'} isOpen={isDeleteTaskMutationError} message={deleteTaskMutationError?.response?.data.message || deleteTaskMutationError?.message} position='top' duration={3000} />
 
       <IonContent>
         <IonRefresher slot='fixed' onIonRefresh={handleRefresh}>
@@ -362,14 +361,14 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
           </IonRefresherContent>
         </IonRefresher>
 
-        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px', scrollBehavior: 'smooth' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
+        <Reorder.Group drag={false} style={{ listStyle: 'none', marginLeft: '-40px' }} values={filteredTasks} onReorder={setFilteredTasks} animate={true}>
           <AnimatePresence >
             {filteredTasks.map((task, idx) => {
               const icon = task.priority === 'Urgent' ? 'highPriority' : task.priority === 'Moderate' ? 'mediumPriority1' : 'lowPriority';
 
               return (
                 <Reorder.Item role='article' drag={false} key={task.id} value={task} initial="hidden" animate="visible" exit="removed" variants={variants} transition={{ duration: 0.2, ease: 'linear' }} >
-                  <IonCard style={{boxShadow: '0 4px 8px rgba(1, 1, 100, 0.3)'}}>
+                  <IonCard key={idx} style={{boxShadow: '0 4px 8px rgba(1, 1, 100, 0.3)'}}>
                     <IonCardHeader>
                       <IonRow >
                         <IonCol>
@@ -493,6 +492,8 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
             })}
           </AnimatePresence>
         </Reorder.Group>
+        {tasksData.length !==0 &&<IonContent style={{marginLeft:'-40px', height:'400px',width:'100px',overflowY:'auto'}}></IonContent>}
+
 
         {tasksData.length === 0 && (
           <Fragment>
@@ -532,9 +533,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
         )}
 
       </IonContent>
-
     </div>
-
   );
 };
 

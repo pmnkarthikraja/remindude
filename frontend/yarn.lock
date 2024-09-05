@@ -967,6 +967,11 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
+"@capacitor-firebase/messaging@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@capacitor-firebase/messaging/-/messaging-6.1.0.tgz#2913eb4f2c9048f3c56b9e5d1dcdf157c7fbe749"
+  integrity sha512-Sne3WC1nmTt2FuxNfiVvBim+mYjaV47eYLzUmcVyEqGDz+m9NqC6mp+Q81B/X7p5LKiXSUv0A/lpkQVIYRmyAw==
+
 "@capacitor/android@6.1.2":
   version "6.1.2"
   resolved "https://registry.npmjs.org/@capacitor/android/-/android-6.1.2.tgz"

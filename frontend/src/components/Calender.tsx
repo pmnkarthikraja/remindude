@@ -11,7 +11,9 @@ import {
   IonImg,
   IonItem,
   IonLabel,
-  IonRow
+  IonNote,
+  IonRow,
+  IonTitle
 } from '@ionic/react';
 import React, { Fragment, FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { getRemainingTime } from '../pages/HomePage';
@@ -181,7 +183,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
     <IonCol size='auto' >
       <IonCard >
         <IonRow>
-          <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='6' sizeXl='7'>
+          <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='7' sizeXl='7'>
 
             {popoverContent!=null && popoverContent.includes('-India') && <IonBadge color={'tertiary'}>Indian Public Holiday</IonBadge>}
             {popoverContent!=null && popoverContent.includes('-Saudi') && <IonBadge color={'tertiary'}>Saudi Public Holiday</IonBadge>}
@@ -190,17 +192,18 @@ const Calender1: FunctionComponent<Calender1Props> = ({
             {popoverContent != null && <p>{popoverContent}</p>}
 
             <IonDatetime
+            style={{margin:'auto'}}
               name="datetime"
               highlightedDates={highlightedDates}
-              size='cover'
               value={selectedDate}
               presentation="date"
               onIonChange={handleDateChange}
               max={buildMaxYear()}
+              size='cover'
             ></IonDatetime>
           </IonCol>
 
-          <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='3' sizeXl='5' >
+          <IonCol sizeXs='12' sizeSm='12' sizeMd='12' sizeLg='5' sizeXl='5' >
             {selectedDate &&
               <IonCardContent>
                 {(new Date(selectedDate).toDateString() == isToday.toDateString()) && <Fragment>
@@ -283,6 +286,7 @@ const Calender1: FunctionComponent<Calender1Props> = ({
               </IonCardContent>
             }
           </IonCol>
+
         </IonRow>
       </IonCard>
     </IonCol>

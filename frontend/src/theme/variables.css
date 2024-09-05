@@ -71,7 +71,7 @@ body::-webkit-scrollbar {
   }
 
   html, body {
-    overflow: -moz-scrollbars-none; 
+    overflow: hidden;
     -ms-overflow-style: none; 
     scrollbar-width: none; 
   }

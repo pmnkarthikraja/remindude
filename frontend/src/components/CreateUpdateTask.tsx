@@ -90,6 +90,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
         const taskId = uuid.v4();
         const notificationIntervals = getNotificationSchedule(new Date(data.datetime) || new Date(), parseInt(data.notifyFrequency || '0'));
         //set the push notification
+
         const localNotifications: LocalNotificationSchema[] = notificationIntervals.map((interval,idx)=>{
             console.log("For time: ",interval)
             console.log("scheduled time: ",interval)
@@ -111,7 +112,8 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             id: taskId,
             priority: data.priority,
             dateTime: data.datetime,
-            description: data.description,
+            // description: notificationIntervals.join('\t | '),
+            description:data.description,
             email: email,
             dayFrequency: data.notifyFrequency || '0',
             title: data.title,
@@ -131,7 +133,8 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             id: data.id,
             dateTime: data.datetime,
             dayFrequency: data.notifyFrequency || '0',
-            description: data.description,
+            // description: notificationIntervals.join('\t | '),
+            description:data.description,
             email: data.email,
             emailNotification: data.emailNotification,
             notificationIntervals,

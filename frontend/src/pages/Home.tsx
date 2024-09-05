@@ -5,7 +5,6 @@ import {
   IonTabBar,
   IonTabButton,
   IonTabs,
-  useIonRouter
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
@@ -19,7 +18,7 @@ import ProfilePage from './ProfilePage';
 
 
 const Home: FunctionComponent = () => {
-  const [token, setToken] = useState<string | null>(null)
+  const [tok, setToken] = useState<string | null>(null)
   const [user, setUser] = useState<User>({
     email: '',
     password: '',
@@ -53,6 +52,7 @@ const Home: FunctionComponent = () => {
       }
     }
     const token = window.localStorage.getItem('token');
+    console.log("Token found: ", token);
     setToken(token)
     if (token == null) {
       window.location.href='/login'
@@ -70,6 +70,8 @@ const Home: FunctionComponent = () => {
       console.log("signout failed: ", e)
     }
   }
+
+  console.log("status: ",status)
 
   return (<Fragment>
     {status == 'success' &&

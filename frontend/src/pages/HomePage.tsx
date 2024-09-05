@@ -2,7 +2,6 @@ import { IonAvatar, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabBut
 import { close, filterOutline } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import InteractiveAnalogClock from "../components/AnalogClock"
-import Calender1 from "../components/Calender"
 import CreateEditTaskFabButton from "../components/CreateUpdateTask"
 import FilterComponent from '../components/Filter'
 import FilterPopover from "../components/FilterPopover"
@@ -19,6 +18,7 @@ import { Platform, useGetPlatform } from "../utils/useGetPlatform"
 import {  useGetAvatar } from "../utils/util"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
+import CalendarPage from "./CalenderPage"
 
 export interface HomePageProps {
   user: User
@@ -36,12 +36,14 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   signOut,
 }) => {
   const [platform, setPlatform] = useState<Platform>('Unknown');
+  const [isMobileView, setIsMobileView] = useState<boolean>(window.innerWidth < 992); 
   const [filters, setFilters] = useState<{ [key: string]: string[] }>({
     label: [],
     category: [],
     priority: [],
     status: [],
   });
+
 
 
   const [sortByNew, setSortByNew] = useState<{ name: string, isDescending: boolean } | null>(null);
@@ -66,6 +68,17 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const { data: taskData, isLoading: isGetTasksLoading, refetch } = useGetTasks(user.email, 2000)
   const { data: holidays, isLoading: isHolidaysLoading, error: holidaysErr, isError: isHolidayErr } = useGetHolidays()
   const {data:localHolidays}=useGetLocalHolidays()
+  const [showCalenderModal, setCalenderModal] = useState(false);
+
+
+  useEffect(() => {
+    const handleResize = () => {
+        setIsMobileView(window.innerWidth < 992);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+}, []);
 
   const handleFiltersChange = (newFilters: { [key: string]: string[] }) => {
     setFilters(newFilters);
@@ -262,7 +275,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
     <IonLoading isOpen={isGetTasksLoading} message={'Load Tasks..'} duration={2000} />
 
-    <IonPage id="main-content" >
+    <IonPage id="main-content">
       {platform !== 'Windows' && <IonHeader >
         <IonToolbar>
           <IonButtons slot="start">
@@ -277,7 +290,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
         </IonToolbar>
       </IonHeader>}
 
-      <IonContent className="body-content" fullscreen={true}>
+      <IonContent fullscreen={true} scrollY={!isMobileView}>
         <IonGrid>
           <IonRow>
             {platform === 'Windows' && (
@@ -289,7 +302,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
             )}
 
             {!pageNav.isSetting && <Fragment>
-              <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
+              <IonCol sizeXs="12" sizeSm="12" sizeMd="12" sizeLg="6" sizeXl="5" >
                 <IonGrid>
                   <IonRow style={{ width: 'fit-content' }}>
                     <IonCol >
@@ -361,11 +374,13 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                 <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays}/>
               </IonCol>
 
-              <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
+              {/* <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
                 <div ref={calenderContentRef}>
                   <Calender1 tasks={tasks} holidays={holidays} localHolidays={localHolidays}/>
                 </div>
-              </IonCol>
+              </IonCol> */}
+
+              <CalendarPage isMobileView={isMobileView} holidays={holidays} localHolidays={localHolidays} tasks={tasks} isOpen={showCalenderModal} onClose={()=>{setCalenderModal(false)}}/>
 
             </Fragment>}
 
@@ -379,9 +394,9 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
         <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays}email={user.email} isEdit={false} />
 
-        {(platform === 'Android' || platform === 'IOS') && (
+        {(isMobileView) && (
           <IonFab vertical='top' horizontal="end" slot="fixed">
-            <IonFabButton onClick={() => { calenderContentRef.current?.scrollIntoView({ behavior: 'smooth' }) }}>
+            <IonFabButton id="calender-modal" onClick={()=>setCalenderModal(true)}>
               <IonImg style={{ width: '50px', height: '50px' }} src="/assets/calender1.png" />
             </IonFabButton>
           </IonFab>
