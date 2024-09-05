@@ -28,7 +28,7 @@ export const scheduleNotifications= async (task: TaskModel) => {
     task.notificationIntervals.forEach((notificationTime: string) => {
       // Check if a job is already scheduled for the same notification time
       const isDuplicate = scheduledJobs[task.id].some(
-        job =>job && job.nextInvocation().getTime() === new Date(notificationTime).getTime()
+        job =>job && job.nextInvocation() && job.nextInvocation().getTime() === new Date(notificationTime).getTime()
       );
   
       if (!isDuplicate) {
