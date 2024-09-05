@@ -1,3 +1,4 @@
+import { currentUserName } from "../controllers/userController";
 import { TaskModel } from "../models/TaskModel";
 
 const formatTimeWithZone = (date: Date, timeZone: string) => {
@@ -152,6 +153,8 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
         </head>
         <body>
         <div class="container">
+            <h1>Hello, ${currentUserName}</h1>
+        
             <div class="header">
                 <h1>${task.eventType} ${isUpdate ? 'Updated' : 'Created'} Successfully!</h1>
             </div>
@@ -165,8 +168,8 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
             </div>
             <div class="footer">
                 <div class="buttons">
-          <a href="${inProgressLink}" class="inprogress">Set InProgress</a>
-          <a href="${doneLink}" class="done">Set Done</a>
+          <a href="${inProgressLink}" class="inprogress">InProgress</a>
+          <a href="${doneLink}" class="done">Done</a>
         </div>
             </div>
         </div>
@@ -296,6 +299,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
 </head>
 <body>
     <div class="container">
+     <h1>Hello, ${currentUserName}</h1>
         <div class="header">
             Reminder: ${task.title}
         </div>
@@ -306,8 +310,8 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
         </div>
         <div class="footer">
            <div class="buttons">
-          <a href="${inProgressLink}" class="inprogress">Set InProgress</a>
-          <a href="${doneLink}" class="done">Set Done</a>
+          <a href="${inProgressLink}" class="inprogress">InProgress</a>
+          <a href="${doneLink}" class="done">Done</a>
         </div>
         </div>
     </div>
@@ -463,6 +467,7 @@ export const forgotPasswordHTMLTemplate =(otp:number)=>`
         </div>
 
         <div class="email-content">
+            <h1>Hello, ${currentUserName}</h1>
             <h1>Reset Your Password</h1>
             <p>We received a request to reset your password. Please use the following OTP to proceed:</p>
             <div class="otp-code">${otp}</div>

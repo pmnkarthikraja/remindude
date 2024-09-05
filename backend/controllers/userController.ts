@@ -5,13 +5,17 @@ import UserService from "../services/userService";
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from "../utils/handleErrors";
 
 let inMemoryOTP:Map<string,string>=new Map()
+export let currentUserName=''
 
 class UserController {
     public async signUpEmail(req: Request, res: Response): Promise<void> {
       const { userName, email, password } = req.body;
+      
       try {
         const user: UserModel = { userName, email, password } as UserModel;
         const { user: newUser, token } = await UserService.SignUp(user);
+        currentUserName=userName //setting globally for mail templates
+
 
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Signed up Successfully',
@@ -34,6 +38,7 @@ class UserController {
       const {accessToken}=req.body
       try{
         const {user,token} = await UserService.GoogleSignUp(accessToken)
+        currentUserName=user.userName //setting globally for mail templates
       
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Signed up Successfully with google',
@@ -59,6 +64,8 @@ class UserController {
       console.log("user login",{email,password})
       try{
         const {user,token} = await UserService.SignIn(email,password)
+        currentUserName=user.userName //setting globally for mail templates
+
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Logged In up Successfully',
           success: true,
@@ -88,6 +95,7 @@ class UserController {
       const {googleId,email}=req.body
       try{
         const {user,token} =await UserService.GoogleSignIn(googleId,email)
+        currentUserName=user.userName //setting globally for mail templates
 
         res.setHeader('Authorization',token).status(201).json({
           message: 'User Successfully Logged In via Google',
@@ -139,6 +147,7 @@ class UserController {
          return
        }
        const {user}= await UserService.AuthUser(token)
+       currentUserName=user.userName //setting globally, for mail templates
          res.status(200).json({message:"successfully authorized",success:true,user})
        next();
       }catch(err:any){
@@ -177,6 +186,9 @@ class UserController {
         const {email,otp}=req.body
         if (inMemoryOTP.get(email)==otp){
           const user = await userRepo.findOneByEmail(email)
+          if (user!==null){
+            currentUserName=user.userName //setting globally for mail templates
+          }
           res.status(200).json({message:"OTP Verification successfull",success:true,user})
           inMemoryOTP=new Map()
           return
@@ -191,6 +203,7 @@ class UserController {
         const {userName,email,isProfilePicSet}=req.body
         const file = req.file 
         const {user} =await UserService.UpdateUser(email,userName,file,isProfilePicSet)
+        currentUserName=user.userName //setting globally for mail templates
         res.status(201).json({message:"successfully user profile updated",success:true,user})
       }catch(err:any){
         if (err instanceof DBErrUserNotFound){
@@ -208,6 +221,7 @@ class UserController {
       try{
         const {email,password}=req.body
         const {user} =await UserService.ResetPassword(email,password)
+        currentUserName=user.userName //setting globally for mail templates
         res.status(201).json({message:"successfully password resetted",success:true,user})
       }catch(err:any){
         if (err instanceof DBErrUserNotFound){
@@ -226,6 +240,7 @@ class UserController {
         const {email,password}=req.body
         console.log("email:password",email,password)
         const {user} =await UserService.ValidatePassword(email,password)
+        currentUserName=user.userName //setting globally for mail templates
         res.status(201).json({message:"successfully password validated",success:true,user})
       }catch(err:any){
         if (err instanceof DBErrUserNotFound){
