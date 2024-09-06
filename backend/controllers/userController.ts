@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { UserModel } from "../models/UserModel";
 import userRepo from "../repo/userRepo";
 import UserService from "../services/userService";
-import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from "../utils/handleErrors";
+import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTaskNotFound, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from "../utils/handleErrors";
 
 let inMemoryOTP:Map<string,string>=new Map()
 export let currentUserName=''
@@ -197,6 +197,25 @@ class UserController {
           return
         }
      }
+
+     public async deleteUserAccount(req:Request,res:Response):Promise<void>{
+        const {email}=req.body
+        try{
+          await UserService.DeleteUserAccount(email)
+          res.status(200).json({message:"User Deleted Successfully",success:true})
+          return
+        }catch(err:any){
+          if (err instanceof DBErrUserNotFound){
+            res.status(404).json({ message: err.name, success: false });
+          }else if (err instanceof DBErrTaskNotFound) {
+            res.status(404).json({ message: err.name, success: false });
+          }else if (err instanceof DBErrInternal) {
+            res.status(500).json({ message: err.name, success: false });
+          }else {
+            res.status(500).json({ message: `An unexpected error occurred: ${err}`, success: false });
+          }
+        }
+   }
 
     public async updateUser(req:Request,res:Response):Promise<void>{
       try{

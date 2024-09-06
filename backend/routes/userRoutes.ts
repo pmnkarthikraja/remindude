@@ -14,6 +14,7 @@ router.post('/signin-google', UserController.signInGoogle);
 router.post('/auth-user',authenticateJWT, UserController.authUser);
 router.post('/send-otp', UserController.sendOTP);
 router.post('/verify-otp', UserController.verifyOTP);
+router.post('/delete-user-account', UserController.deleteUserAccount);
 router.put('/update-user',upload.single('profilePicture'), UserController.updateUser);
 router.put('/reset-password', UserController.resetPassword);
 router.post('/validate-password',UserController.validatePassword)

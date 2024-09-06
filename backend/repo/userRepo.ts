@@ -1,6 +1,6 @@
 import { MongoError } from 'mongodb';
 import UserSchema, { UserModel } from '../models/UserModel';
-import { DBErrInternal, DBErrUserAlreadyExist } from '../utils/handleErrors';
+import { DBErrInternal, DBErrTaskNotFound, DBErrUserAlreadyExist, DBErrUserNotFound } from '../utils/handleErrors';
 
 interface UserRepo {
     findOneByEmail: (email: string) => Promise<UserModel | null>;
@@ -8,6 +8,7 @@ interface UserRepo {
     SignUp: (user: UserModel) => Promise<UserModel>;
     UpdateUser: (email: string, userName: string, profilePicture: string, isProfilePicSet: string) => Promise<UserModel | null>;
     ResetPassword: (email: string, password: string) => Promise<UserModel | null>
+    DeleteUser:(email:string) => Promise<void>
 }
 
 class UserRepoClass implements UserRepo {
@@ -76,6 +77,18 @@ class UserRepoClass implements UserRepo {
             }, { new: true })
             return gotUser
         } catch (e) {
+            throw new DBErrInternal('DB Error')
+        }
+    }
+
+    async DeleteUser(email:string):Promise<void>{
+        console.log("deleting user: ",email)
+        try{
+            const res = await UserSchema.deleteOne({email})
+            if (res.deletedCount<1){
+                throw new DBErrUserNotFound()
+            }
+        }catch(e){
             throw new DBErrInternal('DB Error')
         }
     }

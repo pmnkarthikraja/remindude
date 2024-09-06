@@ -54,7 +54,7 @@ UserSchema.pre('deleteOne',{ document: true, query: false },async function(next)
     }
 })
 
-UserSchema.pre('findOneAndDelete', async function(next) {
+UserSchema.pre('deleteOne', async function(next) {
     try {
         const user = await this.model.findOne(this.getFilter());
         if (user) {

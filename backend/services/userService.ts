@@ -7,6 +7,7 @@ import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, 
 import { getUserInfo } from '../utils/helper';
 import { sendEmail } from '../utils/sendEmail';
 import { accountVerificationHTMLTemplate, forgotPasswordHTMLTemplate } from '../utils/mailTemplates';
+import taskRepo from '../repo/taskRepo';
 require("dotenv").config();
 
 export interface JwtPayload extends BaseJwtPayload {
@@ -23,6 +24,7 @@ interface UserServiceImplementation{
     UpdateUser:(email:string,userName:string,profilePicture:Express.Multer.File | undefined,isProfilePicSet:string)=>Promise<{user:UserModel}>
     ResetPassword:(email:string,password:string)=>Promise<{user:UserModel}>
     ValidatePassword:(email:string,password:string)=>Promise<{user:UserModel}>
+    DeleteUserAccount: (email:string)=>Promise<void>
   }
 
 class UserService implements UserServiceImplementation {
@@ -184,6 +186,14 @@ async ValidatePassword(email:string,password:string):Promise<{user:UserModel}>{
   }
 
   return {user:existingUser}
+}
+
+async DeleteUserAccount(email:string):Promise<void>{
+    await userRepo.DeleteUser(email)
+    // const tasks =await taskRepo.GetAllTasks(email)
+    // if (tasks.tasks.length!==0){
+    //   await taskRepo.DeleteAllTaskWithEmail(email)
+    // }
 }
 }
 

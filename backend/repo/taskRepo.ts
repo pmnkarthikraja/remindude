@@ -9,6 +9,7 @@ interface TaskRepo{
     GetAllTasks:(emai:string)=>Promise<{tasks:TaskModel[]}>
     UpdateTaskStatusViaEmail:(email:string,id:string,status:"InProgress"|"Done")=>Promise<TaskModel>
     GetRawAllTasks:()=>Promise<{tasks:TaskModel[]}>
+    DeleteAllTaskWithEmail:(email:string)=>Promise<void>
 }
 
 
@@ -91,6 +92,17 @@ class TaskRepoClass implements TaskRepo{
             const gotTasks = await TaskSchema.find({})
             return {
                 tasks:gotTasks
+            }
+        }catch(e){
+            throw new DBErrInternal('DB Error')
+        }
+    }
+
+    async DeleteAllTaskWithEmail(email:string):Promise<void>{
+        try{
+            const result = await TaskSchema.deleteMany({email})
+            if (result.deletedCount<1){
+                throw new DBErrTaskNotFound()
             }
         }catch(e){
             throw new DBErrInternal('DB Error')
