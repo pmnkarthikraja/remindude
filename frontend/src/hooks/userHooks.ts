@@ -45,7 +45,8 @@ export const useAuthUser = () => {
   unknown
   >(
     'authenticateUser', 
-    (token:string)=> userApi.authToken(token),
+    async (token:string)=> {
+      return userApi.authToken(token)},
     {
       onSuccess: () => {
         queryClient.invalidateQueries('userDetails');
