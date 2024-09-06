@@ -329,7 +329,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             <IonLabel>Edit profile</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>
-          <IonItem onClick={() => setShowChangePassword(true)}>
+         <IonItem disabled={user.password==undefined} onClick={() => setShowChangePassword(true)}>
             <IonLabel>Change password</IonLabel>
             <IonIcon slot="end" icon={chevronForwardOutline} />
           </IonItem>

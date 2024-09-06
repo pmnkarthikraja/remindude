@@ -1,4 +1,4 @@
-import { IonAvatar, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonImg, IonLoading, IonMenu, IonMenuButton, IonMenuToggle, IonPage, IonRow, IonToolbar, RefresherEventDetail } from "@ionic/react"
+import { IonAlert, IonAvatar, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonImg, IonLoading, IonMenu, IonMenuButton, IonMenuToggle, IonPage, IonRow, IonToast, IonToolbar, RefresherEventDetail } from "@ionic/react"
 import { close, filterOutline } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import InteractiveAnalogClock from "../components/AnalogClock"
@@ -15,10 +15,11 @@ import { User } from "../components/user"
 import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
-import {  useGetAvatar } from "../utils/util"
+import { useGetAvatar } from "../utils/util"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
 import CalendarPage from "./CalenderPage"
+import { useDeleteUserAccount } from "../hooks/userHooks"
 
 export interface HomePageProps {
   user: User
@@ -36,7 +37,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   signOut,
 }) => {
   const [platform, setPlatform] = useState<Platform>('Unknown');
-  const [isMobileView, setIsMobileView] = useState<boolean>(window.innerWidth < 992); 
+  const [isMobileView, setIsMobileView] = useState<boolean>(window.innerWidth < 992);
   const [filters, setFilters] = useState<{ [key: string]: string[] }>({
     label: [],
     category: [],
@@ -67,18 +68,20 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const [hideSidebar, setHidesibebar] = useState<boolean>(false);
   const { data: taskData, isLoading: isGetTasksLoading, refetch } = useGetTasks(user.email, 2000)
   const { data: holidays, isLoading: isHolidaysLoading, error: holidaysErr, isError: isHolidayErr } = useGetHolidays()
-  const {data:localHolidays}=useGetLocalHolidays()
+  const { data: localHolidays } = useGetLocalHolidays()
   const [showCalenderModal, setCalenderModal] = useState(false);
-
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
+  const [showLoading, setShowLoading] = useState(false);
+  const { isLoading: isDeleteUserLoading, isError: isDeleteUserError, error: deleteUserErr, mutateAsync: deleteUserAccount, reset } = useDeleteUserAccount()
 
   useEffect(() => {
     const handleResize = () => {
-        setIsMobileView(window.innerWidth < 992);
+      setIsMobileView(window.innerWidth < 992);
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-}, []);
+  }, []);
 
   const handleFiltersChange = (newFilters: { [key: string]: string[] }) => {
     setFilters(newFilters);
@@ -86,7 +89,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
   function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(() => {
-      refetch() //refetching task data
+      refetch() 
       event.detail.complete();
     }, 1500);
   }
@@ -263,7 +266,66 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   return <Fragment>
     <IonMenu contentId="main-content" disabled={hideSidebar} onIonDidClose={() => setHidesibebar(e => !e)}>
       <IonContent scrollX={false} className="sidebar-content">
-        <Sidebar buildPageNav={buildPageNav} pageNav={pageNav} signOut={signOut} user={user} />
+        <Sidebar buildPageNav={buildPageNav} pageNav={pageNav} signOut={signOut} user={user}
+          onDelete={() => {
+            setHidesibebar(true);
+            setIsDeleteAlertOpen(true);
+          }} />
+        <IonLoading isOpen={isDeleteUserLoading} message={'Deleting User..'} />
+
+        <IonToast color={'danger'}
+          onDidDismiss={() => reset()}
+          buttons={[
+            {
+              text: 'Ok',
+              role: 'cancel',
+              handler: () => {
+                reset()
+              }
+            },
+          ]} position="top" isOpen={isDeleteUserError}
+          message={deleteUserErr && deleteUserErr?.response?.data.message || deleteUserErr?.message}
+          duration={3000}>
+        </IonToast>
+
+        <IonAlert
+        isOpen={isDeleteAlertOpen}
+        header="Are you sure to delete your account?"
+        message={'Once deleted, all tasks and meetings will be deleted. You will be redirected to the login page.'}
+        className="custom-alert"
+        onDidDismiss={() => setIsDeleteAlertOpen(false)}
+        buttons={[
+          {
+            text: 'No',
+            cssClass: 'alert-button-cancel',
+            handler: () => {
+              setIsDeleteAlertOpen(false);
+            },
+          },
+          {
+            text: 'Yes',
+            cssClass: 'alert-button-confirm',
+            handler: async () => {
+              setShowLoading(true);
+              
+              await deleteUserAccount(user.email);
+              
+              setTimeout(() => {
+                setShowLoading(false);
+                setIsDeleteAlertOpen(false);
+                window.location.href='/login'
+              }, 2000);
+            },
+          },
+        ]}
+      />
+
+        <IonLoading
+          isOpen={showLoading}
+          message={'☹️👋 Goodbye!'}
+          duration={2000} 
+        />
+
       </IonContent>
     </IonMenu>
 
@@ -298,6 +360,10 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                 pageNav={pageNav}
                 signOut={signOut}
                 user={user}
+                onDelete={() => {
+                  setHidesibebar(true)
+                  setIsDeleteAlertOpen(true);
+                }}
               />
             )}
 
@@ -371,32 +437,26 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                   <ProfilePage signOut={signOut} user={user} />
                 </div>}
 
-                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays}/>
+                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays} />
               </IonCol>
 
-              {/* <IonCol sizeXs="12" sizeSm="6" sizeMd="6" sizeLg="6" sizeXl="5">
-                <div ref={calenderContentRef}>
-                  <Calender1 tasks={tasks} holidays={holidays} localHolidays={localHolidays}/>
-                </div>
-              </IonCol> */}
-
-              <CalendarPage isMobileView={isMobileView} holidays={holidays} localHolidays={localHolidays} tasks={tasks} isOpen={showCalenderModal} onClose={()=>{setCalenderModal(false)}}/>
+              <CalendarPage isMobileView={isMobileView} holidays={holidays} localHolidays={localHolidays} tasks={tasks} isOpen={showCalenderModal} onClose={() => { setCalenderModal(false) }} />
 
             </Fragment>}
 
 
             {pageNav.isSetting && <Fragment>
-              <ExcelUploader/>
+              <ExcelUploader />
             </Fragment>}
 
           </IonRow>
         </IonGrid>
 
-        <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays}email={user.email} isEdit={false} />
+        <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={user.email} isEdit={false} />
 
         {(isMobileView) && (
           <IonFab vertical='top' horizontal="end" slot="fixed">
-            <IonFabButton id="calender-modal" onClick={()=>setCalenderModal(true)}>
+            <IonFabButton id="calender-modal" onClick={() => setCalenderModal(true)}>
               <IonImg style={{ width: '50px', height: '50px' }} src="/assets/calender1.png" />
             </IonFabButton>
           </IonFab>

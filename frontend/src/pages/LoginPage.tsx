@@ -171,7 +171,6 @@ const LoginPage: React.FC = () => {
                       label='Password' labelPlacement='floating' type="password">
                      <IonInputPasswordToggle slot={!!watch('password') && 'end' || ''}></IonInputPasswordToggle>
                       </IonInput>
-
                   </IonItem>
 
                   <div className="forgot-password" onClick={() => setForgetPassword(true)}>Forgot password?</div>
@@ -205,7 +204,7 @@ const LoginPage: React.FC = () => {
                     user: undefined
                   })} />}
 
-                <div className="or-text">Or Sign Up Using</div>
+                <div className="or-text">Or Sign In Using</div>
                 <div className="social-buttons">
                   <IonButton
                     onClick={handleGoogleSignIn}
@@ -213,7 +212,7 @@ const LoginPage: React.FC = () => {
                     <img src="assets/google.png" alt="Facebook" className="social-icon" />
                   </IonButton>
                 </div>
-                <div className="signup-text">Or Sign Up Using</div>
+                <div className="signup-text">Don't have an account ?</div>
                 <div className="signup-link" onClick={() => window.location.href = '/signup'}>Create Your Account</div>
               </div>
             </IonCol>

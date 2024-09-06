@@ -291,7 +291,8 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 
   const titleTextAreaStyle: CSSProperties = {
     height: '50px',
-    width: "70%",
+    width: "100%",
+    minWidth:'120px',
     marginTop: '-15px'
   }
 
@@ -372,14 +373,19 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
             <IonCard key={idx} style={{ boxShadow: '0 4px 8px rgba(1, 1, 100, 0.3)' }}>
               <IonCardHeader>
                 <IonRow >
-                  <IonCol>
+                  <IonCol sizeXs='12' sizeSm='8' sizeMd='8' sizeLg='6' sizeXl='8'> 
                     <IonItem lines='none'>
                       <IonImg slot='start' style={iconStyle} src={`/assets/${icon}.png`} />
                       <IonTextarea style={titleTextAreaStyle} shape='round' aria-label='task-title' value={task.title} readonly></IonTextarea>
-                      <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "inherit", paddingLeft: "10px", minWidth: '100px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
                     </IonItem>
                   </IonCol>
-                  <IonButtons >
+
+                  <IonCol sizeXs='12' sizeSm='4' sizeMd='4' sizeLg='6' sizeXl='4'>
+                    <IonItem>
+                  <IonBadge style={{ color: task.status == 'Done' ? 'green' : 'orange', background: "inherit",minWidth:'80px', textAlign: 'start' }}>{task.status}{task.status == 'Done' && <span className="tick-mark">✔</span>}</IonBadge>
+                  <div style={{width:'10px'}}></div>
+                  
+                  <div style={{display:'flex', flexDirection:'row',flex:'1'}}>
                     <IonImg onClick={() => toggleEditTask({
                       isEdit: true,
                       task
@@ -392,8 +398,11 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                       });
 
                     }} style={{ ...iconStyle, cursor: 'pointer' }} src='/assets/trash1.png' />
-                  </IonButtons>
+               </div>
+                  </IonItem>
+                  </IonCol>
                 </IonRow>
+
                 <IonRow>
                   <IonCol style={{ width: '300px' }}>
                     <IonItem lines='none'>
@@ -428,7 +437,6 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
                           </IonRow>
                         </IonBadge>
                       </IonCol>
-
 
                       <IonCol style={{ width: 'auto', minWidth: '150px' }}>
                         <IonBadge style={{ color: 'inherit', background: 'rgba(58,33,110,0.1)' }}>

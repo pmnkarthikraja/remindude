@@ -13,7 +13,6 @@ interface AxiosErrorType {
 
 export const useEmailSignupMutation = (validatePassword:boolean) => {
   const queryClient = useQueryClient();
-  const history = useHistory()
 
   return useMutation(
     (userDetails: User) => userApi.signup(userDetails),
@@ -24,8 +23,7 @@ export const useEmailSignupMutation = (validatePassword:boolean) => {
           localStorage.setItem('token',data.data.token)
         }
         setTimeout(() => {
-          history.push('/home');
-          
+          window.location.href='/home'
         }, 1500);
       },
       onError: (e: AxiosError<AxiosErrorType>) => {
@@ -34,6 +32,26 @@ export const useEmailSignupMutation = (validatePassword:boolean) => {
     }
   );
 };
+
+export const useDeleteUserAccount = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (email:string) => {
+      return userApi.deleteUserAccount(email);
+    },
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('userDetails');
+        localStorage.removeItem('token')
+      },
+      onError: (e: AxiosError<AxiosErrorType>) => {
+        console.log("error on delete user", e);
+      }
+    }
+  );
+};
+
 
 export const useAuthUser = () => {
   const queryClient = useQueryClient();

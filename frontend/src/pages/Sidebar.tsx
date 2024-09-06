@@ -22,13 +22,15 @@ export interface SidebarProps {
   signOut: () => void,
   buildPageNav: (page: string) => void,
   pageNav: PageNav
+  onDelete:()=>void
 }
 
 const Sidebar: FunctionComponent<SidebarProps> = ({
   user,
   signOut,
   buildPageNav,
-  pageNav
+  pageNav,
+  onDelete
 }) => {
   const userAvatar = useGetAvatar(user)
   const currentTime = new Date().getHours()
@@ -103,6 +105,10 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
     </IonItem>
     <IonItem lines="none" button onClick={signOut} className="tile">
       <IonLabel>Logout</IonLabel>
+      <IonImg style={{ width: '30px', height: '30px' }} src="/assets/sidebar/logout.png" />
+    </IonItem>
+    <IonItem lines="none" button onClick={onDelete} className="tile" style={{backgroundColor:'red'}}>
+      <IonLabel color={'danger'}>Delete Account</IonLabel>
       <IonImg style={{ width: '30px', height: '30px' }} src="/assets/sidebar/logout.png" />
     </IonItem>
   </IonCol>)

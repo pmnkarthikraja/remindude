@@ -67,16 +67,28 @@ const Home: FunctionComponent = () => {
   }, [authMutation]);
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout | undefined;
+  
     if (status === 'loading') {
-      const timeout = setTimeout(() => {
+      timeout = setTimeout(() => {
         setLoadingTimeout(true);
       }, 5000);
-
-      return () => clearTimeout(timeout);
-    } else {
-      setLoadingTimeout(false);
     }
+  
+    if (status === 'success' || status === 'error') {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      setLoadingTimeout(false); 
+    }
+  
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
   }, [status]);
+  
 
   const signOut = async () => {
     try {

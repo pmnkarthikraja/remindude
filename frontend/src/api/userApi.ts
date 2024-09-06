@@ -12,6 +12,7 @@ export interface UserAPI{
     resetPassword:(email:string,password:string)=>Promise<AxiosResponse>
     editProfile:(email:string,password:string,userName:string,profilePicture:Blob|string)=>Promise<AxiosResponse>
     validatePassword :(email:string,password:string)=>Promise<AxiosResponse>
+    deleteUserAccount:(email:string)=>Promise<AxiosResponse>
 }
 
 // const BASE_URL = "http://localhost:4000"
@@ -60,6 +61,10 @@ class UserAPIService implements UserAPI{
  
      async resetPassword (email:string,password:string):Promise<AxiosResponse> {
          return await axios.put(`${BASE_URL}/reset-password`,{email,password})
+     }
+
+     async deleteUserAccount (email:string):Promise<AxiosResponse> {
+        return await axios.post(`${BASE_URL}/delete-user-account`,{email})
      }
      
      async validatePassword (email:string,password:string):Promise<AxiosResponse> {
