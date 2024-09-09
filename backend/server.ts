@@ -54,7 +54,9 @@ app.get('/google-image', async (req, res) => {
   }
 });
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.get('/health',async (req, res)=>{
+  res.send('server is alive!')
+})
 
 let serverStarted=false
 export const startServer = async () => {
@@ -67,5 +69,3 @@ export const startServer = async () => {
 export const checkIsServerStarted = ():boolean =>{
   return serverStarted
 }
-
-

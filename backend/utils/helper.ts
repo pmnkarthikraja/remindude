@@ -179,3 +179,16 @@ export const startPolling = async () => {
   await pollAndReschedule();
   setInterval(pollAndReschedule, POLL_INTERVAL);
 };
+
+//health check for the server is alive or not.
+const pingInterval = 1 * 30 * 1000; 
+const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com/health" :  "http://localhost:4000/health"
+
+setInterval(async () => {
+  try {
+    await axios.get(BASE_URL);
+    console.log('Ping successful!');
+  } catch (error) {
+    console.error('Error pinging the server:', error);
+  }
+}, pingInterval);
