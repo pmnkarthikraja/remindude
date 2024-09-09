@@ -15,8 +15,7 @@ class UserController {
         const user: UserModel = { userName, email, password } as UserModel;
         const { user: newUser, token } = await UserService.SignUp(user);
         currentUserName=userName //setting globally for mail templates
-
-
+        
         res.setHeader('Authorization', token).status(201).json({
           message: 'User Signed up Successfully',
           success: true,

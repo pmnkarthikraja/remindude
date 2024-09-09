@@ -9,6 +9,7 @@ router.get('/tasks/:email', TaskController.getAllTasks);
 router.delete('/delete-task/:email/:id', TaskController.deleteTask);
 router.get('/update-task/:email/:id/:status',TaskController.updateTaskStatusViaEmail)
 router.post('/update-task-via-email/:email/:id',TaskController.updateTaskPeriodViaEmail)
+router.get('/update-task-via-email/:email/:id/turn-off-email-notification',TaskController.updateTaskNoEmailNotification)
 router.get('/update-task-via-email/:email/:id',(req,res)=>{
     const { email, id } = req.params;
     const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"

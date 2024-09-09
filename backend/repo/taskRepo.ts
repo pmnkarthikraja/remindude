@@ -2,6 +2,7 @@ import { MongoError } from "mongodb";
 import TaskSchema,{ TaskModel } from "../models/TaskModel";
 import { DBErrInternal, DBErrTaskAlreadyExist, DBErrTaskNotFound, DBErrTaskTimeElapsed } from "../utils/handleErrors";
 import { getNotificationSchedule } from "../utils/helper";
+import { cancelScheduledNotifications } from "../utils/sendEmail";
 
 interface TaskRepo{
     CreateTask:(task:TaskModel)=>Promise<TaskModel>
@@ -72,6 +73,35 @@ class TaskRepoClass implements TaskRepo{
             }
         }
     }
+
+
+    async UpdateTaskNoEmailNotificationViaEmail(email:string,id:string):Promise<TaskModel>{
+        try {
+            const task = await TaskSchema.findOne({ id });
+    
+            if (!task) {
+                throw new DBErrTaskNotFound(); 
+            }
+
+            task.emailNotification=false
+            await task.save();
+            await cancelScheduledNotifications(task.id)
+            return task;
+        } catch (err: any) {
+            if (err instanceof DBErrTaskNotFound){
+                throw new DBErrTaskNotFound
+            }
+            const e: MongoError = err;
+            console.log("Error on updating turning off email notification: ", e);
+    
+            if (e.code === 211) {
+                throw new DBErrTaskNotFound();
+            } else {
+                throw new DBErrInternal("DB Error");
+            }
+        }
+    }
+
 
     async CreateTask(task: TaskModel): Promise<TaskModel>{
         try{

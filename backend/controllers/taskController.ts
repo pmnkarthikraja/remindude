@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { TaskModel } from "../models/TaskModel";
 import taskService from "../services/taskService";
 import { DBErrInternal, DBErrTaskNotFound, DBErrTaskTimeElapsed } from "../utils/handleErrors";
-import { taskUpdatedWith404, taskUpdatedWithInternalErr, taskUpdatedWithMissingFields, taskUpdatedWithSuccess, taskUpdatedWithTimeElapsed } from "../utils/mailTemplates";
+import { taskUpdatedWith404, taskUpdatedWithDisableEmailNotification, taskUpdatedWithInternalErr, taskUpdatedWithMissingFields, taskUpdatedWithSuccess, taskUpdatedWithTimeElapsed } from "../utils/mailTemplates";
+import taskRepo from "../repo/taskRepo";
 
 class TaskController{
     public async createTask(req:Request,res:Response):Promise<void>{
@@ -198,46 +199,46 @@ class TaskController{
                 res.status(400).send(taskUpdatedWithMissingFields)
                 return
             }    
-          const task=await taskService.UpdateTaskPeriodViaEmail(email,id,combinedDateTimeString)
+            await taskService.UpdateTaskPeriodViaEmail(email,id,combinedDateTimeString)
 
-        // const appUrl = 'remindude://'; 
-        // const fallbackUrl = 'https://remindude-theta.vercel.app';  
-    
-        // res.send(`
-        //     <!DOCTYPE html>
-        //     <html lang="en">
-        //     <head>
-        //         <meta charset="UTF-8">
-        //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        //         <title>Redirecting...</title>
-        //         <script>
-        //             function redirectToApp() {
-        //                 var appUrl = "${appUrl}";
-        //                 var fallbackUrl = "${fallbackUrl}";
-    
-        //                 // Create an iframe to attempt opening the app
-        //                 var iframe = document.createElement("iframe");
-        //                 iframe.style.display = "none";
-        //                 iframe.src = appUrl;
-    
-        //                 // Append iframe to body
-        //                 document.body.appendChild(iframe);
-    
-        //                 // Set a timeout to redirect to fallback URL if app isn't opened
-        //                 setTimeout(function() {
-        //                     window.location.href = fallbackUrl;
-        //                 }, 1000); // Adjust the timeout as needed
-        //             }
-    
-        //             // Redirect when the page loads
-        //             window.onload = redirectToApp;
-        //         </script>
-        //     </head>
-        //     <body>
-        //         <p>If you are not redirected automatically, <a href="${fallbackUrl}">click here</a>.</p>
-        //     </body>
-        //     </html>
-        // `);
+            // const appUrl = 'remindude://'; 
+            // const fallbackUrl = 'https://remindude-theta.vercel.app';  
+
+            // res.send(`
+            //     <!DOCTYPE html>
+            //     <html lang="en">
+            //     <head>
+            //         <meta charset="UTF-8">
+            //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            //         <title>Redirecting...</title>
+            //         <script>
+            //             function redirectToApp() {
+            //                 var appUrl = "${appUrl}";
+            //                 var fallbackUrl = "${fallbackUrl}";
+
+            //                 // Create an iframe to attempt opening the app
+            //                 var iframe = document.createElement("iframe");
+            //                 iframe.style.display = "none";
+            //                 iframe.src = appUrl;
+
+            //                 // Append iframe to body
+            //                 document.body.appendChild(iframe);
+
+            //                 // Set a timeout to redirect to fallback URL if app isn't opened
+            //                 setTimeout(function() {
+            //                     window.location.href = fallbackUrl;
+            //                 }, 1000); // Adjust the timeout as needed
+            //             }
+
+            //             // Redirect when the page loads
+            //             window.onload = redirectToApp;
+            //         </script>
+            //     </head>
+            //     <body>
+            //         <p>If you are not redirected automatically, <a href="${fallbackUrl}">click here</a>.</p>
+            //     </body>
+            //     </html>
+            // `);
 
         res.send(taskUpdatedWithSuccess)
 
@@ -258,6 +259,29 @@ class TaskController{
             else{
                 res.status(500).send(taskUpdatedWithInternalErr)
             }
+        }
+    }
+
+    public async updateTaskNoEmailNotification(req:Request,res:Response):Promise<void>{
+        const {email,id}=req.params
+
+        try{
+            await taskRepo.UpdateTaskNoEmailNotificationViaEmail(email,id)
+            res.status(200).send(taskUpdatedWithDisableEmailNotification)
+        }catch(err){
+            console.log("error on update:",err)
+           if (err instanceof DBErrTaskNotFound){
+                res.status(404).send(taskUpdatedWith404)
+            }
+            else if (err instanceof DBErrTaskTimeElapsed){
+                res.status(400).send(taskUpdatedWithTimeElapsed)
+            } 
+            else if (err instanceof DBErrInternal){
+                res.status(500).send(taskUpdatedWithInternalErr)
+            } 
+            else{
+                res.status(500).send(taskUpdatedWithInternalErr)
+            } 
         }
     }
 }

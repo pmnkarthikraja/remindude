@@ -151,6 +151,9 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
             .done {
                 background-color: #28a745;
             }
+            .emailnotification{
+                margin-top:10px;
+            }
         </style>
         </head>
         <body>
@@ -191,6 +194,8 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
   </form>
 
   <p>If forms are not supported, <a href="${BASE_URL}/update-task-via-email/${task.email}/${task.id}">click here to reschedule the task</a>.</p>
+
+  <p class="emailnotification">Turn off email notification for this task: <a href="${BASE_URL}/update-task-via-email/${task.email}/${task.id}/turn-off-email-notification">Click Here</a></p>
 
   <p>Best regards,<br> Datasack Solutions</p>
             </div>
@@ -353,6 +358,8 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
   </form>
 
   <p>If forms are not supported, <a href="${BASE_URL}/update-task-via-email/${task.email}/${task.id}">click here to reschedule the task</a>.</p>
+
+  <p class="emailnotification">Turn off email notification for this task: <a href="${BASE_URL}/update-task-via-email/${task.email}/${task.id}/turn-off-email-notification">Click Here</a></p>
 
   <p>Best regards,<br> Datasack Solutions</p>
         </div>
@@ -558,6 +565,15 @@ export const taskUpdatedWithSuccess =`
         <body>
           <h1>✅ Task Updated Successfully</h1>
           <p>Your task has been updated to the new date and time. Thank you for your patience!</p>
+        </body>
+      </html>
+`
+
+export const taskUpdatedWithDisableEmailNotification =`
+     <html>
+        <body>
+          <h1>✅ Email Notification has stopped for this task</h1>
+          <p>Your task has been updated with disable email notification. Thank you for your patience!</p>
         </body>
       </html>
 `

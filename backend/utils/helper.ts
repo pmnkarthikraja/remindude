@@ -158,11 +158,11 @@ export const pollAndReschedule = async () => {
 
     const { tasks} = await taskRepo.GetRawAllTasks(); 
 
-    tasks.forEach((task) => {
+    tasks.forEach(async (task) => {
       const remainingTime = getRemainingTime(task.dateTime);
       if (remainingTime > 0) {
         if (task.emailNotification){
-          scheduleNotifications(task);
+          await scheduleNotifications(task);
         }
       }
     });

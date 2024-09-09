@@ -1,6 +1,6 @@
 import { TaskModel } from "../models/TaskModel";
 import { DBErrTaskTimeElapsed } from "../utils/handleErrors";
-import { getNotificationSchedule, getRemainingTime } from "../utils/helper";
+import { getRemainingTime } from "../utils/helper";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "../utils/sendEmail";
 import { createTemplateHTMLContent } from "../utils/mailTemplates";
@@ -29,7 +29,7 @@ class TaskService implements TaskServiceImplementation {
         if (gotTask){
             await cancelScheduledNotifications(gotTask.id)
             if (gotTask.emailNotification) {
-                  scheduleNotifications(gotTask)
+                  await scheduleNotifications(gotTask)
                   return gotTask
               }
         }
@@ -50,7 +50,7 @@ class TaskService implements TaskServiceImplementation {
           await cancelScheduledNotifications(gotTask.id)
           if (task.emailNotification) {
             console.log("schedule notifications upon creation: ",task.notificationIntervals)
-              scheduleNotifications(task)
+             await scheduleNotifications(task)
               return {
                   task: gotTask,
                   successMsg: 'Task Created Successfully with email notification'
@@ -68,6 +68,7 @@ class TaskService implements TaskServiceImplementation {
           }
         }
     }
+
     async UpdateTask(task: TaskModel): Promise<{ task: TaskModel|undefined, successMsg: string }> {
         const remainingTime = getRemainingTime(task.dateTime);
         if (remainingTime <= 0) {
@@ -81,8 +82,7 @@ class TaskService implements TaskServiceImplementation {
         await cancelScheduledNotifications(gotTask.id)
         console.log("task email notificaiotn:",task.emailNotification)
         if (task.emailNotification) {
-          console.log("task has emailnotification:")
-            scheduleNotifications(task)
+            await scheduleNotifications(task)
             return {
                 task: gotTask,
                 successMsg: 'Task Updated Successfully with email notification'
