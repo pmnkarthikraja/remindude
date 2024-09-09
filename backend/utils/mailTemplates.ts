@@ -526,7 +526,7 @@ export const taskUpdatedWith404 = `
         <html>
           <body>
             <h1>😔 Task Not Found</h1>
-            <p>We couldn't find the task you were trying to update. Please check the task ID and try again.</p>
+            <p>We couldn't find the task you were trying to update. Please make sure the task or meeting exist and try again.</p>
           </body>
         </html>
 `

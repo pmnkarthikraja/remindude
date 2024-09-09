@@ -55,6 +55,9 @@ class TaskRepoClass implements TaskRepo{
     
             return task;
         } catch (err: any) {
+            if (err instanceof DBErrTaskNotFound){
+                throw new DBErrTaskNotFound
+            }
             const e: MongoError = err;
             console.log("Error on updating date/time: ", e);
     

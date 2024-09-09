@@ -189,19 +189,16 @@ class TaskController{
         }
     }
 
-
     public async updateTaskPeriodViaEmail(req:Request,res:Response):Promise<void>{
         const {email,id}=req.params
         const {newDate,newTime} = req.body
         const combinedDateTimeString = `${newDate}T${newTime}:00`;
-        console.log("update schedule:",email,newDate,newTime,combinedDateTimeString)
         try {
             if (!newDate || !newTime){
                 res.status(400).send(taskUpdatedWithMissingFields)
                 return
             }    
           const task=await  taskService.UpdateTaskPeriodViaEmail(email,id,combinedDateTimeString)
-          console.log("updated task via email: ",task)
 
         // const appUrl = 'remindude://'; 
         // const fallbackUrl = 'https://remindude-theta.vercel.app';  
@@ -248,6 +245,7 @@ class TaskController{
         // res.send(`<p>Congratulation! your task <b>${task.title}</b> has been modified!</p>`) 
 
         }catch(err:any){
+            console.log("error on update:",err)
            if (err instanceof DBErrTaskNotFound){
                 res.status(404).send(taskUpdatedWith404)
             }
