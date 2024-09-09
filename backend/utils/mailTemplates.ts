@@ -190,6 +190,8 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
     <button type="submit">Update Task</button>
   </form>
 
+  <p>If forms are not supported, <a href="${BASE_URL}/update-task-via-email/${task.email}/${task.id}">click here to reschedule the task</a>.</p>
+
   <p>Best regards,<br> Datasack Solutions</p>
             </div>
         </div>
@@ -349,6 +351,8 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
 
     <button type="submit">Update Task</button>
   </form>
+
+  <p>If forms are not supported, <a href="${BASE_URL}/update-task-via-email/${task.email}/${task.id}">click here to reschedule the task</a>.</p>
 
   <p>Best regards,<br> Datasack Solutions</p>
         </div>
