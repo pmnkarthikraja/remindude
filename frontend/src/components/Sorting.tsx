@@ -499,7 +499,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
             //  </Reorder.Item>
           );
         })}
-        {tasksData.length !== 0 && <IonContent style={{ marginLeft: '-40px', height: '400px', width: '100px', overflowY: 'auto' }}></IonContent>}
+        {tasksData.length !== 0 && <IonContent style={{ marginLeft: '-40px', height: '600px', width: '100px', overflowY: 'auto' }}></IonContent>}
         {tasksData.length === 0 && (
           <Fragment>
             <IonCard style={{ backgroundColor: 'inherit', textAlign: 'center', padding: '20px', boxShadow: '0 4px 8px rgba(1, 1, 100, 0.9)', borderRadius: '15px', animation: 'fadeIn 1s ease-in-out' }}>

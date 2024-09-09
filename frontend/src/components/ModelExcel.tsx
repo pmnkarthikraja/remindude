@@ -4,7 +4,9 @@ import ExcelJS from 'exceljs';
 import { downloadSharp } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useState } from 'react';
 import { App } from '@capacitor/app';
-import { NativeSettings, AndroidSettings, IOSSettings } from 'capacitor-native-settings';
+// import { NativeSettings, AndroidSettings } from 'capacitor-native-settings';
+import FileAccess from '../plugins/file-access';
+
 
 const DownloadTemplateButton: FunctionComponent = () => {
     const [showToast, setShowToast] = useState<string | undefined>(undefined);
@@ -124,11 +126,19 @@ const DownloadTemplateButton: FunctionComponent = () => {
         });
     };
 
-    const openAppSettings = () => {
-       NativeSettings.openAndroid({
-        option:AndroidSettings.ApplicationDetails
-       })
-    };
+    // const openAppSettings = () => {
+    //    NativeSettings.openAndroid({
+    //     option:AndroidSettings.ApplicationDetails
+    //    })
+    // };
+
+    const openFileAccessSettings = async () => {
+        try {
+          await FileAccess.openManageAllFilesSettings();
+        } catch (error) {
+          console.error('Error opening All Files Access settings:', error);
+        }
+      };
 
     return (
         <Fragment>
@@ -153,7 +163,7 @@ const DownloadTemplateButton: FunctionComponent = () => {
                     },
                     {
                       text: 'Set now',
-                      handler: openAppSettings,
+                      handler: async ()=>{await openFileAccessSettings()},
                     },
                   ]}
             />

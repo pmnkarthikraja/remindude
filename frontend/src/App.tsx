@@ -47,10 +47,8 @@ import { Filesystem } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 
 setupIonicReact();
-
 const App: React.FC = () => {
   const queryClient = new QueryClient()
-
   
   useEffect(() => {
     const initPermissions = async () => {

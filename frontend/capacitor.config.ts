@@ -8,6 +8,9 @@ const config: CapacitorConfig = {
   //   androidScheme:'remindude',
   // },
   plugins:{
+    FileAccess:{
+      package: "io.ionic.starter.FileAccessPlugin"
+    },
     GoogleAuth:{
       scopes:[
         "profile",

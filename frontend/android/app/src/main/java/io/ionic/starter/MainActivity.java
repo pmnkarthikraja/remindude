@@ -1,18 +1,16 @@
 package io.ionic.starter;
 
+import io.ionic.starter.FileAccessPlugin;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Build;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.widget.Toast;
-
-import com.getcapacitor.BridgeActivity;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
 
@@ -20,8 +18,8 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        registerPlugin(FileAccessPlugin.class);
         super.onCreate(savedInstanceState);
-
         // Check and request permissions
         checkAndRequestPermissions();
 
