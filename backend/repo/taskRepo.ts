@@ -1,6 +1,6 @@
 import { MongoError } from "mongodb";
 import TaskSchema,{ TaskModel } from "../models/TaskModel";
-import { DBErrInternal, DBErrTaskAlreadyExist, DBErrTaskNotFound } from "../utils/handleErrors";
+import { DBErrInternal, DBErrTaskAlreadyExist, DBErrTaskNotFound, DBErrTaskTimeElapsed } from "../utils/handleErrors";
 
 interface TaskRepo{
     CreateTask:(task:TaskModel)=>Promise<TaskModel>
@@ -10,6 +10,7 @@ interface TaskRepo{
     UpdateTaskStatusViaEmail:(email:string,id:string,status:"InProgress"|"Done")=>Promise<TaskModel>
     GetRawAllTasks:()=>Promise<{tasks:TaskModel[]}>
     DeleteAllTaskWithEmail:(email:string)=>Promise<void>
+    UpdateTaskPeriodViaEmail: (email:string,id:string, datetime:string)=>Promise<TaskModel>
 }
 
 
@@ -30,6 +31,37 @@ class TaskRepoClass implements TaskRepo{
                 throw new DBErrTaskNotFound()
             }else{
                 throw new DBErrInternal("DB Error")
+            }
+        }
+    }
+
+    async UpdateTaskPeriodViaEmail(email:string,id:string,datetime:string):Promise<TaskModel>{
+        try {
+            const task = await TaskSchema.findOne({ id });
+    
+            if (!task) {
+                throw new DBErrTaskNotFound(); 
+            }
+    
+            const currentDate = new Date();
+            const newTaskDateTime = new Date(datetime);
+    
+            if (newTaskDateTime < currentDate) {
+                throw new DBErrTaskTimeElapsed()
+            }
+    
+            task.dateTime = datetime;
+            await task.save();
+    
+            return task;
+        } catch (err: any) {
+            const e: MongoError = err;
+            console.log("Error on updating date/time: ", e);
+    
+            if (e.code === 211) {
+                throw new DBErrTaskNotFound();
+            } else {
+                throw new DBErrInternal("DB Error");
             }
         }
     }

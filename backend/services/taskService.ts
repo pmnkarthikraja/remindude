@@ -11,11 +11,20 @@ interface TaskServiceImplementation {
     DeleteTask: (email: string, id: string) => Promise<void>
     GetAllTasks: (email: string) => Promise<{ tasks: TaskModel[], msg: string }>
     UpdateTaskStatusViaEmail: (email: string, id: string, status: "InProgress" | "Done") => Promise<TaskModel>
+    UpdateTaskPeriodViaEmail: (email:string,id:string, datetime:string)=>Promise<TaskModel>
 }
 
 class TaskService implements TaskServiceImplementation {
     async UpdateTaskStatusViaEmail(email: string, id: string, status: "InProgress" | "Done"): Promise<TaskModel> {
         return await taskRepo.UpdateTaskStatusViaEmail(email, id, status)
+    }
+
+    async UpdateTaskPeriodViaEmail(email: string, id: string, datetime:string): Promise<TaskModel> {
+        const remainingTime = getRemainingTime(datetime);
+        if (remainingTime <= 0) {
+            throw new DBErrTaskTimeElapsed()
+        }
+        return await taskRepo.UpdateTaskPeriodViaEmail(email, id, datetime)
     }
 
     async CreateTask(task: TaskModel): Promise<{ task: TaskModel|undefined, successMsg: string }> {

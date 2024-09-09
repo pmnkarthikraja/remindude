@@ -3,13 +3,13 @@ import { TaskModel } from "../models/TaskModel";
 
 const formatTimeWithZone = (date: Date, timeZone: string) => {
     return new Intl.DateTimeFormat('en-US', {
-        hour:'numeric',
-        minute:'numeric',
-        hour12:true,
-        timeZone:timeZone,
-        timeZoneName:'short'
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+        timeZone: timeZone,
+        timeZoneName: 'short'
     }).format(date)
-  }
+}
 
 function calculateTimeLeft(targetDate: string) {
     const now = new Date();
@@ -36,9 +36,11 @@ function calculateTimeLeft(targetDate: string) {
 
 
 export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) => {
+    const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
+
     const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
-    const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
-    const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
+    const inProgressLink = `${BASE_URL}/update-task/${task.email}/${task.id}/InProgress`;
+    const doneLink = `${BASE_URL}/update-task/${task.email}/${task.id}/Done`;
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -171,6 +173,24 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
           <a href="${inProgressLink}" class="inprogress">InProgress</a>
           <a href="${doneLink}" class="done">Done</a>
         </div>
+
+  <p>If you would like to postpone or prepone this task, please select a new date and time:</p>
+
+  <form action="${BASE_URL}/update-task-via-email/${task.email}/${task.id}" method="POST" onsubmit="return combineDateTimeWithTimezone()">
+    <label for="newDate">Select new date:</label><br>
+    <input type="date" id="newDate" name="newDate" required><br><br>
+
+    <label for="newTime">Select new time:</label><br>
+    <input type="time" id="newTime" name="newTime" required><br><br>
+
+    <input type="hidden" id="taskId" name="taskId" value="${task.id}">
+    <input type="hidden" id="localTimezone" name="localTimezone" value="${task.localTimezone}">
+    <input type="hidden" id="combinedDateTime" name="combinedDateTime">
+
+    <button type="submit">Update Task</button>
+  </form>
+
+  <p>Best regards,<br> Datasack Solutions</p>
             </div>
         </div>
     </body>
@@ -178,8 +198,9 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
 `}
 
 export const reminderTemplateHTMLContent = (task: TaskModel) => {
-    const inProgressLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/InProgress`;
-    const doneLink = `https://remindude.vercel.app/update-task/${task.email}/${task.id}/Done`;
+    const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
+    const inProgressLink = `${BASE_URL}/update-task/${task.email}/${task.id}/InProgress`;
+    const doneLink = `${BASE_URL}/update-task/${task.email}/${task.id}/Done`;
     const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
 
     return `
@@ -313,6 +334,23 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
           <a href="${inProgressLink}" class="inprogress">InProgress</a>
           <a href="${doneLink}" class="done">Done</a>
         </div>
+         <p>If you would like to postpone or prepone this task, please select a new date and time:</p>
+
+  <form action="${BASE_URL}/update-task-via-email/${task.email}/${task.id}" method="POST" onsubmit="return combineDateTimeWithTimezone()">
+    <label for="newDate">Select new date:</label><br>
+    <input type="date" id="newDate" name="newDate" required><br><br>
+
+    <label for="newTime">Select new time:</label><br>
+    <input type="time" id="newTime" name="newTime" required><br><br>
+
+    <input type="hidden" id="taskId" name="taskId" value="${task.id}">
+    <input type="hidden" id="localTimezone" name="localTimezone" value="${task.localTimezone}">
+    <input type="hidden" id="combinedDateTime" name="combinedDateTime">
+
+    <button type="submit">Update Task</button>
+  </form>
+
+  <p>Best regards,<br> Datasack Solutions</p>
         </div>
     </div>
 </body>
@@ -320,7 +358,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
 `}
 
 
-export const accountVerificationHTMLTemplate = (userName:string,otp:number) =>`
+export const accountVerificationHTMLTemplate = (userName: string, otp: number) => `
 <!DOCTYPE html>
 <html lang="en">
 
@@ -401,7 +439,7 @@ export const accountVerificationHTMLTemplate = (userName:string,otp:number) =>`
 </html>
 `
 
-export const forgotPasswordHTMLTemplate =(otp:number)=>`
+export const forgotPasswordHTMLTemplate = (otp: number) => `
 <!DOCTYPE html>
 <html lang="en">
 
@@ -482,4 +520,49 @@ export const forgotPasswordHTMLTemplate =(otp:number)=>`
 
 </html>
 
+`
+
+export const taskUpdatedWith404 = `
+        <html>
+          <body>
+            <h1>😔 Task Not Found</h1>
+            <p>We couldn't find the task you were trying to update. Please check the task ID and try again.</p>
+          </body>
+        </html>
+`
+
+export const taskUpdatedWithMissingFields = `
+        <html>
+          <body>
+            <h1>😕 Missing Information</h1>
+            <p>It looks like some information is missing. Please provide both date and time, and try again.</p>
+          </body>
+        </html>
+`
+
+export const taskUpdatedWithTimeElapsed =`
+        <html>
+          <body>
+            <h1>🚫 Task Update Failed</h1>
+            <p>Sorry, but you cannot schedule a task for a past date. Please choose a future date and time.</p>
+          </body>
+        </html>
+`
+
+export const taskUpdatedWithSuccess =`
+     <html>
+        <body>
+          <h1>✅ Task Updated Successfully</h1>
+          <p>Your task has been updated to the new date and time. Thank you for your patience!</p>
+        </body>
+      </html>
+`
+
+export const taskUpdatedWithInternalErr =`
+    <html>
+        <body>
+          <h1>😔 Something Went Wrong</h1>
+          <p>Oops! Something went wrong while updating the task. Please try again later.</p>
+        </body>
+      </html>   
 `

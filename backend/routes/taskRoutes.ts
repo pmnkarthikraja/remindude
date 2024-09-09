@@ -8,5 +8,6 @@ router.put('/update-task', TaskController.updateTask);
 router.get('/tasks/:email', TaskController.getAllTasks);
 router.delete('/delete-task/:email/:id', TaskController.deleteTask);
 router.get('/update-task/:email/:id/:status',TaskController.updateTaskStatusViaEmail)
+router.post('/update-task-via-email/:email/:id',TaskController.updateTaskPeriodViaEmail)
 
 export default router;
