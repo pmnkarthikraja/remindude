@@ -16,7 +16,6 @@ router.get('/update-task-via-email/:email/:id',(req,res)=>{
        <html>
   <head>
     <style>
-      /* Ensure the form and title are centered */
       body {
         display: flex;
         flex-direction: column;
@@ -28,14 +27,12 @@ router.get('/update-task-via-email/:email/:id',(req,res)=>{
         background-color: #f0f0f0;
       }
 
-      /* Styling for the title */
       h2 {
         text-align: center;
         margin-bottom: 20px;
         font-size: 24px;
       }
 
-      /* Center the form and make it adjust width automatically */
       form {
         display: flex;
         flex-direction: column;
@@ -79,9 +76,8 @@ router.get('/update-task-via-email/:email/:id',(req,res)=>{
         background-color: #0056b3;
       }
 
-      /* To make sure the form doesn't stretch unnecessarily */
       form {
-        max-width: 400px; /* You can adjust this if needed */
+        max-width: 400px; 
         width: 100%;
       }
     </style>
