@@ -327,7 +327,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
         <div class="content">
             <p><strong>Description: </strong>${task.description}</p>
             <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${formattedTime} (${task.localTimezone})</p>
-            <p class="time-left">${calculateTimeLeft(task.dateTime)}</p>
+            <p class="time-left">In ${calculateTimeLeft(task.dateTime)}</p>
         </div>
         <div class="footer">
            <div class="buttons">

@@ -1,6 +1,6 @@
 import { TaskModel } from "../models/TaskModel";
 import { DBErrTaskTimeElapsed } from "../utils/handleErrors";
-import { getRemainingTime } from "../utils/helper";
+import { getNotificationSchedule, getRemainingTime } from "../utils/helper";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "../utils/sendEmail";
 import { createTemplateHTMLContent } from "../utils/mailTemplates";
@@ -24,13 +24,12 @@ class TaskService implements TaskServiceImplementation {
         if (remainingTime <= 0) {
             throw new DBErrTaskTimeElapsed()
         }
-        const gotTask= await taskRepo.UpdateTaskPeriodViaEmail(email, id, datetime)
+        let gotTask= await taskRepo.UpdateTaskPeriodViaEmail(email, id, datetime)
+
         if (gotTask){
             await cancelScheduledNotifications(gotTask.id)
             if (gotTask.emailNotification) {
                   scheduleNotifications(gotTask)
-                  return gotTask
-              } else {
                   return gotTask
               }
         }

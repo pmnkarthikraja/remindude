@@ -1,6 +1,7 @@
 import { MongoError } from "mongodb";
 import TaskSchema,{ TaskModel } from "../models/TaskModel";
 import { DBErrInternal, DBErrTaskAlreadyExist, DBErrTaskNotFound, DBErrTaskTimeElapsed } from "../utils/handleErrors";
+import { getNotificationSchedule } from "../utils/helper";
 
 interface TaskRepo{
     CreateTask:(task:TaskModel)=>Promise<TaskModel>
@@ -51,8 +52,11 @@ class TaskRepoClass implements TaskRepo{
             }
     
             task.dateTime = datetime;
+            if (task.emailNotification){
+                const notificationSchedules = getNotificationSchedule(new Date(datetime),parseInt(task.dayFrequency))
+                task.notificationIntervals=notificationSchedules.map(interval=>interval.toString())
+            }
             await task.save();
-    
             return task;
         } catch (err: any) {
             if (err instanceof DBErrTaskNotFound){

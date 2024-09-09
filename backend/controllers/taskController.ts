@@ -198,7 +198,7 @@ class TaskController{
                 res.status(400).send(taskUpdatedWithMissingFields)
                 return
             }    
-          const task=await  taskService.UpdateTaskPeriodViaEmail(email,id,combinedDateTimeString)
+          const task=await taskService.UpdateTaskPeriodViaEmail(email,id,combinedDateTimeString)
 
         // const appUrl = 'remindude://'; 
         // const fallbackUrl = 'https://remindude-theta.vercel.app';  

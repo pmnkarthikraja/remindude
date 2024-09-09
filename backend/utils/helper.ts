@@ -192,3 +192,97 @@ setInterval(async () => {
     console.error('Error pinging the server:', error);
   }
 }, pingInterval);
+
+
+
+//scheduling interval reminders
+export function getNotificationSchedule(taskDateTime: Date, reminderInterval: number | null): Date[] {
+  const now = new Date();
+  const taskDate = taskDateTime
+  const taskDayStart = new Date(taskDate);
+  taskDayStart.setHours(0, 0, 0, 0); 
+  const taskDayEnd = new Date(taskDayStart);
+  taskDayEnd.setHours(23, 59, 59, 999);
+
+  const timeToTask = taskDate.getTime() - now.getTime();
+  const notifications: Date[] = [];
+
+  const millisecondsInAnHour = 3600000; 
+  const millisecondsInADay = 86400000;
+
+  if (timeToTask > 0) {
+      if (timeToTask <= millisecondsInADay) {
+          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+
+          if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+          if (oneHourBefore > now) notifications.push(oneHourBefore);
+          if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+      }
+      // for medium task - for a week
+      else if (timeToTask <= 7 * millisecondsInADay) {
+          const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
+          const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
+          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+
+          if (twoDaysBefore > now) notifications.push(twoDaysBefore);
+          if (oneDayBefore > now) notifications.push(oneDayBefore);
+          if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+          if (oneHourBefore > now) notifications.push(oneHourBefore);
+          if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+      }
+      // For long term task - with in a month
+      else if (timeToTask <= 30 * millisecondsInADay) {
+          const oneWeekBefore = new Date(taskDate.getTime() - 7 * millisecondsInADay);
+          const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
+          const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
+          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+
+          if (oneWeekBefore > now) notifications.push(oneWeekBefore);
+          if (twoDaysBefore > now) notifications.push(twoDaysBefore);
+          if (oneDayBefore > now) notifications.push(oneDayBefore);
+          if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+          if (oneHourBefore > now) notifications.push(oneHourBefore);
+          if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+      }
+      // For more than a month
+      else {
+          const oneMonthBefore = new Date(taskDate.getTime() - 30 * millisecondsInADay);
+          const twoWeeksBefore = new Date(taskDate.getTime() - 14 * millisecondsInADay);
+          const oneWeekBefore = new Date(taskDate.getTime() - 7 * millisecondsInADay);
+          const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
+          const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
+          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+
+          if (oneMonthBefore > now) notifications.push(oneMonthBefore);
+          if (twoWeeksBefore > now) notifications.push(twoWeeksBefore);
+          if (oneWeekBefore > now) notifications.push(oneWeekBefore);
+          if (twoDaysBefore > now) notifications.push(twoDaysBefore);
+          if (oneDayBefore > now) notifications.push(oneDayBefore);
+          if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+          if (oneHourBefore > now) notifications.push(oneHourBefore);
+          if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+      }
+  }
+
+  // On the day of the task, notify every hour or two or three, based on user choice
+  if (reminderInterval) {
+      let reminderTime = new Date(taskDayStart);
+      reminderTime.setHours(0, 0, 0, 0); 
+
+      while (reminderTime < taskDate) {
+          reminderTime = new Date(reminderTime.getTime() + reminderInterval * millisecondsInAnHour);
+          if (reminderTime < taskDate && reminderTime > now) {
+              notifications.push(reminderTime);
+          }
+      }
+  }
+  return notifications;
+}
