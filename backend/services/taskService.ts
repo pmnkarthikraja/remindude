@@ -24,7 +24,17 @@ class TaskService implements TaskServiceImplementation {
         if (remainingTime <= 0) {
             throw new DBErrTaskTimeElapsed()
         }
-        return await taskRepo.UpdateTaskPeriodViaEmail(email, id, datetime)
+        const gotTask= await taskRepo.UpdateTaskPeriodViaEmail(email, id, datetime)
+        if (gotTask){
+            await cancelScheduledNotifications(gotTask.id)
+            if (gotTask.emailNotification) {
+                  scheduleNotifications(gotTask)
+                  return gotTask
+              } else {
+                  return gotTask
+              }
+        }
+        return gotTask
     }
 
     async CreateTask(task: TaskModel): Promise<{ task: TaskModel|undefined, successMsg: string }> {
