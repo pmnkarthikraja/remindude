@@ -4,6 +4,7 @@ import { getRemainingTime } from "../utils/helper";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "../utils/sendEmail";
 import { createTemplateHTMLContent } from "../utils/mailTemplates";
+import masterSwitchRepo from "../repo/masterSwitchRepo";
 
 interface TaskServiceImplementation {
     CreateTask: (task: TaskModel) => Promise<{ task: TaskModel|undefined,successMsg:string }>
@@ -43,9 +44,12 @@ class TaskService implements TaskServiceImplementation {
         }
 
         const gotTask = await taskRepo.CreateTask(task)
+        const gotMasterSwitchData = await masterSwitchRepo.GetMasterSwitchData(task.email)
 
         if (gotTask){
-          await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false), "You can change the task setting here!")
+            if (gotMasterSwitchData?.masterEmailNotificationEnabled){
+                await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false), "You can change the task setting here!")
+            }
 
           await cancelScheduledNotifications(gotTask.id)
           if (task.emailNotification) {
@@ -76,8 +80,11 @@ class TaskService implements TaskServiceImplementation {
         }
 
         const gotTask = await taskRepo.UpdateTask(task)
+        const gotMasterSwitchData = await masterSwitchRepo.GetMasterSwitchData(task.email)
         if (gotTask){
-          await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true), "You can change the task setting here!")
+            if (gotMasterSwitchData?.masterEmailNotificationEnabled){
+                await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true), "You can change the task setting here!")
+            }
 
         await cancelScheduledNotifications(gotTask.id)
         console.log("task email notificaiotn:",task.emailNotification)

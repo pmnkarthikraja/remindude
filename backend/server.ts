@@ -12,6 +12,7 @@ import axios from 'axios'
 import taskRoutes from './routes/taskRoutes';
 import userRoutes from './routes/userRoutes';
 import holidayRoutes from './routes/holidayRoutes'
+import masterSwitchRoute from './routes/masterSwitchDataRoute'
 
 export const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -37,6 +38,7 @@ app.use(express.json())
 app.use('/', userRoutes);
 app.use('/',taskRoutes)
 app.use('/',holidayRoutes)
+app.use('/',masterSwitchRoute)
 
 app.get('/google-image', async (req, res) => {
   const imageUrl:string = req.query.url as string;

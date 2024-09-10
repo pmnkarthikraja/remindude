@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import schedule from 'node-schedule'
 import { TaskModel } from '../models/TaskModel';
 import { reminderTemplateHTMLContent } from './mailTemplates';
+import masterSwitchRepo from '../repo/masterSwitchRepo';
 require('dotenv').config();
 const scheduledJobs: { [key: string]: schedule.Job[] } = {};
 
@@ -18,14 +19,19 @@ export const scheduleNotifications= async (task: TaskModel) => {
   
       if (!isDuplicate) {
         const job = schedule.scheduleJob(notificationTime, async () => {
-          console.log(`Sending mail to ${task.email}...`, new Date(notificationTime).toLocaleString());
-  
-          await sendEmail(
-            task.email,
-            `Kind Reminder for ${task.eventType} - ${task.title}`,
-            reminderTemplateHTMLContent(task),
-            `This is a kind reminder for your ${task.eventType}!`
-          );
+          const gotMasterSwitchData = await masterSwitchRepo.GetMasterSwitchData(task.email)
+
+          if (gotMasterSwitchData?.masterEmailNotificationEnabled){
+            console.log(`Sending Email to ${task.email}...`, new Date(notificationTime).toLocaleString());
+            await sendEmail(
+              task.email,
+              `Kind Reminder for ${task.eventType} - ${task.title}`,
+              reminderTemplateHTMLContent(task),
+              `This is a kind reminder for your ${task.eventType}!`
+            );
+          }else{
+            console.log(`Email Notification Turned off: ${task.email}...`, new Date(notificationTime).toLocaleString());
+          }
         });
         
         // Store the job

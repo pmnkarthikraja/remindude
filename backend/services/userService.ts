@@ -8,6 +8,8 @@ import { getUserInfo } from '../utils/helper';
 import { sendEmail } from '../utils/sendEmail';
 import { accountVerificationHTMLTemplate, forgotPasswordHTMLTemplate } from '../utils/mailTemplates';
 import taskRepo from '../repo/taskRepo';
+import masterSwitchService from '../services/masterSwitchService';
+import { MasterControllerModel } from '../models/MasterControllModels';
 require("dotenv").config();
 
 export interface JwtPayload extends BaseJwtPayload {
@@ -36,6 +38,15 @@ class UserService implements UserServiceImplementation {
     }
 
     const newUser = await userRepo.SignUp(userData)
+
+    //apply the default master switch settings
+    const masterSwitchPresetData = {
+      email:newUser.email,
+      masterEmailNotificationEnabled:true,
+      masterPushNotificationEnabled:true
+  } as MasterControllerModel
+  
+    await masterSwitchService.Toggle(masterSwitchPresetData)
     const token = createJSONWebToken(newUser._id)
     return {user:newUser,token}
   }
@@ -59,6 +70,16 @@ class UserService implements UserServiceImplementation {
 
     //if user not present, create user in db with google id
     const newUser = await userRepo.SignUp(userData) 
+    
+    //apply the default master switch settings
+    const masterSwitchPresetData = {
+        email:googleUser.email,
+        masterEmailNotificationEnabled:true,
+        masterPushNotificationEnabled:true
+    } as MasterControllerModel
+
+    await masterSwitchService.Toggle(masterSwitchPresetData)
+
     const token = createJSONWebToken(newUser._id)
     return {user:newUser,token}
   }
