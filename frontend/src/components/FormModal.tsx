@@ -14,6 +14,7 @@ import { EventData, TaskRequestData } from "./task"
 import StaticTimePickerLandscape from "./TimePicker"
 import ToggleWithLabel from "./Toggle"
 import { useWeekContext } from "./weekContext"
+import { MasterSwitchData } from "../api/userApi"
 
 
 const colorMap: { [key: string]: { textColor: string, backgroundColor: string } } = {
@@ -31,6 +32,7 @@ interface FormModalProps {
     datetimeRef: React.MutableRefObject<HTMLIonDatetimeElement | null>,
     holidays: HolidayData[] | undefined
     localHolidays: LocalHolidayData[] | undefined
+    masterSwitchData: MasterSwitchData | undefined
     toggleEditTask?: (op: { isEdit: boolean, task: TaskRequestData | undefined }) => void,
 }
 
@@ -43,7 +45,8 @@ const FormModal: FunctionComponent<FormModalProps> = ({
     id,
     formData,
     holidays,
-    localHolidays
+    localHolidays,
+    masterSwitchData
 }) => {
     const { clearErrors, control, formState: { errors: fieldErrors }, register, watch, setValue, } = formData
     const { eventType, category, emailNotification, priority, notifyFrequency, status, datetime, timezone } = watch()
@@ -487,15 +490,17 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                             <IonButton color='light'>{selectedTime?.toLocaleTimeString('en-IN',
                                 { hour: 'numeric', minute: 'numeric', hour12: true }) || ''}
                             </IonButton>
-
                         </IonItem>
 
-                        <IonItem lines="none">
+                            {!masterSwitchData?.masterEmailNotificationEnabled && 
+                           <IonItem>
+                           <IonNote style={{fontSize:'12px',padding:'10px'}} >Please enable master control on settings to enable email notification</IonNote></IonItem>}
+                        <IonItem lines="none" disabled={!masterSwitchData?.masterEmailNotificationEnabled}>
                             <IonLabel position="fixed" color={'secondary'}> <b>Email Notification</b></IonLabel>
                             <IonRadioGroup
                                 onIonChange={(e) => setValue('emailNotification', e.detail.value === 'yes')}
                                 {...register("emailNotification")}
-                                value={emailNotification ? 'yes' : 'no'}>
+                                value={(!masterSwitchData?.masterEmailNotificationEnabled && 'no') || (emailNotification ? 'yes' : 'no')}>
                                 <IonRow>
                                     <IonRadio style={{ marginRight: '10px' }} value={'yes'}>Yes</IonRadio>
                                     <IonRadio value={'no'}>No</IonRadio>
@@ -504,7 +509,7 @@ const FormModal: FunctionComponent<FormModalProps> = ({
                         </IonItem>
 
                         {emailNotification && (
-                            <IonItem lines="none">
+                            <IonItem lines="none" disabled={!masterSwitchData?.masterEmailNotificationEnabled}>
                                 <IonLabel position="fixed" color={'secondary'}><b>Notify Frequency</b></IonLabel>
                                 <IonSelect
                                     {...register("notifyFrequency")}

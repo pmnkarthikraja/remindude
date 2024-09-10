@@ -4,24 +4,30 @@ import { IonAvatar, IonBackButton, IonButton, IonButtons, IonCard, IonCardConten
 import { arrowBack, chevronForwardOutline, logOutOutline, notificationsOutline, personOutline, settingsOutline } from "ionicons/icons"
 import React, { Fragment, FunctionComponent, useEffect, useState } from "react"
 import { useForm } from 'react-hook-form'
+import { userApi } from '../api/userApi'
 import ChangePasswordModal from '../components/ChangePasswordModal'
+import { generateUniqueId1 } from '../components/CreateUpdateTask'
+import { TaskRequestData } from '../components/task'
 import { User } from "../components/user"
 import { useWeekContext } from '../components/weekContext'
-import { useEditProfileMutation } from '../hooks/userHooks'
+import { useGetTasks } from '../hooks/taskHooks'
+import { useEditProfileMutation, useGetMasterSwitchData, useToggleMasterSwitchData } from '../hooks/userHooks'
 import '../styles/ProfilePage.css'
 import { chooseAvatar } from '../utils/util'
-import imageCompression from 'browser-image-compression'
 
 export interface ProfilePageProps {
   user: User,
-  signOut: () => void
+  signOut: () => void,
+  taskData:TaskRequestData[] | undefined
 }
 
 const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   signOut,
-  user
+  user,
 }) => {
   const { isLoading, isError, error, mutateAsync: editProfile } = useEditProfileMutation()
+  const {data:masterSwitchData,isLoading:isMasterSwitchDataLoading,isError:isMasterSwitchDataError, error:masterSwitchDataError,refetch}=useGetMasterSwitchData(user.email)
+  const {isLoading:isToggleMasterSwitchLoading,isError:isToggleMasterSwitchError,error:toggleMasterSwitchError,mutateAsync:toggleMasterSwitch} =useToggleMasterSwitchData()
   const [profileModalIsOpen, setProfileModalIsOpen] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false);
   const { startOfWeek, setStartOfWeek } = useWeekContext();
@@ -32,6 +38,8 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   const [userAvatar,setUserAvatar]=useState('')
   const userData = watch()
   const [warningToast,setWarningToast]=useState(false)
+  const { data: taskData, isLoading: isGetTasksLoading } = useGetTasks(user.email, 2000)
+
 
   const callAvatar = async (us:User)=>{
     const image= await chooseAvatar(us)
@@ -54,7 +62,103 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
       console.log('Notification received:', notification);
     });
 
+    const getMasterData = async (email:string)=>{
+      const res=  await userApi.getMasterSwitchData(email)
+      console.log("got master data: ",{res})
+    }
+
+    getMasterData(userData.email)
+
   }, []);
+
+  const cancelAllNotifications = async () => {
+    try {
+      const pendingNotifications = await LocalNotifications.getPending();  
+      if (pendingNotifications.notifications.length > 0) {
+        const notificationIds = pendingNotifications.notifications.map(notification => notification.id);
+        
+        await LocalNotifications.cancel({
+          notifications: notificationIds.map(id => ({ id }))
+        });
+  
+        console.log('All notifications have been canceled.');
+      } else {
+        console.log('No notifications to cancel.');
+      }
+    } catch (error) {
+      console.error('Error canceling notifications:', error);
+    }
+  };
+  
+  const onPushNotificationChange = async (isChecked: boolean) => {
+    console.log("Push notification status:", isChecked);
+    
+    if (!isChecked) {
+      console.log("Disabling notifications...");
+      await cancelAllNotifications();
+      const result = await LocalNotifications.getPending();
+      console.log("After canceling all, pending schedules:", result.notifications);
+    }
+  
+    if (isChecked) {
+      console.log("Enabling notifications and scheduling tasks...");
+  
+      // Schedule notifications for all tasks
+      if (!!taskData?.tasks) {
+        taskData.tasks.forEach(async (task) => {
+          console.log("Scheduling task:", task);
+  
+          const now = new Date();
+  
+          // Filter only upcoming intervals
+          const upcomingIntervals = task.notificationIntervals.filter((inter) => {
+            let interval=inter.toString()
+            if (interval.includes('GMT+0000')){
+              const parts=interval.split('GMT')
+              interval=parts[0].trim()
+            }
+            const intervalDate = new Date(interval);
+            return intervalDate > now; 
+          });
+  
+          if (upcomingIntervals.length === 0) {
+            return;
+          }
+
+          // Schedule notifications for upcoming intervals
+          const localNotifications: LocalNotificationSchema[] = upcomingIntervals.map((inter, idx) => {
+            let interval=inter.toString()
+            if (interval.includes('GMT+0000')){
+              const parts=interval.split('GMT')
+              interval=parts[0].trim()
+            }
+            const intervalDate = new Date(interval);
+  
+            return {
+              title: `Reminder for Upcoming ${task.eventType}: ${task.title}`,
+              body: `Scheduled for ${new Date(task.dateTime).toLocaleDateString()} at ${new Date(task.dateTime).toLocaleTimeString('en-IN', { hour: 'numeric', minute: 'numeric', hour12: true })}`,
+              id: generateUniqueId1(task.id,intervalDate), 
+              schedule: { at: intervalDate },
+              channelId: 'default',
+              sound: 'default',
+              largeIcon: 'reminder.png',
+              smallIcon: 'upcoming_task.png',
+              largeBody: `You have a ${task.eventType} for ${new Date(task.dateTime).toLocaleDateString()} at ${new Date(task.dateTime).toLocaleTimeString('en-IN', { hour: 'numeric', minute: 'numeric', hour12: true })}. Please be prepared.`,
+            };
+          });
+  
+          // Schedule notifications
+          await LocalNotifications.schedule({
+            notifications: localNotifications
+          });
+
+          const d = await LocalNotifications.getPending()
+          console.log("after scheduling: ",d.notifications)
+          });
+      }
+    }
+  };
+  
 
   const handleStartOfWeekChange = (value: string) => {
     setStartOfWeek(value);
@@ -319,6 +423,13 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
         </IonToolbar>
       </IonHeader>
       <IonContent>
+
+        <IonLoading isOpen={isMasterSwitchDataLoading || isToggleMasterSwitchLoading || isGetTasksLoading} message={'Please Wait..'} />
+        <IonToast color={'danger'} buttons={[{ text: 'Ok', role: 'cancel' }]} position="top"
+         isOpen={isMasterSwitchDataError} message={masterSwitchDataError?.response?.data.message||masterSwitchDataError?.message} duration={3000} />
+         <IonToast color={'danger'} buttons={[{ text: 'Ok', role: 'cancel' }]} position="top"
+         isOpen={isToggleMasterSwitchError} message={toggleMasterSwitchError?.response?.data.message||toggleMasterSwitchError?.message} duration={3000} />
+
         <IonList>
           {/* Account Section */}
           <IonItem lines="none">
@@ -339,17 +450,33 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
             <IonIcon slot="start" icon={notificationsOutline} />
             <IonLabel>Notifications</IonLabel>
           </IonItem>
-          <IonItem>
+          <IonItem >
             <IonLabel>Email Notifications</IonLabel>
-            <IonToggle slot="end" />
+            <IonToggle slot="end" enableOnOffLabels 
+            checked={masterSwitchData?.masterSwitchData.masterEmailNotificationEnabled}
+            onIonChange={async (e)=>await toggleMasterSwitch({
+              email:user.email,
+              masterEmailNotificationEnabled:e.target.checked,
+              masterPushNotificationEnabled: masterSwitchData?.masterSwitchData.masterPushNotificationEnabled || false
+            })}/>
           </IonItem>
           <IonItem>
             <IonLabel>App Push Notifications</IonLabel>
-            <IonToggle slot="end" checked />
+            <IonToggle slot="end" 
+            checked={masterSwitchData?.masterSwitchData.masterPushNotificationEnabled}
+            onIonChange={async (e)=>{
+              await onPushNotificationChange(e.target.checked)
+              await toggleMasterSwitch({
+              email:user.email,
+              masterPushNotificationEnabled:e.target.checked,
+              masterEmailNotificationEnabled: masterSwitchData?.masterSwitchData.masterEmailNotificationEnabled || false
+            });
+            }} enableOnOffLabels/>
+
           </IonItem>
           <IonItem>
             <IonLabel>Notification Sounds</IonLabel>
-            <IonToggle slot="end" checked />
+            <IonToggle slot="end" checked  enableOnOffLabels/>
           </IonItem>
 
           {/* Calender Section */}

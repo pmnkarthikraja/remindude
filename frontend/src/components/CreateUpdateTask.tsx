@@ -10,13 +10,14 @@ import React, { Fragment, FunctionComponent, useCallback, useMemo, useRef, useSt
 import { useForm } from 'react-hook-form';
 import * as uuid from 'uuid';
 import { HolidayData, LocalHolidayData } from "../api/calenderApi";
+import { MasterSwitchData } from "../api/userApi";
 import { useCreateTaskMutation, useUpdateTaskMutation } from "../hooks/taskHooks";
 import '../styles/CreateTask.css';
 import { Platform, useGetPlatform } from "../utils/useGetPlatform";
+import { localTimeZone } from "../utils/util";
 import FormModal from "./FormModal";
 import { getNotificationSchedule } from "./calculateRemindTime";
 import { EventData, TaskRequestData } from "./task";
-import { localTimeZone } from "../utils/util";
 
 export function formatISTDateToString(date: Date): string {
     const offset = date.getTimezoneOffset();
@@ -24,7 +25,7 @@ export function formatISTDateToString(date: Date): string {
     return adjustedDate.toJSON();
 }
 
-const generateUniqueId = (prefix: string = ''): number => {
+export const generateUniqueId = (prefix:string): number => {
     // Generate a timestamp and a small random number, then combine them
     const timestamp = Date.now(); // Get the current timestamp in milliseconds
     const randomNum = Math.floor(Math.random() * 1000); // Generate a random number between 0 and 999
@@ -33,17 +34,32 @@ const generateUniqueId = (prefix: string = ''): number => {
     // Ensure the ID is within the 32-bit integer range
     return uniqueId % 2147483647; // 2147483647 is the maximum value for a 32-bit signed integer
   };
+
+  export const generateUniqueId1 = (taskId: string, interval: Date): number => {
+    const timestamp = interval.getTime(); 
+
+    const uniqueString = `${taskId}_${timestamp}`;
+
+    let hash = 0;
+    for (let i = 0; i < uniqueString.length; i++) {
+        const char = uniqueString.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash; 
+    }
+    return Math.abs(hash); 
+  };
   
 export interface CreateTaskFabButtonProps {
     isEdit: boolean;
     email: string;
     holidays:HolidayData[] | undefined
     localHolidays:LocalHolidayData[]|undefined
+    masterSwitchData:MasterSwitchData | undefined
     taskData?: EventData;
     toggleEditTask?: (op: { isEdit: boolean, task: TaskRequestData | undefined }) => void
 }
 
-const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ email, isEdit, taskData, toggleEditTask,holidays,localHolidays }) => {
+const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ email, isEdit, taskData, toggleEditTask,holidays,localHolidays,masterSwitchData }) => {
     const formData = useForm<EventData>({
         defaultValues: isEdit && taskData ? {
             id: taskData.id,
@@ -80,6 +96,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
     const { isLoading: isCreateTaskMutationLoading, isError: isCreateTaskMutationError, error: createTaskMutationError, mutateAsync: createTaskMutation } = useCreateTaskMutation()
     const { isLoading: isUpdateTaskMutationLoading, isError: isUpdateTaskMutationError, error: UpdateTaskMutationError, mutateAsync: UpdateTaskMutation } = useUpdateTaskMutation()
 
+
     const [platform, setPlatform] = useState<Platform>('Windows');
     useGetPlatform(setPlatform);
 
@@ -98,7 +115,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                 title: `Reminder for Upcoming ${data.eventType}: ${data.title}`,
                 body: `Scheduled for ${new Date(data.datetime).toLocaleDateString()} at ${new Date(data.datetime).toLocaleTimeString('en-IN',{ hour: 'numeric', minute: 'numeric', hour12: true })}`,
                 // id: (idx+1)*Math.PI*Math.random(),
-                id:generateUniqueId(idx.toString()),
+                id:generateUniqueId1(taskId,interval),
                 schedule: { at: interval }, 
                 channelId: 'default',
                 sound: 'default',
@@ -152,7 +169,14 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
 
         if (isEdit) {
             await onUpdateTask(updateTaskPayload);
-            await LocalNotifications.schedule({ notifications: localNotifications });
+            if (masterSwitchData?.masterPushNotificationEnabled){
+                await LocalNotifications.schedule({ notifications: localNotifications });
+            }else{
+                await LocalNotifications.cancel({
+                    notifications:[]
+                })
+                console.log("cancel all notifications and skipping notification scheduling: push notiifcation is off")
+            }
             if (typeof toggleEditTask === 'function') {
                 toggleEditTask({
                     isEdit: false,
@@ -163,7 +187,14 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             setIsModalOpen(false);
         } else {
             await onCreateTask(createTaskPayload);
-            await LocalNotifications.schedule({ notifications: localNotifications });
+            if (masterSwitchData?.masterPushNotificationEnabled){
+                await LocalNotifications.schedule({ notifications: localNotifications });
+            }else{
+                await LocalNotifications.cancel({
+                    notifications:[]
+                })
+                console.log("cancel all notifications and skipping notification scheduling: push notiifcation is off")
+            }
             formData.clearErrors();
             setIsModalOpen(false);
         }
@@ -214,6 +245,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                                 setIsAlertOpen={setIsModalOpen}
                                 toggleEditTask={toggleEditTask}
                                 formData={formData}
+                                masterSwitchData={masterSwitchData}
                             />
                         </Fragment>
                     )}
@@ -234,6 +266,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                         formData={formData}
                         holidays={holidays}
                         localHolidays={localHolidays}
+                        masterSwitchData={masterSwitchData}
                     />
                 </Fragment>
             )}

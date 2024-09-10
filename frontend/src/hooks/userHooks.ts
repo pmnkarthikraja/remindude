@@ -1,8 +1,8 @@
 import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth";
 import { AxiosError, AxiosResponse } from "axios";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useHistory } from "react-router-dom";
-import { userApi } from "../api/userApi";
+import { MasterSwitchData, userApi } from "../api/userApi";
 import { User } from "../components/user";
 
 interface AxiosErrorType {
@@ -322,4 +322,32 @@ export const useEditProfileMutation = () => {
   );
 };
 
+
+
+export const useGetMasterSwitchData = (email:string,refetchInterval?: number) => {
+  return  useQuery({
+      queryKey: ['masterSwitchData'],
+      queryFn: async () => {
+        return await userApi.getMasterSwitchData(email)
+      },
+      onError:(e:AxiosError<AxiosErrorType>)=>e,
+      refetchInterval:false,
+    })
+}
+
+export const useToggleMasterSwitchData = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (data:MasterSwitchData) => userApi.toggleMasterSwitchData(data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries('masterSwitchData');
+      },
+      onError: (e: AxiosError<AxiosErrorType>) => {
+        console.log("error on toggle master switch", e);
+      }
+    }
+  );
+};
 

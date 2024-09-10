@@ -14,12 +14,12 @@ import { TaskRequestData } from "../components/task"
 import { User } from "../components/user"
 import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
+import { useDeleteUserAccount, useGetMasterSwitchData } from "../hooks/userHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
 import { useGetAvatar } from "../utils/util"
+import CalendarPage from "./CalenderPage"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
-import CalendarPage from "./CalenderPage"
-import { useDeleteUserAccount } from "../hooks/userHooks"
 
 export interface HomePageProps {
   user: User
@@ -73,6 +73,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
   const [showLoading, setShowLoading] = useState(false);
   const { isLoading: isDeleteUserLoading, isError: isDeleteUserError, error: deleteUserErr, mutateAsync: deleteUserAccount, reset } = useDeleteUserAccount()
+  const {data:masterSwitchData,isLoading:isMasterSwitchDataLoading}=useGetMasterSwitchData(user.email)
 
   useEffect(() => {
     const handleResize = () => {
@@ -335,7 +336,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
       </IonContent>
     </IonMenu>
 
-    <IonLoading isOpen={isGetTasksLoading} message={'Load Tasks..'} duration={2000} />
+    <IonLoading isOpen={isGetTasksLoading || isMasterSwitchDataLoading} message={'Load Tasks..'} duration={2000} />
 
     <IonPage id="main-content">
       {platform !== 'Windows' && <IonHeader >
@@ -434,10 +435,10 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                 </div>}
 
                 {pageNav.isProfile && <div>
-                  <ProfilePage signOut={signOut} user={user} />
+                  <ProfilePage signOut={signOut} user={user} taskData={tasks} />
                 </div>}
 
-                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays} />
+                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays}  masterSwitchData={masterSwitchData?.masterSwitchData}/>
               </IonCol>
 
               <CalendarPage isMobileView={isMobileView} holidays={holidays} localHolidays={localHolidays} tasks={tasks} isOpen={showCalenderModal} onClose={() => { setCalenderModal(false) }} />
@@ -452,7 +453,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
           </IonRow>
         </IonGrid>
 
-        <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={user.email} isEdit={false} />
+        <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={user.email} isEdit={false} masterSwitchData={masterSwitchData?.masterSwitchData} />
 
         {(isMobileView) && (
           <IonFab vertical='top' horizontal="end" slot="fixed">

@@ -1,10 +1,10 @@
 
-import { IonAlert, IonBadge, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
+import { IonAlert, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
 import { CSSProperties } from '@mui/styled-engine';
-import { AnimatePresence, Reorder } from 'framer-motion';
 import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline, sadOutline } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
 import { HolidayData, LocalHolidayData } from '../api/calenderApi';
+import { MasterSwitchData } from '../api/userApi';
 import { useDeleteTaskMutation } from '../hooks/taskHooks';
 import { getRemainingTime } from '../pages/HomePage';
 import '../styles/Sorting.css';
@@ -22,6 +22,7 @@ export interface SortableCardsProps {
   handleRefresh: (event: CustomEvent<RefresherEventDetail>) => void
   holidays: HolidayData[] | undefined
   localHolidays: LocalHolidayData[] | undefined
+  masterSwitchData:MasterSwitchData | undefined
 }
 
 const SortableCards: FunctionComponent<SortableCardsProps> = ({
@@ -31,7 +32,8 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
   sortBy,
   handleRefresh,
   holidays,
-  localHolidays
+  localHolidays,
+  masterSwitchData
 }) => {
   const [filteredTasks, setFilteredTasks] = useState<TaskRequestData[]>(tasksData);
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -308,7 +310,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
       />
       {<Fragment>
         {(!!editTask && editTask.isEdit) &&
-          <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={email} isEdit={true} taskData={editTask.task} toggleEditTask={toggleEditTask} />
+          <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={email} isEdit={true} taskData={editTask.task} toggleEditTask={toggleEditTask} masterSwitchData={masterSwitchData} />
         }
       </Fragment>}
 
@@ -543,3 +545,4 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
 };
 
 export default SortableCards;
+``

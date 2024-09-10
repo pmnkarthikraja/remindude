@@ -1,6 +1,12 @@
 import axios, {AxiosResponse} from 'axios'
 import { User } from '../components/user'
 
+export interface MasterSwitchData{
+    email:string,
+    masterEmailNotificationEnabled:boolean,
+    masterPushNotificationEnabled:boolean,
+}
+
 export interface UserAPI{
     authToken:(token:string)=>Promise<AxiosResponse>;
     googleSignup:(accessToken:string)=>Promise<AxiosResponse>;
@@ -13,6 +19,10 @@ export interface UserAPI{
     editProfile:(email:string,password:string,userName:string,profilePicture:Blob|string)=>Promise<AxiosResponse>
     validatePassword :(email:string,password:string)=>Promise<AxiosResponse>
     deleteUserAccount:(email:string)=>Promise<AxiosResponse>
+
+    //settings -> master controller switch data api
+    getMasterSwitchData:(email:string)=>Promise<{message:string,success:boolean,masterSwitchData:MasterSwitchData}>
+    toggleMasterSwitchData:(data:MasterSwitchData)=>Promise<{message:string,success:boolean,masterSwitchData:MasterSwitchData}>
 }
 
 // const BASE_URL = "http://localhost:4000"
@@ -88,6 +98,24 @@ class UserAPIService implements UserAPI{
              },
          })
      }
+
+     async getMasterSwitchData(email:string):Promise<{message:string,success:boolean,masterSwitchData:MasterSwitchData}>{
+        const result= await axios.get(`${BASE_URL}/master-switch-data/${email}`,{
+            params:[
+                {
+                    email
+                }
+            ]
+        })
+        return result.data
+    }
+
+    async toggleMasterSwitchData(masterSwitchData:MasterSwitchData):Promise<{message:string,success:boolean,masterSwitchData:MasterSwitchData}>{
+        const result = await axios.post(`${BASE_URL}/toggle-master-switch-data`,{
+            ...masterSwitchData
+        })
+        return result.data
+    }
  }
  
 
