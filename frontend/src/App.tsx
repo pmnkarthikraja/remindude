@@ -52,6 +52,20 @@ const App: React.FC = () => {
   
   useEffect(() => {
     const initPermissions = async () => {
+      //Request Local Notification
+      LocalNotifications.requestPermissions().then(result => {
+        if (result.display === 'granted') {
+          console.log('Notification permissions granted');
+        } else {
+          console.log('Notification permissions denied');
+        }
+      });
+  
+      // Listen for notification events (optional)
+      LocalNotifications.addListener('localNotificationReceived', notification => {
+        console.log('Notification received:', notification);
+      });
+
       // Request notification permissions
       if (Capacitor.isNativePlatform()){
         const notificationPermission = await LocalNotifications.requestPermissions();

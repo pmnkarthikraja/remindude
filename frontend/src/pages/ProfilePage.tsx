@@ -48,27 +48,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
 
   useEffect(() => {
     callAvatar(user)
-    // Request permission to send notifications (for iOS)
-    LocalNotifications.requestPermissions().then(result => {
-      if (result.display === 'granted') {
-        console.log('Notification permissions granted');
-      } else {
-        console.log('Notification permissions denied');
-      }
-    });
-
-    // Listen for notification events (optional)
-    LocalNotifications.addListener('localNotificationReceived', notification => {
-      console.log('Notification received:', notification);
-    });
-
-    const getMasterData = async (email:string)=>{
-      const res=  await userApi.getMasterSwitchData(email)
-      console.log("got master data: ",{res})
-    }
-
-    getMasterData(userData.email)
-
   }, []);
 
   const cancelAllNotifications = async () => {
