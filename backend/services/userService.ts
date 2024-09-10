@@ -1,15 +1,14 @@
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload as BaseJwtPayload } from 'jsonwebtoken';
+import { MasterControllerModel } from '../models/MasterControllModels';
 import { UserModel } from '../models/UserModel';
 import userRepo from '../repo/userRepo';
+import masterSwitchService from '../services/masterSwitchService';
 import createJSONWebToken from '../utils/authToken';
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from '../utils/handleErrors';
 import { getUserInfo } from '../utils/helper';
-import { sendEmail } from '../utils/sendEmail';
 import { accountVerificationHTMLTemplate, forgotPasswordHTMLTemplate } from '../utils/mailTemplates';
-import taskRepo from '../repo/taskRepo';
-import masterSwitchService from '../services/masterSwitchService';
-import { MasterControllerModel } from '../models/MasterControllModels';
+import { sendEmail } from '../utils/sendEmail';
 require("dotenv").config();
 
 export interface JwtPayload extends BaseJwtPayload {
@@ -46,7 +45,7 @@ class UserService implements UserServiceImplementation {
       masterPushNotificationEnabled:true
   } as MasterControllerModel
   
-    await masterSwitchService.Toggle(masterSwitchPresetData)
+    await masterSwitchService.Toggle(masterSwitchPresetData) 
     const token = createJSONWebToken(newUser._id)
     return {user:newUser,token}
   }
@@ -157,7 +156,7 @@ async SendOTP(email:string,accountVerification:boolean,type:'verification'|'forg
   const otp = Math.floor(100000 + Math.random() * 900000) ;
 
   const subject = type =='verification' ? 'Verify your email address':'Request to reset your password'
-  const template = type =='verification' ? accountVerificationHTMLTemplate(userName || '', otp) : forgotPasswordHTMLTemplate(otp)
+  const template = type =='verification' ? accountVerificationHTMLTemplate(userName || '', otp) : forgotPasswordHTMLTemplate(otp,userName)
   
   const onSendMail = await sendEmail(email,subject,template,'')
    

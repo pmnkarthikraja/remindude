@@ -7,6 +7,7 @@ import TaskModel from "../models/TaskModel";
 import UserModel from "../models/UserModel";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications } from "./sendEmail";
+import userRepo from "../repo/userRepo";
 
 // const formatTimeWithZone = (date: Date, timeZone: string) => {
 //   return new Intl.DateTimeFormat('en-US', {
@@ -439,4 +440,17 @@ export function getNotificationSchedule(
 
   // Adjust all notification times to the original timezone by subtracting the offset
   return notifications.map(notification => new Date(notification.getTime() - timezoneOffset * 60000));
+}
+
+
+//get current user
+export async function getCurrentUsername(email:string):Promise<string | undefined>{
+  try{
+    const user = await userRepo.findOneByEmail(email)
+    if (user){
+      return user.userName
+    }
+  }catch(e){
+    console.log("error on find user by email:",e)
+  }
 }

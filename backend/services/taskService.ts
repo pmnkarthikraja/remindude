@@ -1,6 +1,6 @@
 import { TaskModel } from "../models/TaskModel";
 import { DBErrTaskTimeElapsed } from "../utils/handleErrors";
-import { getRemainingTime } from "../utils/helper";
+import { getCurrentUsername, getRemainingTime } from "../utils/helper";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications, sendEmail } from "../utils/sendEmail";
 import { createTemplateHTMLContent } from "../utils/mailTemplates";
@@ -45,10 +45,11 @@ class TaskService implements TaskServiceImplementation {
 
         const gotTask = await taskRepo.CreateTask(task)
         const gotMasterSwitchData = await masterSwitchRepo.GetMasterSwitchData(task.email)
+        const currentUserName=await getCurrentUsername(gotTask.email)
 
         if (gotTask){
             if (gotMasterSwitchData?.masterEmailNotificationEnabled){
-                await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false), "You can change the task setting here!")
+                await sendEmail(task.email, `${gotTask.eventType} has successfully created!`, createTemplateHTMLContent(gotTask,false,currentUserName), "You can change the task setting here!")
             }
 
           await cancelScheduledNotifications(gotTask.id)
@@ -81,9 +82,10 @@ class TaskService implements TaskServiceImplementation {
 
         const gotTask = await taskRepo.UpdateTask(task)
         const gotMasterSwitchData = await masterSwitchRepo.GetMasterSwitchData(task.email)
+        const currentUsername = await getCurrentUsername(gotTask.email)
         if (gotTask){
             if (gotMasterSwitchData?.masterEmailNotificationEnabled){
-                await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true), "You can change the task setting here!")
+                await sendEmail(task.email, `${gotTask.eventType} has successfully updated!`, createTemplateHTMLContent(gotTask,true,currentUsername), "You can change the task setting here!")
             }
 
         await cancelScheduledNotifications(gotTask.id)

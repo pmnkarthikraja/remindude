@@ -1,4 +1,3 @@
-import { currentUserName } from "../controllers/userController";
 import { TaskModel } from "../models/TaskModel";
 
 const formatTimeWithZone = (date: Date, timeZone: string) => {
@@ -35,7 +34,7 @@ function calculateTimeLeft(targetDate: string) {
 }
 
 
-export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) => {
+export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean,currentUserName:string|undefined) => {
     const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
 
     const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
@@ -204,7 +203,7 @@ export const createTemplateHTMLContent = (task: TaskModel, isUpdate: boolean) =>
     </html>
 `}
 
-export const reminderTemplateHTMLContent = (task: TaskModel) => {
+export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:string|undefined) => {
     const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
     const inProgressLink = `${BASE_URL}/update-task/${task.email}/${task.id}/InProgress`;
     const doneLink = `${BASE_URL}/update-task/${task.email}/${task.id}/Done`;
@@ -327,7 +326,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel) => {
 </head>
 <body>
     <div class="container">
-     <h1>Hello, ${currentUserName}</h1>
+     <h1>Hello, ${currentUsername}</h1>
         <div class="header">
             Reminder: ${task.title}
         </div>
@@ -450,7 +449,7 @@ export const accountVerificationHTMLTemplate = (userName: string, otp: number) =
 </html>
 `
 
-export const forgotPasswordHTMLTemplate = (otp: number) => `
+export const forgotPasswordHTMLTemplate = (otp: number,currentUsername:string|undefined) => `
 <!DOCTYPE html>
 <html lang="en">
 
@@ -516,7 +515,7 @@ export const forgotPasswordHTMLTemplate = (otp: number) => `
         </div>
 
         <div class="email-content">
-            <h1>Hello, ${currentUserName}</h1>
+            <h1>Hello, ${currentUsername}</h1>
             <h1>Reset Your Password</h1>
             <p>We received a request to reset your password. Please use the following OTP to proceed:</p>
             <div class="otp-code">${otp}</div>
