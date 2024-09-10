@@ -327,31 +327,29 @@ setInterval(async () => {
 // }
 
 
-const getLocalDateInTimezone = (date: Date, timeZone: string): Date => {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
-      hour12: true,
-  });
-  const parts = formatter.formatToParts(date);
-  const year = parts.find(part => part.type === 'year')?.value;
-  const month = parts.find(part => part.type === 'month')?.value;
-  const day = parts.find(part => part.type === 'day')?.value;
-  const hour = parts.find(part => part.type === 'hour')?.value;
-  const minute = parts.find(part => part.type === 'minute')?.value;
-  const second = parts.find(part => part.type === 'second')?.value;
+/**
+ * Converts a timezone name to its offset in minutes.
+ * @param timezoneName - The timezone name (e.g., 'Asia/Kolkata').
+ * @returns The timezone offset in minutes from UTC.
+ */
+function getTimezoneOffsetInMinutes(timezoneName: string): number {
+  const date = new Date();
+  const options = { timeZone: timezoneName, timeZoneName: 'short' } as Intl.DateTimeFormatOptions;
+  const tzOffset = -date.getTimezoneOffset(); // Offset in minutes from UTC
+  const offsetInMinutes = tzOffset - (date.getTimezoneOffset() - (new Date(date.toLocaleString('en-US', options)).getTimezoneOffset()));
+  return offsetInMinutes;
+}
 
-  return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
-};
-
-export function getNotificationSchedule(taskDateTime: Date, reminderInterval: number | null, timeZone: string): Date[] {
+export function getNotificationSchedule(
+  taskDateTime: Date, 
+  reminderInterval: number | null, 
+  timeZone: string 
+): Date[] {
   const now = new Date();
-  const taskDate = taskDateTime;
+  const timezoneOffset = getTimezoneOffsetInMinutes(timeZone)
+  
+  // Calculate local task date based on timezone offset
+  const taskDate = new Date(taskDateTime.getTime() + timezoneOffset * 60000); // Convert offset to milliseconds
   const taskDayStart = new Date(taskDate);
   taskDayStart.setHours(0, 0, 0, 0); 
   const taskDayEnd = new Date(taskDayStart);
@@ -364,75 +362,81 @@ export function getNotificationSchedule(taskDateTime: Date, reminderInterval: nu
   const millisecondsInADay = 86400000;
 
   if (timeToTask > 0) {
-      if (timeToTask <= millisecondsInADay) {
-          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
-          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
-          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+    // Short-term tasks (within 24 hours)
+    if (timeToTask <= millisecondsInADay) {
+      const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+      const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+      const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
 
-          if (threeHoursBefore > now) notifications.push(getLocalDateInTimezone(threeHoursBefore, timeZone));
-          if (oneHourBefore > now) notifications.push(getLocalDateInTimezone(oneHourBefore, timeZone));
-          if (fifteenMinutesBefore > now) notifications.push(getLocalDateInTimezone(fifteenMinutesBefore, timeZone));
-      } 
-      else if (timeToTask <= 7 * millisecondsInADay) {
-          const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
-          const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
-          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
-          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
-          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+      if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+      if (oneHourBefore > now) notifications.push(oneHourBefore);
+      if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+    }
+    // Medium-term tasks (within a week)
+    else if (timeToTask <= 7 * millisecondsInADay) {
+      const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
+      const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
+      const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+      const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+      const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
 
-          if (twoDaysBefore > now) notifications.push(getLocalDateInTimezone(twoDaysBefore, timeZone));
-          if (oneDayBefore > now) notifications.push(getLocalDateInTimezone(oneDayBefore, timeZone));
-          if (threeHoursBefore > now) notifications.push(getLocalDateInTimezone(threeHoursBefore, timeZone));
-          if (oneHourBefore > now) notifications.push(getLocalDateInTimezone(oneHourBefore, timeZone));
-          if (fifteenMinutesBefore > now) notifications.push(getLocalDateInTimezone(fifteenMinutesBefore, timeZone));
-      } 
-      else if (timeToTask <= 30 * millisecondsInADay) {
-          const oneWeekBefore = new Date(taskDate.getTime() - 7 * millisecondsInADay);
-          const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
-          const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
-          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
-          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
-          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+      if (twoDaysBefore > now) notifications.push(twoDaysBefore);
+      if (oneDayBefore > now) notifications.push(oneDayBefore);
+      if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+      if (oneHourBefore > now) notifications.push(oneHourBefore);
+      if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+    }
+    // Long-term tasks (within a month)
+    else if (timeToTask <= 30 * millisecondsInADay) {
+      const oneWeekBefore = new Date(taskDate.getTime() - 7 * millisecondsInADay);
+      const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
+      const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
+      const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+      const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+      const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
 
-          if (oneWeekBefore > now) notifications.push(getLocalDateInTimezone(oneWeekBefore, timeZone));
-          if (twoDaysBefore > now) notifications.push(getLocalDateInTimezone(twoDaysBefore, timeZone));
-          if (oneDayBefore > now) notifications.push(getLocalDateInTimezone(oneDayBefore, timeZone));
-          if (threeHoursBefore > now) notifications.push(getLocalDateInTimezone(threeHoursBefore, timeZone));
-          if (oneHourBefore > now) notifications.push(getLocalDateInTimezone(oneHourBefore, timeZone));
-          if (fifteenMinutesBefore > now) notifications.push(getLocalDateInTimezone(fifteenMinutesBefore, timeZone));
-      } 
-      else {
-          const oneMonthBefore = new Date(taskDate.getTime() - 30 * millisecondsInADay);
-          const twoWeeksBefore = new Date(taskDate.getTime() - 14 * millisecondsInADay);
-          const oneWeekBefore = new Date(taskDate.getTime() - 7 * millisecondsInADay);
-          const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
-          const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
-          const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
-          const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
-          const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
+      if (oneWeekBefore > now) notifications.push(oneWeekBefore);
+      if (twoDaysBefore > now) notifications.push(twoDaysBefore);
+      if (oneDayBefore > now) notifications.push(oneDayBefore);
+      if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+      if (oneHourBefore > now) notifications.push(oneHourBefore);
+      if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+    }
+    // Very long-term tasks (more than a month)
+    else {
+      const oneMonthBefore = new Date(taskDate.getTime() - 30 * millisecondsInADay);
+      const twoWeeksBefore = new Date(taskDate.getTime() - 14 * millisecondsInADay);
+      const oneWeekBefore = new Date(taskDate.getTime() - 7 * millisecondsInADay);
+      const twoDaysBefore = new Date(taskDate.getTime() - 2 * millisecondsInADay);
+      const oneDayBefore = new Date(taskDate.getTime() - millisecondsInADay);
+      const threeHoursBefore = new Date(taskDate.getTime() - 3 * millisecondsInAnHour);
+      const oneHourBefore = new Date(taskDate.getTime() - millisecondsInAnHour);
+      const fifteenMinutesBefore = new Date(taskDate.getTime() - 15 * 60000);
 
-          if (oneMonthBefore > now) notifications.push(getLocalDateInTimezone(oneMonthBefore, timeZone));
-          if (twoWeeksBefore > now) notifications.push(getLocalDateInTimezone(twoWeeksBefore, timeZone));
-          if (oneWeekBefore > now) notifications.push(getLocalDateInTimezone(oneWeekBefore, timeZone));
-          if (twoDaysBefore > now) notifications.push(getLocalDateInTimezone(twoDaysBefore, timeZone));
-          if (oneDayBefore > now) notifications.push(getLocalDateInTimezone(oneDayBefore, timeZone));
-          if (threeHoursBefore > now) notifications.push(getLocalDateInTimezone(threeHoursBefore, timeZone));
-          if (oneHourBefore > now) notifications.push(getLocalDateInTimezone(oneHourBefore, timeZone));
-          if (fifteenMinutesBefore > now) notifications.push(getLocalDateInTimezone(fifteenMinutesBefore, timeZone));
-      }
+      if (oneMonthBefore > now) notifications.push(oneMonthBefore);
+      if (twoWeeksBefore > now) notifications.push(twoWeeksBefore);
+      if (oneWeekBefore > now) notifications.push(oneWeekBefore);
+      if (twoDaysBefore > now) notifications.push(twoDaysBefore);
+      if (oneDayBefore > now) notifications.push(oneDayBefore);
+      if (threeHoursBefore > now) notifications.push(threeHoursBefore);
+      if (oneHourBefore > now) notifications.push(oneHourBefore);
+      if (fifteenMinutesBefore > now) notifications.push(fifteenMinutesBefore);
+    }
   }
 
+  // On the day of the task, notify every hour or two or three, based on user choice
   if (reminderInterval) {
-      let reminderTime = new Date(taskDayStart);
-      reminderTime.setHours(0, 0, 0, 0); 
+    let reminderTime = new Date(taskDayStart);
+    reminderTime.setHours(0, 0, 0, 0);
 
-      while (reminderTime < taskDate) {
-          reminderTime = new Date(reminderTime.getTime() + reminderInterval * millisecondsInAnHour);
-          if (reminderTime < taskDate && reminderTime > now) {
-              notifications.push(getLocalDateInTimezone(reminderTime, timeZone));
-          }
+    while (reminderTime < taskDate) {
+      reminderTime = new Date(reminderTime.getTime() + reminderInterval * millisecondsInAnHour);
+      if (reminderTime < taskDate && reminderTime > now) {
+        notifications.push(reminderTime);
       }
+    }
   }
 
-  return notifications;
+  // Adjust all notification times to the original timezone by subtracting the offset
+  return notifications.map(notification => new Date(notification.getTime() - timezoneOffset * 60000));
 }
