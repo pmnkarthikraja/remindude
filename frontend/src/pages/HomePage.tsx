@@ -16,7 +16,7 @@ import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
 import { useDeleteUserAccount, useGetMasterSwitchData } from "../hooks/userHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
-import {  chooseAvatar, useGetAvatar } from "../utils/util"
+import { chooseAvatar, useGetAvatar } from "../utils/util"
 import CalendarPage from "./CalenderPage"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
@@ -45,7 +45,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     priority: [],
     status: [],
   });
-  const {user} = useUserContext()
+  const { user } = useUserContext()
 
   const [sortByNew, setSortByNew] = useState<{ name: string, isDescending: boolean } | null>(null);
   const [showPopover, setShowPopover] = useState(false);
@@ -73,7 +73,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
   const [showLoading, setShowLoading] = useState(false);
   const { isLoading: isDeleteUserLoading, isError: isDeleteUserError, error: deleteUserErr, mutateAsync: deleteUserAccount, reset } = useDeleteUserAccount()
-  const {data:masterSwitchData,isLoading:isMasterSwitchDataLoading}=useGetMasterSwitchData(user.email)
+  const { data: masterSwitchData, isLoading: isMasterSwitchDataLoading } = useGetMasterSwitchData(user.email)
   // const [userAvatar,setUserAvatar]=useState('')
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
   function handleRefresh(event: CustomEvent<RefresherEventDetail>) {
     setTimeout(() => {
-      refetch() 
+      refetch()
       event.detail.complete();
     }, 1500);
   }
@@ -108,7 +108,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
 
   }, [tasks, pageNav, startDate, endDate, filters, currentFilterKey]);
 
-  const userAvatar=useGetAvatar()
+  const userAvatar = useGetAvatar()
 
   const handlePlatformChange = useCallback((newPlatform: Platform) => {
     setPlatform(newPlatform);
@@ -292,41 +292,41 @@ const HomePage: FunctionComponent<HomePageProps> = ({
         </IonToast>
 
         <IonAlert
-        isOpen={isDeleteAlertOpen}
-        header="Are you sure to delete your account?"
-        message={'Once deleted, all tasks and meetings will be deleted. You will be redirected to the login page.'}
-        className="custom-alert"
-        onDidDismiss={() => setIsDeleteAlertOpen(false)}
-        buttons={[
-          {
-            text: 'No',
-            cssClass: 'alert-button-cancel',
-            handler: () => {
-              setIsDeleteAlertOpen(false);
-            },
-          },
-          {
-            text: 'Yes',
-            cssClass: 'alert-button-confirm',
-            handler: async () => {
-              setShowLoading(true);
-              
-              await deleteUserAccount(user.email);
-              
-              setTimeout(() => {
-                setShowLoading(false);
+          isOpen={isDeleteAlertOpen}
+          header="Are you sure to delete your account?"
+          message={'Once deleted, all tasks and meetings will be deleted. You will be redirected to the login page.'}
+          className="custom-alert"
+          onDidDismiss={() => setIsDeleteAlertOpen(false)}
+          buttons={[
+            {
+              text: 'No',
+              cssClass: 'alert-button-cancel',
+              handler: () => {
                 setIsDeleteAlertOpen(false);
-                window.location.href='/login'
-              }, 2000);
+              },
             },
-          },
-        ]}
-      />
+            {
+              text: 'Yes',
+              cssClass: 'alert-button-confirm',
+              handler: async () => {
+                setShowLoading(true);
+
+                await deleteUserAccount(user.email);
+
+                setTimeout(() => {
+                  setShowLoading(false);
+                  setIsDeleteAlertOpen(false);
+                  window.location.href = '/login'
+                }, 2000);
+              },
+            },
+          ]}
+        />
 
         <IonLoading
           isOpen={showLoading}
           message={'☹️👋 Goodbye!'}
-          duration={2000} 
+          duration={2000}
         />
 
       </IonContent>
@@ -440,13 +440,10 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                   <ProfilePage signOut={signOut} user={user} />
                 </div>}
 
-                <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays}  masterSwitchData={masterSwitchData?.masterSwitchData}/>
-              </IonCol>
+                {!isMasterSwitchDataLoading && <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays} masterSwitchData={masterSwitchData?.masterSwitchData} />}              </IonCol>
 
               <CalendarPage isMobileView={isMobileView} holidays={holidays} localHolidays={localHolidays} tasks={tasks} isOpen={showCalenderModal} onClose={() => { setCalenderModal(false) }} />
-
             </Fragment>}
-
 
             {pageNav.isSetting && <Fragment>
               <ExcelUploader />
@@ -455,7 +452,8 @@ const HomePage: FunctionComponent<HomePageProps> = ({
           </IonRow>
         </IonGrid>
 
-        <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={user.email} isEdit={false} masterSwitchData={masterSwitchData?.masterSwitchData} />
+        {!isMasterSwitchDataLoading &&
+          <CreateEditTaskFabButton holidays={holidays} localHolidays={localHolidays} email={user.email} isEdit={false} masterSwitchData={masterSwitchData?.masterSwitchData} />}
 
         {(isMobileView) && (
           <IonFab vertical='top' horizontal="end" slot="fixed">
