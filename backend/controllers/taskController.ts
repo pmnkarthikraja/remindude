@@ -194,6 +194,8 @@ class TaskController{
         const {email,id}=req.params
         const {newDate,newTime} = req.body
         const combinedDateTimeString = `${newDate}T${newTime}:00`;
+        console.log("newdate and newtime:",newDate,newTime)
+        console.log("combinedDateTimeString: ",combinedDateTimeString)
         try {
             if (!newDate || !newTime){
                 res.status(400).send(taskUpdatedWithMissingFields)
