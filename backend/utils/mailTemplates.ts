@@ -211,6 +211,9 @@ export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:stri
     console.log("task date time on reminder:",task.dateTime)
     // const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
     const momentTime = moment.tz(task.dateTime,task.localTimezone).format('MMMM Do YYYY, h:mm a')
+    const remainingTime = moment.tz(task.dateTime,task.localTimezone).fromNow()
+
+    
 
     return `
 <!DOCTYPE html>
@@ -336,6 +339,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:stri
         <div class="content">
             <p><strong>Description: </strong>${task.description}</p>
             <p><strong>Date & Time: </strong>${momentTime} (${task.localTimezone})</p>
+            <p>${remainingTime}</p>
         </div>
         <div class="footer">
            <div class="buttons">
