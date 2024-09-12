@@ -1,3 +1,4 @@
+import moment from "moment-timezone";
 import { TaskModel } from "../models/TaskModel";
 
 const formatTimeWithZone = (date: Date, timeZone: string) => {
@@ -209,6 +210,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:stri
     const doneLink = `${BASE_URL}/update-task/${task.email}/${task.id}/Done`;
     console.log("task date time on reminder:",task.dateTime)
     // const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
+    const momentTime = moment.tz(task.dateTime,task.localTimezone).format('MMMM Do YYYY, h:mm a')
 
     return `
 <!DOCTYPE html>
@@ -333,8 +335,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:stri
         </div>
         <div class="content">
             <p><strong>Description: </strong>${task.description}</p>
-            <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${task.dateTime} (${task.localTimezone})</p>
-            <p class="time-left">In ${calculateTimeLeft(task.dateTime)}</p>
+            <p><strong>Date & Time: </strong>${momentTime} (${task.localTimezone})</p>
         </div>
         <div class="footer">
            <div class="buttons">

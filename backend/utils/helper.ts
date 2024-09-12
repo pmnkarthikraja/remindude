@@ -449,7 +449,7 @@ export function getNotificationSchedule(
   reminderInterval: number | null,
   timeZone: string
 ): Date[] {
-  const now = moment();
+  const now = moment.tz(new Date(),timeZone);
   
   // Convert taskDateTime to the correct timezone using moment-timezone
   const taskDate = moment.tz(taskDateTime, timeZone);
