@@ -18,6 +18,7 @@ import { localTimeZone } from "../utils/util";
 import FormModal from "./FormModal";
 import { getNotificationSchedule } from "./calculateRemindTime";
 import { EventData, TaskRequestData } from "./task";
+import { cancelAllNotifications } from "../pages/ProfilePage";
 
 export function formatISTDateToString(date: Date): string {
     const offset = date.getTimezoneOffset();
@@ -170,9 +171,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             if (masterSwitchData?.masterPushNotificationEnabled){
                 await LocalNotifications.schedule({ notifications: localNotifications });
             }else{
-                await LocalNotifications.cancel({
-                    notifications:localNotifications.map(notification => ({ id: notification.id }))
-                })
+                await cancelAllNotifications()
                 console.log("cancel all notifications and skipping notification scheduling: push notiifcation is off")
             }
             if (typeof toggleEditTask === 'function') {
@@ -188,9 +187,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
             if (masterSwitchData?.masterPushNotificationEnabled){
                 await LocalNotifications.schedule({ notifications: localNotifications });
             }else{
-                await LocalNotifications.cancel({
-                    notifications: localNotifications.map(notification => ({ id: notification.id }))
-                })
+                await cancelAllNotifications()
                 console.log("cancel all notifications and skipping notification scheduling: push notiifcation is off")
             }
             formData.clearErrors();

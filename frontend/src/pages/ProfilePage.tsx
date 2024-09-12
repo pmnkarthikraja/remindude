@@ -15,6 +15,25 @@ import '../styles/ProfilePage.css'
 import { chooseAvatar } from '../utils/util'
 import { useUserContext } from '../components/userContext'
 
+export const cancelAllNotifications = async () => {
+  try {
+    const pendingNotifications = await LocalNotifications.getPending();  
+    if (pendingNotifications.notifications.length > 0) {
+      const notificationIds = pendingNotifications.notifications.map(notification => notification.id);
+      
+      await LocalNotifications.cancel({
+        notifications: notificationIds.map(id => ({ id }))
+      });
+
+      console.log('All notifications have been canceled.');
+    } else {
+      console.log('No notifications to cancel.');
+    }
+  } catch (error) {
+    console.error('Error canceling notifications:', error);
+  }
+};
+
 export interface ProfilePageProps {
   user: User,
   signOut: () => void,
@@ -50,24 +69,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     callAvatar(user)
   }, []);
 
-  const cancelAllNotifications = async () => {
-    try {
-      const pendingNotifications = await LocalNotifications.getPending();  
-      if (pendingNotifications.notifications.length > 0) {
-        const notificationIds = pendingNotifications.notifications.map(notification => notification.id);
-        
-        await LocalNotifications.cancel({
-          notifications: notificationIds.map(id => ({ id }))
-        });
-  
-        console.log('All notifications have been canceled.');
-      } else {
-        console.log('No notifications to cancel.');
-      }
-    } catch (error) {
-      console.error('Error canceling notifications:', error);
-    }
-  };
+
   
   const onPushNotificationChange = async (isChecked: boolean) => {
     console.log("Push notification status:", isChecked);
