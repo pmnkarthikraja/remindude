@@ -8,7 +8,7 @@ import UserModel from "../models/UserModel";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications } from "./sendEmail";
 import userRepo from "../repo/userRepo";
-import moment from 'moment-timezone';
+import moment, { Moment } from 'moment-timezone';
 
 // const formatTimeWithZone = (date: Date, timeZone: string) => {
 //   return new Intl.DateTimeFormat('en-US', {
@@ -445,7 +445,7 @@ export function getNotificationSchedule1(
 
 
 export function getNotificationSchedule(
-  taskDateTime: Date,
+  taskDateTime: moment.Moment,
   reminderInterval: number | null,
   timeZone: string
 ): Date[] {

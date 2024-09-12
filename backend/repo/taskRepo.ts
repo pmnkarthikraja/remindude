@@ -3,6 +3,7 @@ import TaskSchema,{ TaskModel } from "../models/TaskModel";
 import { DBErrInternal, DBErrTaskAlreadyExist, DBErrTaskNotFound, DBErrTaskTimeElapsed } from "../utils/handleErrors";
 import { getNotificationSchedule } from "../utils/helper";
 import { cancelScheduledNotifications } from "../utils/sendEmail";
+import moment from "moment-timezone";
 
 interface TaskRepo{
     CreateTask:(task:TaskModel)=>Promise<TaskModel>
@@ -45,16 +46,16 @@ class TaskRepoClass implements TaskRepo{
                 throw new DBErrTaskNotFound(); 
             }
     
-            const currentDate = new Date();
-            const newTaskDateTime = new Date(datetime);
+            const currentDate = moment.tz(new Date(), task.localTimezone)
+            const newTaskDateTime = moment.tz(datetime,task.localTimezone)
     
-            if (newTaskDateTime < currentDate) {
+            if (newTaskDateTime.valueOf() < currentDate.valueOf()) {
                 throw new DBErrTaskTimeElapsed()
             }
     
             task.dateTime = datetime;
             if (task.emailNotification){
-                const notificationSchedules = getNotificationSchedule(new Date(datetime),parseInt(task.dayFrequency), task.localTimezone)
+                const notificationSchedules = getNotificationSchedule(moment.tz(task.dateTime,task.localTimezone),parseInt(task.dayFrequency), task.localTimezone)
                 console.log("notification schedules:",notificationSchedules)
                 task.notificationIntervals=notificationSchedules.map(interval=>interval.toString())
             }
