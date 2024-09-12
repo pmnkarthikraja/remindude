@@ -55,6 +55,7 @@ class TaskRepoClass implements TaskRepo{
             task.dateTime = datetime;
             if (task.emailNotification){
                 const notificationSchedules = getNotificationSchedule(new Date(datetime),parseInt(task.dayFrequency), task.localTimezone)
+                console.log("notification schedules:",notificationSchedules)
                 task.notificationIntervals=notificationSchedules.map(interval=>interval.toString())
             }
             await task.save();
