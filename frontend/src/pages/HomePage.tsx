@@ -16,10 +16,11 @@ import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
 import { useDeleteUserAccount, useGetMasterSwitchData } from "../hooks/userHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
-import { useGetAvatar } from "../utils/util"
+import {  chooseAvatar, useGetAvatar } from "../utils/util"
 import CalendarPage from "./CalenderPage"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
+import { useUserContext } from "../components/userContext"
 
 export interface HomePageProps {
   user: User
@@ -33,7 +34,7 @@ export const getRemainingTime = (dateTime: string): number => {
 };
 
 const HomePage: FunctionComponent<HomePageProps> = ({
-  user,
+  // user,
   signOut,
 }) => {
   const [platform, setPlatform] = useState<Platform>('Unknown');
@@ -44,8 +45,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     priority: [],
     status: [],
   });
-
-
+  const {user} = useUserContext()
 
   const [sortByNew, setSortByNew] = useState<{ name: string, isDescending: boolean } | null>(null);
   const [showPopover, setShowPopover] = useState(false);
@@ -74,6 +74,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
   const [showLoading, setShowLoading] = useState(false);
   const { isLoading: isDeleteUserLoading, isError: isDeleteUserError, error: deleteUserErr, mutateAsync: deleteUserAccount, reset } = useDeleteUserAccount()
   const {data:masterSwitchData,isLoading:isMasterSwitchDataLoading}=useGetMasterSwitchData(user.email)
+  // const [userAvatar,setUserAvatar]=useState('')
 
   useEffect(() => {
     const handleResize = () => {
@@ -104,7 +105,10 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     if (filters[currentFilterKey || '']?.length < 1) {
       setShowPopover(false);
     }
+
   }, [tasks, pageNav, startDate, endDate, filters, currentFilterKey]);
+
+  const userAvatar=useGetAvatar()
 
   const handlePlatformChange = useCallback((newPlatform: Platform) => {
     setPlatform(newPlatform);
@@ -261,8 +265,6 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     setPageNav((prevState) => ({ ...prevState, isCalenderRangeTaskPage: true }));
   }, []);
 
-  // const userAvatar = chooseAvatar(user);
-  const userAvatar = useGetAvatar(user)
 
   return <Fragment>
     <IonMenu contentId="main-content" disabled={hideSidebar} onIonDidClose={() => setHidesibebar(e => !e)}>
@@ -435,7 +437,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
                 </div>}
 
                 {pageNav.isProfile && <div>
-                  <ProfilePage signOut={signOut} user={user} taskData={tasks} />
+                  <ProfilePage signOut={signOut} user={user} />
                 </div>}
 
                 <SortableCards email={user.email} sortBy={sortByNew} tasksData={filteredTasks} filters={filters} handleRefresh={handleRefresh} holidays={holidays} localHolidays={localHolidays}  masterSwitchData={masterSwitchData?.masterSwitchData}/>

@@ -32,7 +32,7 @@ const Sidebar: FunctionComponent<SidebarProps> = ({
   pageNav,
   onDelete
 }) => {
-  const userAvatar = useGetAvatar(user)
+  const userAvatar = useGetAvatar()
   const currentTime = new Date().getHours()
   const greetMsg = currentTime < 12 && 'Good Morning' || currentTime < 18 && 'Good Afternoon' || 'Good Evening'
 

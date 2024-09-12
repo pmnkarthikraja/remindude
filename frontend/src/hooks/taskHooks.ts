@@ -38,7 +38,7 @@ interface AxiosErrorType {
         },
         onError: (e: AxiosError<AxiosErrorType>) => {
           console.log("error on update task", e);
-        }
+        },
       }
     );
   };

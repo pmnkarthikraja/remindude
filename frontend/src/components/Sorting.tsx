@@ -1,5 +1,5 @@
 
-import { IonAlert, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
+import { IonAlert, IonBadge, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonChip, IonCol, IonContent, IonIcon, IonImg, IonItem, IonLabel, IonLoading, IonRefresher, IonRefresherContent, IonRow, IonSearchbar, IonText, IonTextarea, IonToast, RefresherEventDetail } from '@ionic/react';
 import { CSSProperties } from '@mui/styled-engine';
 import { chevronDownCircleOutline, chevronDownOutline, chevronUpOutline, sadOutline } from 'ionicons/icons';
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react';
@@ -41,7 +41,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
   const [platform, setPlatform] = useState<Platform>('Unknown')
   const [editTask, setEditTask] = useState<{ isEdit: boolean, task: EventData | undefined } | undefined>(undefined)
   const [confirmDelete, setConfirmDelete] = useState<{ task: TaskRequestData | undefined, isOpen: boolean } | undefined>(undefined)
-  const { isError: isDeleteTaskMutationError, error: deleteTaskMutationError, mutateAsync: deleteTaskMutation } = useDeleteTaskMutation()
+  const { isError: isDeleteTaskMutationError,isLoading:isDeleteTaskLoading, error: deleteTaskMutationError, mutateAsync: deleteTaskMutation } = useDeleteTaskMutation()
 
   const handlePlatformChange = (newPlatform: Platform) => {
     setPlatform(newPlatform);
@@ -354,6 +354,7 @@ const SortableCards: FunctionComponent<SortableCardsProps> = ({
       <IonToast color={'danger'} isOpen={isDeleteTaskMutationError} message={deleteTaskMutationError?.response?.data.message || deleteTaskMutationError?.message} position='top' duration={3000} />
 
       <IonContent>
+      <IonLoading isOpen={isDeleteTaskLoading} message={'Deleting..'} />
         <IonRefresher slot='fixed' onIonRefresh={handleRefresh}>
           <IonRefresherContent
             pullingIcon={chevronDownCircleOutline}

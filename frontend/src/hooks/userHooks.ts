@@ -62,7 +62,7 @@ export const useAuthUser = () => {
   string,
   unknown
   >(
-    'authenticateUser', 
+    'userDetails', 
     async (token:string)=> {
       return userApi.authToken(token)},
     {
@@ -279,7 +279,7 @@ export const useEmailSigninMutation = (validatePassword:boolean) => {
     (user: User) => userApi.login(user),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries('userLogin');
+        queryClient.invalidateQueries('userDetails');
         if (!validatePassword){
           localStorage.setItem('token',data.data.token)
         }
@@ -310,9 +310,6 @@ export const useEditProfileMutation = () => {
     {
       onSuccess: (data) => {
         queryClient.invalidateQueries('userDetails');
-        setTimeout(() => {
-          window.location.href='/home'
-        }, 1000)
         console.log("on edit profile mutation success: ", data);
       },
       onError: (e: AxiosError<AxiosErrorType>) => {

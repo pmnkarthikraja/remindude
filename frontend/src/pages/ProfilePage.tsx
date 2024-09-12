@@ -7,24 +7,24 @@ import { useForm } from 'react-hook-form'
 import { userApi } from '../api/userApi'
 import ChangePasswordModal from '../components/ChangePasswordModal'
 import { generateUniqueId1 } from '../components/CreateUpdateTask'
-import { TaskRequestData } from '../components/task'
 import { User } from "../components/user"
 import { useWeekContext } from '../components/weekContext'
 import { useGetTasks } from '../hooks/taskHooks'
 import { useEditProfileMutation, useGetMasterSwitchData, useToggleMasterSwitchData } from '../hooks/userHooks'
 import '../styles/ProfilePage.css'
 import { chooseAvatar } from '../utils/util'
+import { useUserContext } from '../components/userContext'
 
 export interface ProfilePageProps {
   user: User,
   signOut: () => void,
-  taskData:TaskRequestData[] | undefined
 }
 
 const ProfilePage: FunctionComponent<ProfilePageProps> = ({
   signOut,
-  user,
+  // user,
 }) => {
+  const {user,setUser} = useUserContext()
   const { isLoading, isError, error, mutateAsync: editProfile } = useEditProfileMutation()
   const {data:masterSwitchData,isLoading:isMasterSwitchDataLoading,isError:isMasterSwitchDataError, error:masterSwitchDataError,refetch}=useGetMasterSwitchData(user.email)
   const {isLoading:isToggleMasterSwitchLoading,isError:isToggleMasterSwitchError,error:toggleMasterSwitchError,mutateAsync:toggleMasterSwitch} =useToggleMasterSwitchData()
@@ -143,41 +143,6 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     setStartOfWeek(value);
   };
 
-
-  const pickFile = async () => {
-    try {
-      await pickImages()
-    } catch (error) {
-      console.error('Error picking file:', error);
-    }
-  };
-
-
-  //not using this function
-  const pickImages = async (): Promise<string|null> => {
-    const result = await FilePicker.pickImages({
-      readData: true,
-    })
-
-    const blobData1 = result.files[0].blob
-    let img = 'data:image/*;base64,' + result.files[0].data
-    if (!!blobData1) {
-      const imgSizeMB = blobData1.size / (1024 * 1024)
-      console.log('Image size in MB:', imgSizeMB) 
-      if (imgSizeMB > 2) {
-        setWarningToast(true)
-        console.log('Warning: Image size exceeds 2 MB')
-        return null
-      }
-  
-
-      setBlobData(blobData1)
-      setValue('profilePicture', img)
-
-    }
-    return img
-  }
-
   const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -190,7 +155,7 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
           console.error('The selected image is too large. Please upload an image smaller than 2 MB.');
           return; // Exit the function if the file is too large
         }
-  
+
         // Create a Blob object from the file
         const blobData = new Blob([file], { type: file.type });
   
@@ -224,15 +189,27 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
     }
   };
   
-
   const onSubmit = async () => {
     try {
-      await editProfile({
+      const res = await editProfile({
         email: userData.email,
         password: userData.password || '',
         userName: userData.userName as string,
         profilePicture: blobData
       })
+      let newUser:User = res.data.user
+      newUser.profilePicture='data:image/*;base64,' + newUser.profilePicture;
+      setUser(newUser)
+      const res1 = await editProfile({
+        email: userData.email,
+        password: userData.password || '',
+        userName: userData.userName as string,
+        profilePicture: blobData
+      })
+      let newUser1:User = res1.data.user
+      newUser1.profilePicture='data:image/*;base64,' + newUser1.profilePicture;
+      setUser(newUser1)
+
     }
     catch (e) {
       console.log("failed to update profile :" + e)
@@ -369,9 +346,18 @@ const ProfilePage: FunctionComponent<ProfilePageProps> = ({
                     <IonCol>
                       <IonButton
                         color="danger"
-                        onClick={() => {
-                          setProfileModalIsOpen(false);
+                        onClick={async () => {
                           reset()
+                          const u: User = {
+                            email: user.email,
+                            userName: user.userName,
+                            googlePicture: '',
+                            profilePicture: user.profilePicture,
+                            password: ''
+                          };
+                          
+                          await callAvatar(u);
+                          setProfileModalIsOpen(false);
                         }}
                       >
                         Close

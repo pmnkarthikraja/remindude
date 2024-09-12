@@ -17,16 +17,18 @@ import '../styles/Home.css';
 import { Platform, useGetPlatform } from '../utils/useGetPlatform';
 import HomePage from './HomePage';
 import ProfilePage from './ProfilePage';
+import { useUserContext } from '../components/userContext';
 
 const Home: FunctionComponent = () => {
   const [tok, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User>({
-    email: '',
-    password: '',
-    userName: '',
-    profilePicture: '',
-    googlePicture: undefined,
-  });
+  // const [user, setUser] = useState<User>({
+  //   email: '',
+  //   password: '',
+  //   userName: '',
+  //   profilePicture: '',
+  //   googlePicture: undefined,
+  // });
+  const {user,setUser} =useUserContext()
   const { status, error: authError, mutateAsync: authMutation } = useAuthUser(); 
   const [platform, setPlatform] = useState<Platform>('Unknown');
   const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
@@ -56,7 +58,6 @@ const Home: FunctionComponent = () => {
     };
 
     const token = window.localStorage.getItem('token');
-    console.log('Token found: ', token);
     setToken(token);
 
     if (!token) {
@@ -141,7 +142,7 @@ const Home: FunctionComponent = () => {
       {status === 'loading'  && (
         <IonLoading
           isOpen={true}
-          duration={4500}
+          duration={500}
           message={'App Starting...'}
         />
       )}

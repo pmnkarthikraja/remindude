@@ -109,8 +109,6 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
         //set the push notification
 
         const localNotifications: LocalNotificationSchema[] = notificationIntervals.map((interval,idx)=>{
-            console.log("For time: ",interval)
-            console.log("scheduled time: ",interval)
             return {
                 title: `Reminder for Upcoming ${data.eventType}: ${data.title}`,
                 body: `Scheduled for ${new Date(data.datetime).toLocaleDateString()} at ${new Date(data.datetime).toLocaleTimeString('en-IN',{ hour: 'numeric', minute: 'numeric', hour12: true })}`,

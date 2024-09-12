@@ -2,6 +2,7 @@ import moment from "moment-timezone";
 import { User } from "../components/user"
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useUserContext } from "../components/userContext";
 
 const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude.vercel.app" :  "http://localhost:4000"
 
@@ -16,10 +17,9 @@ async function fetchImageAndReturnAsBlob(url:string) {
   }
 }
 
-
 export async function chooseAvatar(user:User | undefined) {
   if (!!user) {
-      if ((user.googlePicture == '' && user.profilePicture == 'data:image/*;base64,') || (user.profilePicture == '' && user.googlePicture == '')) {
+      if (((user.googlePicture == '' || user.googlePicture==undefined) && user.profilePicture == 'data:image/*;base64,') || (user.profilePicture == '' && user.googlePicture == '')) {
           return '/assets/avatar.png';
       } else if (user.googlePicture && user.googlePicture.startsWith('https')) {
           try {
@@ -40,16 +40,16 @@ export async function chooseAvatar(user:User | undefined) {
   }
 }
 
-
-export const useGetAvatar =(user:User)=>{
+export const useGetAvatar =()=>{
   const [userAvatar,setUserAvatar]=useState('')
+  const {user:user1} = useUserContext()
   useEffect(()=>{
     const callAvatar = async ()=>{
-     const image= await chooseAvatar(user)
+     const image= await chooseAvatar(user1)
      setUserAvatar(image)
     }
     callAvatar()
-  },[user])
+  },[user1])
   return userAvatar
 }
 
