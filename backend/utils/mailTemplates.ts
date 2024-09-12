@@ -207,7 +207,8 @@ export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:stri
     const BASE_URL=process.env.NODE_ENV==='production' ? "https://remindude-backend.onrender.com" :  "http://localhost:4000"
     const inProgressLink = `${BASE_URL}/update-task/${task.email}/${task.id}/InProgress`;
     const doneLink = `${BASE_URL}/update-task/${task.email}/${task.id}/Done`;
-    const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
+    console.log("task date time on reminder:",task.dateTime)
+    // const formattedTime = formatTimeWithZone(new Date(task.dateTime), task.localTimezone)
 
     return `
 <!DOCTYPE html>
@@ -332,7 +333,7 @@ export const reminderTemplateHTMLContent = (task: TaskModel,currentUsername:stri
         </div>
         <div class="content">
             <p><strong>Description: </strong>${task.description}</p>
-            <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${formattedTime} (${task.localTimezone})</p>
+            <p><strong>Date & Time: </strong>${new Date(task.dateTime).toLocaleDateString()} and ${task.dateTime} (${task.localTimezone})</p>
             <p class="time-left">In ${calculateTimeLeft(task.dateTime)}</p>
         </div>
         <div class="footer">
