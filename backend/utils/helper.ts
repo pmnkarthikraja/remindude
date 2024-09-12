@@ -8,6 +8,7 @@ import UserModel from "../models/UserModel";
 import taskRepo from '../repo/taskRepo'
 import { cancelScheduledNotifications, scheduleNotifications } from "./sendEmail";
 import userRepo from "../repo/userRepo";
+import moment from 'moment-timezone';
 
 // const formatTimeWithZone = (date: Date, timeZone: string) => {
 //   return new Intl.DateTimeFormat('en-US', {
@@ -341,7 +342,7 @@ function getTimezoneOffsetInMinutes(timezoneName: string): number {
   return offsetInMinutes;
 }
 
-export function getNotificationSchedule(
+export function getNotificationSchedule1(
   taskDateTime: Date, 
   reminderInterval: number | null, 
   timeZone: string 
@@ -350,7 +351,7 @@ export function getNotificationSchedule(
   const timezoneOffset = getTimezoneOffsetInMinutes(timeZone)
   
   // Calculate local task date based on timezone offset
-  const taskDate = new Date(taskDateTime.getTime() + timezoneOffset * 60000); // Convert offset to milliseconds
+  const taskDate = new Date(taskDateTime.getTime() + timezoneOffset * 60000);
   const taskDayStart = new Date(taskDate);
   taskDayStart.setHours(0, 0, 0, 0); 
   const taskDayEnd = new Date(taskDayStart);
@@ -441,6 +442,105 @@ export function getNotificationSchedule(
   // Adjust all notification times to the original timezone by subtracting the offset
   return notifications.map(notification => new Date(notification.getTime() - timezoneOffset * 60000));
 }
+
+
+export function getNotificationSchedule(
+  taskDateTime: Date,
+  reminderInterval: number | null,
+  timeZone: string
+): Date[] {
+  const now = moment();
+  
+  // Convert taskDateTime to the correct timezone using moment-timezone
+  const taskDate = moment.tz(taskDateTime, timeZone);
+  const taskDayStart = taskDate.clone().startOf('day');
+  const taskDayEnd = taskDate.clone().endOf('day');
+
+  const timeToTask = taskDate.diff(now);
+  const notifications: Date[] = [];
+
+  const millisecondsInAnHour = 3600000;
+  const millisecondsInADay = 86400000;
+
+  // Check if the task time is in the future
+  if (timeToTask > 0) {
+    // Short-term tasks (within 24 hours)
+    if (timeToTask <= millisecondsInADay) {
+      const threeHoursBefore = taskDate.clone().subtract(3, 'hours');
+      const oneHourBefore = taskDate.clone().subtract(1, 'hours');
+      const fifteenMinutesBefore = taskDate.clone().subtract(15, 'minutes');
+
+      if (threeHoursBefore.isAfter(now)) notifications.push(threeHoursBefore.toDate());
+      if (oneHourBefore.isAfter(now)) notifications.push(oneHourBefore.toDate());
+      if (fifteenMinutesBefore.isAfter(now)) notifications.push(fifteenMinutesBefore.toDate());
+    }
+    // Medium-term tasks (within a week)
+    else if (timeToTask <= 7 * millisecondsInADay) {
+      const twoDaysBefore = taskDate.clone().subtract(2, 'days');
+      const oneDayBefore = taskDate.clone().subtract(1, 'days');
+      const threeHoursBefore = taskDate.clone().subtract(3, 'hours');
+      const oneHourBefore = taskDate.clone().subtract(1, 'hours');
+      const fifteenMinutesBefore = taskDate.clone().subtract(15, 'minutes');
+
+      if (twoDaysBefore.isAfter(now)) notifications.push(twoDaysBefore.toDate());
+      if (oneDayBefore.isAfter(now)) notifications.push(oneDayBefore.toDate());
+      if (threeHoursBefore.isAfter(now)) notifications.push(threeHoursBefore.toDate());
+      if (oneHourBefore.isAfter(now)) notifications.push(oneHourBefore.toDate());
+      if (fifteenMinutesBefore.isAfter(now)) notifications.push(fifteenMinutesBefore.toDate());
+    }
+    // Long-term tasks (within a month)
+    else if (timeToTask <= 30 * millisecondsInADay) {
+      const oneWeekBefore = taskDate.clone().subtract(1, 'weeks');
+      const twoDaysBefore = taskDate.clone().subtract(2, 'days');
+      const oneDayBefore = taskDate.clone().subtract(1, 'days');
+      const threeHoursBefore = taskDate.clone().subtract(3, 'hours');
+      const oneHourBefore = taskDate.clone().subtract(1, 'hours');
+      const fifteenMinutesBefore = taskDate.clone().subtract(15, 'minutes');
+
+      if (oneWeekBefore.isAfter(now)) notifications.push(oneWeekBefore.toDate());
+      if (twoDaysBefore.isAfter(now)) notifications.push(twoDaysBefore.toDate());
+      if (oneDayBefore.isAfter(now)) notifications.push(oneDayBefore.toDate());
+      if (threeHoursBefore.isAfter(now)) notifications.push(threeHoursBefore.toDate());
+      if (oneHourBefore.isAfter(now)) notifications.push(oneHourBefore.toDate());
+      if (fifteenMinutesBefore.isAfter(now)) notifications.push(fifteenMinutesBefore.toDate());
+    }
+    // Very long-term tasks (more than a month)
+    else {
+      const oneMonthBefore = taskDate.clone().subtract(1, 'months');
+      const twoWeeksBefore = taskDate.clone().subtract(2, 'weeks');
+      const oneWeekBefore = taskDate.clone().subtract(1, 'weeks');
+      const twoDaysBefore = taskDate.clone().subtract(2, 'days');
+      const oneDayBefore = taskDate.clone().subtract(1, 'days');
+      const threeHoursBefore = taskDate.clone().subtract(3, 'hours');
+      const oneHourBefore = taskDate.clone().subtract(1, 'hours');
+      const fifteenMinutesBefore = taskDate.clone().subtract(15, 'minutes');
+
+      if (oneMonthBefore.isAfter(now)) notifications.push(oneMonthBefore.toDate());
+      if (twoWeeksBefore.isAfter(now)) notifications.push(twoWeeksBefore.toDate());
+      if (oneWeekBefore.isAfter(now)) notifications.push(oneWeekBefore.toDate());
+      if (twoDaysBefore.isAfter(now)) notifications.push(twoDaysBefore.toDate());
+      if (oneDayBefore.isAfter(now)) notifications.push(oneDayBefore.toDate());
+      if (threeHoursBefore.isAfter(now)) notifications.push(threeHoursBefore.toDate());
+      if (oneHourBefore.isAfter(now)) notifications.push(oneHourBefore.toDate());
+      if (fifteenMinutesBefore.isAfter(now)) notifications.push(fifteenMinutesBefore.toDate());
+    }
+  }
+
+  // On the day of the task, notify every hour or two or three, based on user choice
+  if (reminderInterval) {
+    let reminderTime = taskDayStart.clone();
+
+    while (reminderTime.isBefore(taskDate)) {
+      reminderTime = reminderTime.add(reminderInterval, 'hours');
+      if (reminderTime.isBefore(taskDate) && reminderTime.isAfter(now)) {
+        notifications.push(reminderTime.toDate());
+      }
+    }
+  }
+
+  return notifications;
+}
+
 
 
 //get current user
