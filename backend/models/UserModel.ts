@@ -2,6 +2,7 @@ import mongoose, { CallbackError } from 'mongoose'
 import bcrypt from 'bcrypt'
 import  { Document } from 'mongoose';
 import TaskModel from './TaskModel';
+import MasterControllModels from './MasterControllModels';
 
 
 const Schema = mongoose.Schema
@@ -48,6 +49,7 @@ UserSchema.pre('save', async function(next) {
 UserSchema.pre('deleteOne',{ document: true, query: false },async function(next){
     try {
         await TaskModel.deleteMany({ email: this.email });
+        await MasterControllModels.deleteOne({email:this.email})
         next();
     } catch (err:any) {
         next(err);
@@ -59,6 +61,7 @@ UserSchema.pre('deleteOne', async function(next) {
         const user = await this.model.findOne(this.getFilter());
         if (user) {
             await TaskModel.deleteMany({ email: user.email });
+            await MasterControllModels.deleteOne({email:user.email})
         }
         next();
     } catch (err:any) {
