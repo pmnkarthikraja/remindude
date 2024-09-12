@@ -167,14 +167,10 @@ const DownloadTemplateButton: FunctionComponent = () => {
                     },
                   ]}
             />
-            <IonToolbar>
-                <IonButtons style={{ cursor: 'pointer' }}>
-                    <IonButton onClick={createExcelTemplate} style={{ textTransform: 'capitalize' }} color={'secondary'} strong>
+            <IonButton size='small' onClick={createExcelTemplate} style={{ textTransform: 'capitalize', height:'20px' }} color={'secondary'} strong>
                         Download <p style={{ textTransform: 'lowercase' }}>(.xlsx)</p>
                         <IonIcon icon={downloadSharp}></IonIcon>
                     </IonButton>
-                </IonButtons>
-            </IonToolbar>
         </Fragment>
     );
 };

@@ -16,7 +16,7 @@ import { useGetHolidays, useGetLocalHolidays } from "../hooks/calenderHooks"
 import { useGetTasks } from "../hooks/taskHooks"
 import { useDeleteUserAccount, useGetMasterSwitchData } from "../hooks/userHooks"
 import { Platform, useGetPlatform } from "../utils/useGetPlatform"
-import { chooseAvatar, useGetAvatar } from "../utils/util"
+import {  useGetAvatar } from "../utils/util"
 import CalendarPage from "./CalenderPage"
 import ProfilePage from "./ProfilePage"
 import Sidebar, { PageNav } from "./Sidebar"
@@ -341,19 +341,19 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     <IonLoading isOpen={isGetTasksLoading || isMasterSwitchDataLoading} message={'Load Tasks..'} duration={2000} />
 
     <IonPage id="main-content">
-      {platform !== 'Windows' && <IonHeader >
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonMenuButton color='dark' ></IonMenuButton>
-          </IonButtons>
-
-          <IonAvatar slot="end" style={{ marginTop: '10px', marginRight: '10px' }}>
-            <img style={{ width: '50px', height: '50px' }}
-              src={userAvatar} alt="avatar" />
-          </IonAvatar>
-
-        </IonToolbar>
-      </IonHeader>}
+      {platform !== 'Windows' && 
+    <IonHeader>
+    <IonToolbar>
+      <IonButtons slot="start">
+        <IonMenuButton /> Menu
+      </IonButtons>
+  
+      <IonAvatar slot="end" style={{ marginTop: '10px', marginRight: '10px' }}>
+        <img style={{ width: '50px', height: '50px' }} src={userAvatar} alt="avatar" />
+      </IonAvatar>
+    </IonToolbar>
+  </IonHeader>
+  }
 
       <IonContent fullscreen={true} scrollY={!isMobileView}>
         <IonGrid>
