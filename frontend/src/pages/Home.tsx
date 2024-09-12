@@ -104,7 +104,7 @@ const Home: FunctionComponent = () => {
     <Fragment>
       {status === 'success' && (
         <Fragment>
-          {platform !== 'Windows' ? (
+          {(platform !== 'Windows' && platform!=='Mac') ? (
             <IonReactRouter>
               <IonTabs>
                 <IonRouterOutlet>

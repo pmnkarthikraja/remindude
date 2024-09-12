@@ -162,10 +162,10 @@ ion-alert .alert-input {
   background-color: white !important; 
 }
 
-      ion-toolbar {
+      /* ion-toolbar {
   --background:  url('/assets/header_layout.png') no-repeat center center;
   --color: white;
   --border-color: #6b456a;
   --border-width: 4px 0;
   --border-style: double;
-}
+} */

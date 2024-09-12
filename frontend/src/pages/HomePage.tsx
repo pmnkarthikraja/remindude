@@ -341,7 +341,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
     <IonLoading isOpen={isGetTasksLoading || isMasterSwitchDataLoading} message={'Load Tasks..'} duration={2000} />
 
     <IonPage id="main-content">
-      {platform !== 'Windows' && 
+      {(platform !== 'Windows' && platform !=='Mac') && 
     <IonHeader>
     <IonToolbar>
       <IonButtons slot="start">
@@ -358,7 +358,7 @@ const HomePage: FunctionComponent<HomePageProps> = ({
       <IonContent fullscreen={true} scrollY={!isMobileView}>
         <IonGrid>
           <IonRow>
-            {platform === 'Windows' && (
+            {(platform === 'Windows'|| platform==='Mac') && (
               <Sidebar buildPageNav={buildPageNav}
                 pageNav={pageNav}
                 signOut={signOut}
