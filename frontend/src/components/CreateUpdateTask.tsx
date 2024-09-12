@@ -171,7 +171,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                 await LocalNotifications.schedule({ notifications: localNotifications });
             }else{
                 await LocalNotifications.cancel({
-                    notifications:[]
+                    notifications:localNotifications.map(notification => ({ id: notification.id }))
                 })
                 console.log("cancel all notifications and skipping notification scheduling: push notiifcation is off")
             }
@@ -189,7 +189,7 @@ const CreateEditTaskFabButton: FunctionComponent<CreateTaskFabButtonProps> = ({ 
                 await LocalNotifications.schedule({ notifications: localNotifications });
             }else{
                 await LocalNotifications.cancel({
-                    notifications:[]
+                    notifications: localNotifications.map(notification => ({ id: notification.id }))
                 })
                 console.log("cancel all notifications and skipping notification scheduling: push notiifcation is off")
             }
