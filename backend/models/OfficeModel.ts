@@ -62,7 +62,7 @@ export type FormData = Agreements | PurchaseOrder | VisaDetails | IQAMARenewals 
 
 // Base schema with common fields
 const baseFormDataSchema = new Schema<BaseFormData>({
-  id: { type: String, required: true },
+  id: { type: String, required: true, unique:true },
   email: {type:String,required:true},
   category: { 
     type: String, 
