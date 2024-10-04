@@ -32,7 +32,7 @@ class FormDataService {
     }
   }
 
-  async updateFormData(id: string, updateData: Partial<Omit<FormDataType, 'id'>>): Promise<FormDataType | null> {
+  async updateFormData(id: string, updateData: FormDataType): Promise<FormDataType | null> {
     try {
       const updatedData = await FormDataRepository.update(id, updateData);
       if (!updatedData) {
