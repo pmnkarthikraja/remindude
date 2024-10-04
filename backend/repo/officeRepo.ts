@@ -18,8 +18,8 @@ class FormDataRepository {
   }
 
   async update(id: string, updateData: FormDataType): Promise<FormDataType | null> {
-    const updatedData = await FormData.findOneAndUpdate({ id }, updateData, { new: true }).exec();
-    return this.validateFormData(updatedData);
+    const updatedData = await FormData.findOneAndReplace({ id },{...updateData},{new:true})
+    return this.validateFormData(updatedData)
   }
 
   async delete(id: string): Promise<FormDataType | null> {
