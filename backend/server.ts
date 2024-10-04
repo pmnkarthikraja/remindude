@@ -13,6 +13,7 @@ import taskRoutes from './routes/taskRoutes';
 import userRoutes from './routes/userRoutes';
 import holidayRoutes from './routes/holidayRoutes'
 import masterSwitchRoute from './routes/masterSwitchDataRoute'
+import officeRoutes from './routes/officeRoutes'
 
 export const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -24,7 +25,8 @@ app.use(bodyParser.json())
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    console.log("origin: ",origin)
+  // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     // Set the Access-Control-Allow-Origin header to the incoming origin
@@ -39,6 +41,7 @@ app.use('/', userRoutes);
 app.use('/',taskRoutes)
 app.use('/',holidayRoutes)
 app.use('/',masterSwitchRoute)
+app.use('/',officeRoutes)
 
 app.get('/google-image', async (req, res) => {
   const imageUrl:string = req.query.url as string;
