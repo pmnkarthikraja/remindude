@@ -18,30 +18,7 @@ class FormDataRepository {
   }
 
   async update(id: string, updateData: FormDataType): Promise<FormDataType | null> {
-    let updatable = {...updateData}
-    switch (updatable.category){
-      case 'Agreements':
-        updatable.endDate= new Date(updatable.endDate)
-        updatable.startDate = new Date(updatable.startDate)
-        break
-      case 'IQAMA Renewals':
-        updatable.expiryDate = new Date(updatable.expiryDate)
-        break
-      case 'Insurance Renewals':
-        updatable.insuranceStartDate = new Date(updatable.insuranceStartDate)
-        updatable.insuranceEndDate = new Date(updatable.insuranceEndDate)
-        break
-      case 'Purchase Order':
-        updatable.poIssueDate = new Date(updatable.poIssueDate)
-        updatable.poEndDate = new Date(updatable.poEndDate)
-        break
-      default:
-        updatable.visaEntryDate = new Date(updatable.visaEntryDate)
-        updatable.visaEndDate = new Date(updatable.visaEndDate)
-        break
-    }
-
-    const updatedData = await FormData.findOneAndUpdate({ id }, updatable, { new: true }).exec();
+    const updatedData = await FormData.findOneAndUpdate({ id }, updateData, { new: true }).exec();
     return this.validateFormData(updatedData);
   }
 

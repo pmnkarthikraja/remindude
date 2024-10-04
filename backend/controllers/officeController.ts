@@ -31,7 +31,30 @@ class FormDataController {
 
   async update(req: Request, res: Response): Promise<Response> {
     try {
-      const updatedFormData = await FormDataService.updateFormData(req.params.id, req.body);
+        let updatable = {...req.body}
+        switch (updatable.category){
+          case 'Agreements':
+            updatable.endDate= new Date(updatable.endDate)
+            updatable.startDate = new Date(updatable.startDate)
+            break
+          case 'IQAMA Renewals':
+            updatable.expiryDate = new Date(updatable.expiryDate)
+            break
+          case 'Insurance Renewals':
+            updatable.insuranceStartDate = new Date(updatable.insuranceStartDate)
+            updatable.insuranceEndDate = new Date(updatable.insuranceEndDate)
+            break
+          case 'Purchase Order':
+            updatable.poIssueDate = new Date(updatable.poIssueDate)
+            updatable.poEndDate = new Date(updatable.poEndDate)
+            break
+          default:
+            updatable.visaEntryDate = new Date(updatable.visaEntryDate)
+            updatable.visaEndDate = new Date(updatable.visaEndDate)
+            break
+        }
+    
+      const updatedFormData = await FormDataService.updateFormData(req.params.id, updatable);
       return res.status(200).json(updatedFormData);
     } catch (error:any) {
       return res.status(400).json({ error: error.message });
