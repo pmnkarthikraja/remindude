@@ -22,7 +22,8 @@ class FormDataController {
 
   async getAll(req: Request, res: Response): Promise<Response> {
     try {
-      const formDataList = await FormDataService.getAllFormData();
+      const email = req.params.email
+      const formDataList = await FormDataService.getAllFormData(email);
       return res.status(200).json(formDataList);
     } catch (error:any) {
       return res.status(500).json({ error: error.message });

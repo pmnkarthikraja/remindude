@@ -11,9 +11,9 @@ class FormDataRepository {
     return this.validateFormData(data);
   }
 
-  async readAll(): Promise<FormDataType[]> {
+  async readAll(email:string): Promise<FormDataType[]> {
     const data = await FormData.find({}).exec();
-    const formdata= data.map(this.validateFormData).filter(r=>r!=null);
+    const formdata= data.map(this.validateFormData).filter(e=>e!=null).filter(r=>r.email==email);
     return formdata
   }
 

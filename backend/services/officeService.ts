@@ -23,9 +23,9 @@ class FormDataService {
     }
   }
 
-  async getAllFormData(): Promise<FormDataType[]> {
+  async getAllFormData(email:string): Promise<FormDataType[]> {
     try {
-      const data = await FormDataRepository.readAll();
+      const data = await FormDataRepository.readAll(email);
       return data;
     } catch (error:any) {
       throw new Error(`Error retrieving all FormData: ${error.message}`);

@@ -4,6 +4,7 @@ import mongoose, { Schema } from 'mongoose';
 // Base Interface for FormData
 export interface BaseFormData extends Document {
   id: string;
+  email:string;
   category: 'Agreements' | 'Purchase Order' | 'Visa Details' | 'IQAMA Renewals' | 'Insurance Renewals';
   remarks?: string;
   wantsCustomReminders: boolean;
@@ -62,6 +63,7 @@ export type FormData = Agreements | PurchaseOrder | VisaDetails | IQAMARenewals 
 // Base schema with common fields
 const baseFormDataSchema = new Schema<BaseFormData>({
   id: { type: String, required: true },
+  email: {type:String,required:true},
   category: { 
     type: String, 
     required: true, 
