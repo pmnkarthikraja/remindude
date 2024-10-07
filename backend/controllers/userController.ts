@@ -233,8 +233,13 @@ class UserController {
         const user = await UserSchema.findOneAndUpdate(
           { email }, 
           { userName, profilePicture },
-      );        
-      res.status(201).json({message:"successfully user profile updated",success:true,user})
+          {new: true}
+      );     
+      if (!user) {
+        res.status(404).json({ message: 'User not found', success: false });
+        return
+    }   
+      res.status(201).json({message:"successfully user profile updated with plain request",success:true,user})
       }catch(err:any){
         if (err instanceof DBErrUserNotFound){
           res.status(404).json({ message: err.name, success: false });
