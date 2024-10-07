@@ -16,6 +16,7 @@ router.post('/send-otp', UserController.sendOTP);
 router.post('/verify-otp', UserController.verifyOTP);
 router.post('/delete-user-account', UserController.deleteUserAccount);
 router.put('/update-user',upload.single('profilePicture'), UserController.updateUser);
+router.put('/update-user-plain', UserController.updateUserPlain);
 router.put('/reset-password', UserController.resetPassword);
 router.post('/validate-password',UserController.validatePassword)
 

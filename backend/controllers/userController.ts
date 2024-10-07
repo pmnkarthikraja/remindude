@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserModel } from "../models/UserModel";
+import UserSchema,{ UserModel } from "../models/UserModel";
 import userRepo from "../repo/userRepo";
 import UserService from "../services/userService";
 import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, DBErrTaskNotFound, DBErrTokenExpired, DBErrUserAlreadyExist, DBErrUserNotFound, DBErrUserSignedUpWithGoogle } from "../utils/handleErrors";
@@ -215,6 +215,27 @@ class UserController {
         const file = req.file 
         const {user} =await UserService.UpdateUser(email,userName,file,isProfilePicSet)
         res.status(201).json({message:"successfully user profile updated",success:true,user})
+      }catch(err:any){
+        if (err instanceof DBErrUserNotFound){
+          res.status(404).json({ message: err.name, success: false });
+        }else if (err instanceof DBErrInternal) {
+          res.status(500).json({ message: err.name, success: false });
+        } else {
+          res.status(500).json({ message: `An unexpected error occurred: ${err}`, success: false });
+        }
+        
+      }
+    }
+
+    public async updateUserPlain(req:Request,res:Response):Promise<void>{
+      try{
+        const {userName,email,profilePicture}=req.body
+        const user = await UserSchema.findOneAndUpdate(
+          { email }, 
+          { userName, profilePicture },
+          { new: true, upsert: true }
+      );        
+      res.status(201).json({message:"successfully user profile updated",success:true,user})
       }catch(err:any){
         if (err instanceof DBErrUserNotFound){
           res.status(404).json({ message: err.name, success: false });
