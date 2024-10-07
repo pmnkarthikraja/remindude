@@ -233,7 +233,6 @@ class UserController {
         const user = await UserSchema.findOneAndUpdate(
           { email }, 
           { userName, profilePicture },
-          { new: true, upsert: true }
       );        
       res.status(201).json({message:"successfully user profile updated",success:true,user})
       }catch(err:any){
