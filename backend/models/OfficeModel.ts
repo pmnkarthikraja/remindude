@@ -62,7 +62,17 @@ export interface InsuranceRenewals extends BaseFormData {
   value: string;   //consider this is the total insurance value
 }
 
-export type FormData = Agreements | PurchaseOrder | VisaDetails | IQAMARenewals | InsuranceRenewals;
+export interface HouseRentalRenewal {
+  category: 'House Rental Renewal';
+  houseOwnerName:string,
+  location:string,
+  consultantName:string,
+  startDate:Date,
+  endDate:Date,
+  rentAmount:string,  
+}
+
+export type FormData = Agreements | PurchaseOrder | VisaDetails | IQAMARenewals | InsuranceRenewals | HouseRentalRenewal;
 
 // Base schema with common fields
 const baseFormDataSchema = new Schema<BaseFormData>({
@@ -71,7 +81,7 @@ const baseFormDataSchema = new Schema<BaseFormData>({
   category: { 
     type: String, 
     required: true, 
-    enum: ['Agreements', 'Purchase Order', 'Visa Details', 'IQAMA Renewals', 'Insurance Renewals'] 
+    enum: ['Agreements', 'Purchase Order', 'Visa Details', 'IQAMA Renewals', 'Insurance Renewals', 'House Rental Renewal'] 
   },
   remarks: { type: String },
   wantsCustomReminders: { type: Boolean, required: true },
@@ -128,6 +138,15 @@ const insuranceRenewalsSchema = new Schema({
   childrenInsuranceValues: [{ type: String, required: false }]
 });
 
+const houseRentalRenewalSchema = new Schema({
+  houseOwnerName:{ type: String, required: true },
+  location: { type: String, required: true },
+  consultantName: { type: String, required: true },
+  rentAmount: {type: String, required:true},
+  startDate: { type: Date, required:true},
+  endDate: {type: Date, required: true},
+})
+
 const FormData = mongoose.model<BaseFormData>('FormData', baseFormDataSchema);
 
 FormData.discriminator('Agreements', agreementsSchema);
@@ -135,5 +154,6 @@ FormData.discriminator('Purchase Order', purchaseOrderSchema);
 FormData.discriminator('Visa Details', visaDetailsSchema);
 FormData.discriminator('IQAMA Renewals', iqamaRenewalsSchema);
 FormData.discriminator('Insurance Renewals', insuranceRenewalsSchema);
+FormData.discriminator('House Rental Renewal', houseRentalRenewalSchema);
 
 export default FormData as Model<BaseFormData>;
