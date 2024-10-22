@@ -62,7 +62,7 @@ export interface InsuranceRenewals extends BaseFormData {
   value: string;   //consider this is the total insurance value
 }
 
-export interface HouseRentalRenewal {
+export interface HouseRentalRenewal extends BaseFormData {
   category: 'House Rental Renewal';
   houseOwnerName:string,
   location:string,

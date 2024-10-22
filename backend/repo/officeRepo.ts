@@ -1,4 +1,4 @@
-import FormData, { FormData as FormDataType, Agreements, PurchaseOrder, VisaDetails, IQAMARenewals, InsuranceRenewals } from '../models/OfficeModel'; 
+import FormData, { FormData as FormDataType, Agreements, PurchaseOrder, VisaDetails, IQAMARenewals, InsuranceRenewals, HouseRentalRenewal } from '../models/OfficeModel'; 
 
 class FormDataRepository {
   async create(formData: FormDataType): Promise<FormDataType> {
@@ -41,6 +41,8 @@ class FormDataRepository {
         return data as IQAMARenewals;
       case 'Insurance Renewals':
         return data as InsuranceRenewals;
+      case 'House Rental Renewal':
+        return data as HouseRentalRenewal;
       default:
         throw new Error('Invalid category');
     }
