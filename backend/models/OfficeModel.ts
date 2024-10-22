@@ -5,7 +5,7 @@ import mongoose, { Schema } from 'mongoose';
 export interface BaseFormData extends Document {
   id: string;
   email:string;
-  category: 'Agreements' | 'Purchase Order' | 'Visa Details' | 'IQAMA Renewals' | 'Insurance Renewals';
+  category: 'Agreements' | 'Purchase Order' | 'Visa Details' | 'IQAMA Renewals' | 'Insurance Renewals' | 'House Rental Renewal';
   remarks?: string;
   wantsCustomReminders: boolean;
   customReminderDates: Date[];
