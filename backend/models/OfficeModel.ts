@@ -10,6 +10,7 @@ export interface BaseFormData extends Document {
   wantsCustomReminders: boolean;
   customReminderDates: Date[];
   reminderDates: Date[];
+  completed:boolean
 }
 
 // Specific Interfaces for each category
@@ -55,7 +56,10 @@ export interface InsuranceRenewals extends BaseFormData {
   insuranceEndDate: Date;
   insuranceCompany: string;
   insuranceCategory: string;
-  value: string;
+  employeeInsuranceValue: string;  
+  spouseInsuranceValue?: string;    
+  childrenInsuranceValues?: string[]; //upto 4 childrens
+  value: string;   //consider this is the total insurance value
 }
 
 export type FormData = Agreements | PurchaseOrder | VisaDetails | IQAMARenewals | InsuranceRenewals;
@@ -71,6 +75,7 @@ const baseFormDataSchema = new Schema<BaseFormData>({
   },
   remarks: { type: String },
   wantsCustomReminders: { type: Boolean, required: true },
+  completed: { type: Boolean, required: true },
   customReminderDates: [{ type: Date }],
   reminderDates: [{ type: Date }]
 }, { discriminatorKey: 'category', timestamps: true });
@@ -117,7 +122,10 @@ const insuranceRenewalsSchema = new Schema({
   insuranceEndDate: { type: Date, required: true },
   insuranceCompany: { type: String, required: true },
   insuranceCategory: { type: String, required: true },
-  value: { type: String, required: true }
+  value: { type: String, required: true },
+  employeeInsuranceValue: { type: String, required: true },
+  spouseInsuranceValue: { type: String, required: false },  
+  childrenInsuranceValues: [{ type: String, required: false }]
 });
 
 const FormData = mongoose.model<BaseFormData>('FormData', baseFormDataSchema);
