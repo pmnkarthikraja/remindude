@@ -1,9 +1,10 @@
 import { MongoError } from 'mongodb';
 import UserSchema, { UserModel } from '../models/UserModel';
-import { DBErrInternal, DBErrTaskNotFound, DBErrUserAlreadyExist, DBErrUserNotFound } from '../utils/handleErrors';
+import { DBErrInternal, DBErrUserAlreadyExist, DBErrUserNotFound } from '../utils/handleErrors';
 
 interface UserRepo {
     findOneByEmail: (email: string) => Promise<UserModel | null>;
+    findAll: ()=>Promise<UserModel[] | null>;
     findOneById: (id: string) => Promise<UserModel | null>;
     SignUp: (user: UserModel) => Promise<UserModel>;
     UpdateUser: (email: string, userName: string, profilePicture: string, isProfilePicSet: string) => Promise<UserModel | null>;
@@ -22,6 +23,10 @@ class UserRepoClass implements UserRepo {
             query = { googleId };
         }
         return await UserSchema.findOne(query)
+    }
+
+    async findAll():Promise<UserModel[] | null>{
+        return await UserSchema.find({})
     }
 
     async findOneById(id: string): Promise<UserModel | null> {

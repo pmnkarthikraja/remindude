@@ -7,6 +7,19 @@ import { DBErrCredentialsMismatch, DBErrInternal, DBErrOTPUserSignedUpByGoogle, 
 let inMemoryOTP:Map<string,string>=new Map()
 
 class UserController {
+    public async getAllUsers(req:Request,res:Response):Promise<void>{
+      try {
+        const users =await  userRepo.findAll()
+        res.status(200).json({
+          users:users,
+          success:true,
+          message:"Successfully retrieved all users"
+        })
+      }catch(err:any){
+        res.status(500).json({message:'An unexpected error occured',success:false})
+      }
+    }
+
     public async signUpEmail(req: Request, res: Response): Promise<void> {
       const { userName, email, password } = req.body;
       

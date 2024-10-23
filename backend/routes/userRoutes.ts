@@ -19,6 +19,7 @@ router.put('/update-user',upload.single('profilePicture'), UserController.update
 router.put('/update-user-plain',upload.none() ,UserController.updateUserPlain);
 router.put('/reset-password', UserController.resetPassword);
 router.post('/validate-password',UserController.validatePassword)
+router.get('/get-users',UserController.getAllUsers)
 
 export default router;
 
