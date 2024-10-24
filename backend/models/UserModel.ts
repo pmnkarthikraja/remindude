@@ -12,7 +12,7 @@ export interface UserModel extends Document{
     email:string,
     password:string,
     googleId:string,
-    profilePicture:string
+    profilePicture:string,
 }
 
 const UserSchema = new Schema({
