@@ -1,11 +1,12 @@
 import FormDataRepository from '../repo/officeRepo';
-import FormModel,{ Agreements, FormData as FormDataType, HouseRentalRenewal, InsuranceRenewals, IQAMARenewals, PurchaseOrder, VisaDetails } from '../models/OfficeModel';
+import FormModel, { Agreements, FormData as FormDataType, HouseRentalRenewal, InsuranceRenewals, IQAMARenewals, PurchaseOrder, VisaDetails } from '../models/OfficeModel';
 import admin from 'firebase-admin';
 import userRepo from '../repo/userRepo';
-import {v4} from 'uuid'
+import fcmTokenRepo from '../repo/fcmTokenRepo';
+import { v4 } from 'uuid'
 
 
-function translate(data:any):FormDataType{
+function translate(data: any): FormDataType {
   switch (data.category) {
     case 'Agreements':
       return data as Agreements;
@@ -31,39 +32,44 @@ class FormDataService {
       const createdData = await FormDataRepository.create(formData);
       //do all the stuff
       if (formData.assignedTo) {
-        const newData = {...formData, assignedBy:formData.email, assignedTo:undefined, email: formData.assignedTo.email, id: v4()}
+        const newData = { ...formData, assignedBy: formData.email, assignedTo: undefined, email: formData.assignedTo.email, id: v4() }
         const gotNewData = translate(newData)
 
-        console.log("got new Data: ",gotNewData)
-        
-        const gotnewDataRes = await FormDataRepository.create(gotNewData)
-        
-        console.log("successfully added: ",gotnewDataRes)
+        await FormDataRepository.create(gotNewData)
+
         const gotUser = await userRepo.findOneByEmail(formData.email)
 
         //notify the user.
         //we need to get token from user
         //send push notification with fcm
-        const pixelToken = "cwWdgtpvR4a2WjMa3zFFLG:APA91bFUYoWvo9Wn9L0rdU1hacy3mntzMeeudUH2vkrHjA0MpMftOJf_G9uiYBFi1w0VmkfYQA9vYXVtktc9Ypa5Mx75MmxyrL4aeyZXHT5TdL4bwKgbTq8"
-        const vivoToken = 'dJTPzh4OQmC0tG7c0yaVqk:APA91bHCRtM-0fcar8PDguz9u4wuKSFCQQ7ZHoWchqp-AdJ8QVYcUk49g2xA5ExNMDlFc7UKq6xmgvIh4XNm0IdIaou-h5jWxaVVqKOwKkSExe8Bz2_FHOI'
+        //collect token from fcmToken model
 
-        const notificationPayload = {
-          notification: {
-            title: 'Hi, You have the new message!',
-            body: `${gotUser?.userName} has assigned you the task, ${formData.category}`,
-          },
-          token: pixelToken,
-        };
+        const tokenData = await fcmTokenRepo.getByEmail(formData.assignedTo.email)
 
-        admin.messaging().send(notificationPayload)
-          .then(response => {
-            console.log('Successfully sent message:', response);
-          })
-          .catch(error => {
-            console.error('Error sending message:', error);
+        if (tokenData != null && tokenData.tokens.length > 0) {
+
+            const notificationPromises = tokenData.tokens.map(async (token) => {
+          
+              const notificationPayload = {
+              notification: {
+                title: 'Hi, You have the new message!',
+                body: `${gotUser?.userName} has assigned you the task, ${formData.category}`,
+              },
+              token: token,
+            };
+
+            try{
+              const response =await admin.messaging().send(notificationPayload)
+              console.log('Successfully sent message:', response);
+            }catch(e:any){
+              console.error('Error sending message:', e);
+            }
           });
 
+          await Promise.all(notificationPromises)
+        }
       }
+
       return createdData;
     } catch (error: any) {
       throw new Error(`Error creating FormData: ${error.message}`);
