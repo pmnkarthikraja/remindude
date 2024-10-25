@@ -15,6 +15,7 @@ import userRoutes from './routes/userRoutes';
 import holidayRoutes from './routes/holidayRoutes'
 import masterSwitchRoute from './routes/masterSwitchDataRoute'
 import officeRoutes from './routes/officeRoutes'
+import fcmTokenRoutes from './routes/fcmTokenRoutes'
 
 export const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -43,6 +44,7 @@ app.use('/',taskRoutes)
 app.use('/',holidayRoutes)
 app.use('/',masterSwitchRoute)
 app.use('/',officeRoutes)
+app.use('/',fcmTokenRoutes)
 
 
 admin.initializeApp({
