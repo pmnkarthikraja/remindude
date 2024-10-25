@@ -44,7 +44,7 @@ class FormDataService {
         //notify the user.
         //we need to get token from user
         //send push notification with fcm
-        const pixelToken = 'dGXbsf-7TEukw4tLaUeFu8:APA91bHoPDB7YZNX0Q7fLDdjuEWX6X1xfbPO_g57_-3to-GgkuPxT7NZXnUVBnsflwnn9s5SwArUrZL57ba3NDwchUSqdDlRUOuNkLUQ1QV_tuMCz65P7ME' //pixel phone simulator
+        const pixelToken = "cwWdgtpvR4a2WjMa3zFFLG:APA91bFUYoWvo9Wn9L0rdU1hacy3mntzMeeudUH2vkrHjA0MpMftOJf_G9uiYBFi1w0VmkfYQA9vYXVtktc9Ypa5Mx75MmxyrL4aeyZXHT5TdL4bwKgbTq8"
         const vivoToken = 'dJTPzh4OQmC0tG7c0yaVqk:APA91bHCRtM-0fcar8PDguz9u4wuKSFCQQ7ZHoWchqp-AdJ8QVYcUk49g2xA5ExNMDlFc7UKq6xmgvIh4XNm0IdIaou-h5jWxaVVqKOwKkSExe8Bz2_FHOI'
 
         const notificationPayload = {
@@ -52,7 +52,7 @@ class FormDataService {
             title: 'Hi, You have the new message!',
             body: `${gotUser?.userName} has assigned you the task, ${formData.category}`,
           },
-          token: vivoToken,
+          token: pixelToken,
         };
 
         admin.messaging().send(notificationPayload)
