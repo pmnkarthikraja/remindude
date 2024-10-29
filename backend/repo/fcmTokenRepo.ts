@@ -13,6 +13,15 @@ class FormDataRepository {
     async getByEmail(email:string): Promise<FCMToken | null> {
     return  await FCMTokenModel.findOne({email}).exec();
     }
+
+    async removeToken(email: string | undefined, token: string): Promise<void> {
+        if (email){
+            await FCMTokenModel.updateOne(
+                { email },
+                { $pull: { tokens:token } }
+            ).exec();
+        }
+    }
 }
 
 export default new FormDataRepository()

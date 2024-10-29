@@ -61,7 +61,9 @@ class FormDataService {
             try{
               const response =await admin.messaging().send(notificationPayload)
               console.log('Successfully sent message:', response);
-            }catch(e:any){
+            }catch(e:any){  
+              //token failed or expired
+              await fcmTokenRepo.removeToken(formData.assignedTo?.email, token)
               console.error('Error sending message:', e);
             }
           });
