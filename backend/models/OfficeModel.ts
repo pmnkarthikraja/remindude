@@ -92,6 +92,8 @@ export interface IQAMARenewals extends BaseFormData {
   employeeName: string;
   iqamaNumber: string;
   expiryDate: Date;
+  startDate:Date;
+  endDate:Date
 }
 
 export interface InsuranceRenewals extends BaseFormData {
