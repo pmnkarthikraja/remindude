@@ -122,6 +122,60 @@ class FormDataService {
       throw new Error(`Error deleting FormData: ${error.message}`);
     }
   }
+
+  async bulkCreateOrUpdateOrDeleteFormData(formDataArray:FormDataType[],email:string):Promise<void[]>{
+    const insertedData:FormDataType[]=[];
+    const updatedData:FormDataType[] =[];
+    const idsToDelete: string[] = [];
+
+    const existingData = await FormDataRepository.readAll(email)
+
+    const existingIds = new Set(existingData.map((data) => data.id));
+
+
+    try{
+      for (const formData of formDataArray){
+        if (formData.id){
+          const existingRecord = existingData.find((data) => data.id === formData.id);
+
+          if (existingRecord) {
+            updatedData.push(formData); // Mark as update
+            existingIds.delete(formData.id); // Remove the ID from the set, as it's being updated
+          } else {
+            insertedData.push(formData); // Mark as new
+          }
+        }else{
+          insertedData.push(formData)
+        }
+      }
+
+      idsToDelete.push(...existingIds);
+
+
+      const insertPromises = insertedData.map(async (data)=>{
+        await this.createFormData(data)
+      })
+
+      const updatePromises = updatedData.map(async (data)=>{
+        await this.updateFormData(data.id,data)
+      })
+
+      const deletePromises = idsToDelete.map(async (id) => {
+        await this.deleteFormData(id);
+      });
+
+      const [insertResults,updateResults,deleteResults]=await Promise.all([
+        Promise.all(insertPromises),
+        Promise.all(updatePromises),
+        Promise.all(deletePromises),
+      ])
+      return [...insertResults, ...updateResults,...deleteResults];
+
+    }catch(error:any){
+      throw new Error(`Error processing bulk operation: ${error.message}`);
+    }
+
+  }
 }
 
 export default new FormDataService();
